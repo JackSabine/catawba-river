@@ -8,7 +8,14 @@ module tb_top;
     logic clk = 1'b0;
     reset_if rst_if(clk);
 
+    pipe_icache_if icache_if();
+
     // Dut instantiation
+    pipeline dut(
+        .clk(clk),
+        .rst_if(rst_if),
+        .icache_if(icache_if)
+    );
 
     initial begin
         @(posedge clk_enabled);

@@ -3,47 +3,42 @@
 module execute import catawba_types::*; #(
     parameter XLEN = 32
 ) (
-    input logic [XLEN-1:0] read_port_data_1,
-    input logic [XLEN-1:0] read_port_data_2,
-    input logic [XLEN-1:0] immediate,
-    input logic [XLEN-1:0] next_pc,
+    input logic clk,
 
-    input logic alu_use_pc,
-    input logic alu_use_imm,
-    input alu_operation_e alu_operation,
-    input branch_alu_operation_e branch_alu_operation,
-
-    input logic is_branch_inst,
-
-    output logic take_branch,
-    output logic [XLEN-1:0] alu_output,
-    output logic [XLEN-1:0] read_port_data_for_memory
+    decode_execute_if.ex de_if,
+    execute_memory_if.ex mem_if
 );
 
-logic [XLEN-1:0] alu_operand_a, alu_operand_b;
-logic branch_alu_result;
+    logic [XLEN-1:0] alu_result;
+    logic [XLEN-1:0] alu_operand_a, alu_operand_b;
+    logic branch_alu_result;
 
-assign alu_operand_a = alu_use_pc ? next_pc : read_port_data_1;
-assign alu_operand_b = alu_use_imm ? immediate : read_port_data_2;
+    assign alu_operand_a = de_if.a_use_pc ? de_if.next_pc : de_if.rs1_word;
+    assign alu_operand_b = de_if.b_use_imm ? de_if.immediate : de_if.rs2_word;
 
-alu #(
-    .XLEN(XLEN)
-) alu (
-    .operand_a(alu_operand_a),
-    .operand_b(alu_operand_b),
-    .operation(alu_operation),
-    .result(alu_output)
-);
+    alu #(
+        .XLEN(XLEN)
+    ) alu (
+        .operand_a(alu_operand_a),
+        .operand_b(alu_operand_b),
+        .operation(de_ex_if.alu_operation),
+        .result(alu_result)
+    );
 
-branch_alu branch_alu (
-    .operand_a(read_port_data_1),
-    .operand_b(read_port_data_2),
-    .branch_type(branch_alu_operation),
-    .result(branch_alu_result)
-);
+    branch_alu branch_alu (
+        .operand_a(de_if.rs1_word),
+        .operand_b(de_if.rs2_word),
+        .operation(de_if.branch_alu_operation),
+        .result(branch_alu_result)
+    );
 
-assign take_branch = is_branch_inst && branch_alu_result;
+    assign take_branch = de_if.is_branch_inst && branch_alu_result;
 
-assign read_port_data_for_memory = read_port_data_2;
+    always_ff @(posedge clk) begin
+        mem_if.rs2_word <= de_if.rs2_word;
+        mem_if.alu_result <= alu_result;
+
+        mem_if.instruction <= de_if.instruction;
+    end
 
 endmodule
