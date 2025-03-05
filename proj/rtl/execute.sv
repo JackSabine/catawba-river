@@ -1,6 +1,6 @@
 `include "macros.svh"
 
-module execute import xentry_pkg::*; #(
+module execute import catawba_types::*; #(
     parameter XLEN = 32
 ) (
     input wire [XLEN-1:0] read_port_data_1,

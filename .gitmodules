@@ -1,0 +1,3 @@
+[submodule "proj/scripts/qsim"]
+	path = proj/scripts/qsim
+	url = git@github.com:JackSabine/qsim.git

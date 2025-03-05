@@ -1,4 +1,4 @@
-module alu import xentry_pkg::*; #(
+module alu import catawba_types::*; #(
     parameter XLEN = 32
 ) (
     input wire [XLEN-1:0] operand_a,

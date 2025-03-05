@@ -1,3 +1,0 @@
-${RTL_ROOT}/execute.sv
-${RTL_ROOT}/register_file.sv
-${RTL_ROOT}/alu.sv

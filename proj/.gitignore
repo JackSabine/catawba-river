@@ -1,2 +1,4 @@
 work
 synth/*
+__pycache__
+.vscode/settings.json

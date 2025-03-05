@@ -14,61 +14,115 @@
 # | * Makefile (this file!)
 # | * project.sh
 
-.ONESHELL:
+.DEFAULT_GOAL := all
 
-.DEFAULT_GOAL := sim
-
-ifndef PROJECT_ROOT
+ifndef WORKAREA
   $(error You must define the project root by sourcing project.sh)
 endif
 
-# UVM_HOME    := $(HOME)/Documents/1800.2-2020-1.1
+NPROCS = $(shell grep -c 'processor' /proc/cpuinfo)
+MAKEFLAGS += -j$(NPROCS)
 
-# UVM_COMPILE_OPTIONS     := +incdir+$(UVM_HOME)/src -l $(WORK_DIR)/uvm_1_1 $(UVM_HOME)/src/uvm_pkg.sv
-# UVM_SIMULATION_OPTIONS  := +UVM_VERBOSITY=UVM_HIGH +UVM_TESTNAME=$(t)
+####################################################################
+# Manual configure
 
-WORKDIR := $(PROJECT_ROOT)/work
+# DPI-C Modules/Filenames
+DPIC_SOURCES := get_environment_variable
+
+# UVM Verbosity
+v = UVM_LOW
+
+# xsim random number generation
+RANDOM_NUMBER = $(shell shuf -i 0-4294967296 -n 1)
+s = $(RANDOM_NUMBER)
+
+# TB specification
+TB_TOP := tb_top
+
+# Provide files to compile (must be added below)
+include $(RTL_ROOT)/file_list.mk
+include $(DV_ROOT)/file_list.mk
+
+####################################################################
+# Output directory configuration
+WORK := work
+WORKDIR := $(WORKAREA)/$(WORK)
+
+####################################################################
+# DPI-C compilation settings
+CC := xsc
+
+SEARCH := -B/usr/lib/x86_64-linux-gnu
+CFLAGS := $(addprefix --gcc_compile_options ",$(addsuffix ",$(INC) $(LIB) $(SEARCH)))
+
+# Auto-generate shared object paths
+DPIC_SHARED_OBJECTS := $(addsuffix .so,$(addprefix $(WORKDIR)/,$(DPIC_SOURCES)))
+
+# Auto-generate shared object arg for XELAB
+DPIC_SV_LIB_FLAGS := $(addprefix -sv_lib ,$(DPIC_SOURCES))
+
+####################################################################
+# HDL compilation/elaboration/simulation settings
+
+# UVM flags
+UVM_XVLOG_FLAGS := -L uvm
+UVM_XELAB_FLAGS := -L uvm
+
+# Other/non-UVM flags
 XVLOG_FLAGS := --sv --incr --include $(DV_ROOT)/svtb --include $(DV_ROOT)/tests
+XELAB_FLAGS := --timescale=1ns/1ns --override_timeprecision $(DPIC_SV_LIB_FLAGS)
 
-COMPILE_LIST += -f $(DV_ROOT)/svtb/file_list
-COMPILE_LIST += -f $(RTL_ROOT)/file_list
-COMPILE_LIST += -f $(DV_ROOT)/tests/file_list
+# Compilation/dependency list for xvlog
+SRC_FILES_RTL_ABS_PATH := $(addprefix $(RTL_ROOT)/,$(SRC_FILES_RTL))
+SRC_FILES_DV_ABS_PATH := $(addprefix $(DV_ROOT)/,$(SRC_FILES_DV))
 
-TB_TOP := no_test
+COMPILE_LIST += ${DV_ROOT}/svtb/catawba_types.sv
+COMPILE_LIST += $(SRC_FILES_RTL_ABS_PATH)
+COMPILE_LIST += $(SRC_FILES_DV_ABS_PATH)
 
-# (c)ompile (o)nly
-.PHONY: co
-co: | work
-	cd $(WORKDIR)
-	xvlog $(COMPILE_LIST) $(XVLOG_FLAGS)
-	xelab -top $(TB_TOP) -snapshot $(TB_TOP)_snapshot -debug all
+HDL_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "*.sv" -o -name "*.svh" -o -name "*.mk" \))
 
-# (s)im (o)nly
-.PHONY: so
-so: | work
-	cd $(WORKDIR)
-	xsim $(TB_TOP)_snapshot -tclbatch $(PROJECT_ROOT)/xsim_cfg.tcl
+####################################################################
+# Vivado output/rule aliases
+XVLOG_WORK_FILE = $(WORKDIR)/xsim.dir/$(WORK)/$(WORK).rlx
+XSIM_BINARY = $(WORKDIR)/xsim.dir/$(TB_TOP)_snapshot/xsimk
 
-.PHONY: sim
-sim: co so
+####################################################################
+# Rules
+
+$(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
+	@echo "----- Compiling DPI-C -----"
+	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
+
+$(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) | $(WORKDIR)
+	@echo "----- Compiling HDL -----"
+	cd $(WORKDIR) && xvlog $(UVM_XVLOG_FLAGS) $(COMPILE_LIST) $(XVLOG_FLAGS)
+
+$(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE)
+	@echo "----- Elaborating HDL -----"
+	cd $(WORKDIR) && xelab -top $(TB_TOP) -snapshot $(TB_TOP)_snapshot -debug all $(UVM_XELAB_FLAGS) $(XELAB_FLAGS)
+
+.PHONY: all
+all: $(XSIM_BINARY)
+	@echo "----- Compilation complete -----"
 
 .PHONY: waves
-waves: | work
-	cd $(WORKDIR)
-	xsim --gui $(TB_TOP)_snapshot.wdb
+waves: | $(WORKDIR)
+	@echo "----- Opening waves -----"
+	@if [ -f $(TB_TOP)_snapshot.wcfg ]; then \
+		cp $(TB_TOP)_snapshot.wcfg $(WORKDIR); \
+	fi
+	cd $(WORKDIR) && xsim -autoloadwcfg --gui $(TB_TOP)_snapshot.wdb &
 
-.PHONY: work
-work:
-	mkdir $(WORKDIR)
+$(WORKDIR):
+	@mkdir $(WORKDIR)
 
 .PHONY: clean
 clean:
-	rm -rf $(WORKDIR)
+	@rm -rf $(WORKDIR)
 
-
-# compile_UVM: env
-#   @vlog $(UVM_COMPILE_OPTIONS) $(COMPILE_LIST) -source
-
-# simc_UVM:
-#   @echo "TEST is $(t)"
-#   vsim $(UVM_SIMULATION_OPTIONS) $(TOP_MODULE)
+.PHONY: help
+help:
+	@echo "#### RULES ####"
+	@echo "* all - compile with xvlog and xelab"
+	@echo "* waves - show most recent simulation in waveform"
