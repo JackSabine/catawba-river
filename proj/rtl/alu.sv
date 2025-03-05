@@ -1,8 +1,8 @@
 module alu import catawba_types::*; #(
     parameter XLEN = 32
 ) (
-    input wire [XLEN-1:0] operand_a,
-    input wire [XLEN-1:0] operand_b,
+    input logic [XLEN-1:0] operand_a,
+    input logic [XLEN-1:0] operand_b,
     input alu_operation_e operation,
 
     output logic [XLEN-1:0] result
