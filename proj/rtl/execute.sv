@@ -25,7 +25,9 @@ module execute import catawba_types::*; #(
         .result(alu_result)
     );
 
-    branch_alu branch_alu (
+    branch_alu #(
+        .XLEN(XLEN)
+    ) branch_alu (
         .operand_a(de_if.rs1_word),
         .operand_b(de_if.rs2_word),
         .operation(de_if.branch_alu_operation),

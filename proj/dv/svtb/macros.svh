@@ -6,5 +6,6 @@
 `define BYTE        (8)
 `define NUM_REGS    (32)
 `define REG_BITS    ($clog2(`NUM_REGS))
+`define OPC_BITS    (7)
 
 `endif

@@ -1,5 +1,7 @@
+`include "macros.svh"
+
 package catawba_types;
-    typedef enum logic[1:0] {BYTE = 2'b01, HALF = 2'b00, WORD = 2'b10} Mem_OpSize_e;
+    typedef enum logic[1:0] {BYTE = 2'b11, HALF = 2'b10, WORD = 2'b00} Mem_OpSize_e;
 
     typedef enum logic[3:0] {
         ADD = 4'b0000,
@@ -38,54 +40,54 @@ package catawba_types;
     typedef union packed {
         struct packed {
             logic [6:0] funct7;
-            logic [4:0] rs2;
-            logic [4:0] rs1;
+            logic [`REG_BITS-1:0] rs2;
+            logic [`REG_BITS-1:0] rs1;
             logic [2:0] funct3;
-            logic [4:0] rd;
-            logic [6:0] opcode;
+            logic [`REG_BITS-1:0] rd;
+            logic [`OPC_BITS-1:0] opcode;
         } common;
 
         struct packed {
             logic [6:0] funct7;
-            logic [4:0] rs2;
-            logic [4:0] rs1;
+            logic [`REG_BITS-1:0] rs2;
+            logic [`REG_BITS-1:0] rs1;
             logic [2:0] funct3;
-            logic [4:0] rd;
-            logic [6:0] opcode;
+            logic [`REG_BITS-1:0] rd;
+            logic [`OPC_BITS-1:0] opcode;
         } r_type;
 
         struct packed {
             logic [11:0] imm;
-            logic [4:0] rs1;
+            logic [`REG_BITS-1:0] rs1;
             logic [2:0] funct3;
-            logic [4:0] rd;
-            logic [6:0] opcode;
+            logic [`REG_BITS-1:0] rd;
+            logic [`OPC_BITS-1:0] opcode;
         } i_type;
 
         struct packed {
             logic [6:0] imm_11_5;
-            logic [4:0] rs2;
-            logic [4:0] rs1;
+            logic [`REG_BITS-1:0] rs2;
+            logic [`REG_BITS-1:0] rs1;
             logic [2:0] other2;
             logic [4:0] imm_4_0;
-            logic [6:0] opcode;
+            logic [`OPC_BITS-1:0] opcode;
         } s_type;
 
         struct packed {
             logic imm_12;
             logic [5:0] imm_10_5;
-            logic [4:0] rs2;
-            logic [4:0] rs1;
+            logic [`REG_BITS-1:0] rs2;
+            logic [`REG_BITS-1:0] rs1;
             logic [2:0] funct3;
             logic [3:0] imm_4_1;
             logic imm_11;
-            logic [6:0] opcode;
+            logic [`OPC_BITS-1:0] opcode;
         } b_type;
 
         struct packed {
             logic [19:0] imm_31_12;
-            logic [4:0] rd;
-            logic [6:0] opcode;
+            logic [`REG_BITS-1:0] rd;
+            logic [`OPC_BITS-1:0] opcode;
         } u_type;
 
         struct packed {
@@ -93,8 +95,8 @@ package catawba_types;
             logic [9:0] imm_10_1;
             logic imm_11;
             logic [7:0] imm_19_12;
-            logic [4:0] rd;
-            logic [6:0] opcode;
+            logic [`REG_BITS-1:0] rd;
+            logic [`OPC_BITS-1:0] opcode;
         } j_type;
     } instruction_t;
 
