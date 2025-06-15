@@ -5,6 +5,7 @@ module execute import catawba_types::*; #(
 ) (
     input logic clk,
 
+    fetch_execute_if.ex fe_if,
     decode_execute_if.ex de_if,
     execute_memory_if.ex mem_if
 );
@@ -34,7 +35,8 @@ module execute import catawba_types::*; #(
         .result(branch_alu_result)
     );
 
-    assign take_branch = de_if.is_branch_inst && branch_alu_result;
+    assign fe_if.take_branch = de_if.is_branch_inst && branch_alu_result;
+    assign fe_if.branch_target_pc = de_if.next_pc + de_if.immediate;
 
     always_ff @(posedge clk) begin
         mem_if.rs2_word <= de_if.rs2_word;
