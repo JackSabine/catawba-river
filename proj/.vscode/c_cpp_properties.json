@@ -3,11 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "/opt/Xilinx/Vivado/2024.1/data/xsim/include",
-                "/usr/lib/gcc/x86_64-linux-gnu/11/include"
+                "/opt/Xilinx/Vivado/2024.2/data/xsim/include",
+                "/usr/lib/gcc/x86_64-linux-gnu/13/include"
             ],
             "defines": ["__linux"],
-            "compilerPath": "/opt/Xilinx/Vivado/2024.1/bin/xsc",
+            "compilerPath": "/opt/Xilinx/Vivado/2024.2/bin/xsc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"
