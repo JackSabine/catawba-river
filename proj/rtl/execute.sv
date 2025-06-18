@@ -37,6 +37,7 @@ module execute import catawba_types::*; #(
 
     assign fe_if.take_branch = de_if.is_branch_inst && branch_alu_result;
     assign fe_if.branch_target_pc = de_if.next_pc + de_if.immediate;
+    assign fe_if.branch_inst_next_pc = de_if.next_pc;
 
     always_ff @(posedge clk) begin
         mem_if.rs2_word <= de_if.rs2_word;

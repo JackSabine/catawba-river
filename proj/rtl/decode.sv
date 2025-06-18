@@ -1,4 +1,6 @@
-module decode import catawba_types::*; #(parameter XLEN = 32) (
+module decode import catawba_types::*; #(
+    parameter XLEN = 32
+) (
     input logic clk,
 
     fetch_decode_if.de fe_if,
