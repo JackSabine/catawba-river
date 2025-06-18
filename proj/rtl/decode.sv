@@ -69,12 +69,16 @@ module decode import catawba_types::*; #(
     always_comb begin
         is_branch_inst = 1'b0;
 
-        unique casez (fe_if.instruction.common.opcode) inside
+        unique casez (fe_if.instruction.common.opcode)
         7'b01100??: begin
             inst_type = R_INST;
             composed_immediate = 'x;
         end
-        7'b00?00??, 7'b11?01??: begin
+        7'b00?00??: begin
+            inst_type = I_INST;
+            composed_immediate = fe_if.instruction.i_type.imm;
+        end
+        7'b11?01??: begin
             inst_type = I_INST;
             composed_immediate = fe_if.instruction.i_type.imm;
         end
