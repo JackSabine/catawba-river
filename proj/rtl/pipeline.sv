@@ -7,6 +7,7 @@ module pipeline (
 );
 
 fetch_decode_if fe_de_if();
+fetch_execute_if fe_ex_if();
 decode_execute_if de_ex_if();
 execute_memory_if ex_mem_if();
 
@@ -14,6 +15,7 @@ fetch fe (
     .clk(clk),
     .rst_if(rst_if),
     .de_if(fe_de_if),
+    .ex_if(fe_ex_if),
     .icache_if(icache_if)
 );
 
@@ -26,6 +28,7 @@ decode de (
 execute ex (
     .clk(clk),
     .de_if(de_ex_if),
+    .fe_if(fe_ex_if),
     .mem_if(ex_mem_if)
 );
 
