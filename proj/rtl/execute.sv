@@ -45,5 +45,4 @@ module execute import catawba_types::*; #(
 
         mem_if.instruction <= de_if.instruction;
     end
-
 endmodule
