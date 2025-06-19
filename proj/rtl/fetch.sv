@@ -7,11 +7,13 @@ module fetch import catawba_types::*; #(
 
     fetch_execute_if.fe ex_if,
     fetch_decode_if.fe de_if,
-    pipe_icache_if.pipe icache_if
+    memory_if.requester icache_if
 );
 
 logic [XLEN-1:0] pc, next_pc, pc_plus_4;
 logic downstream_valid;
+
+instruction_t instruction;
 
 // FSM
 typedef enum logic [0:0] {
@@ -22,7 +24,7 @@ typedef enum logic [0:0] {
 fetch_state_e fe_state, next_fe_state;
 logic current_inst_is_branch;
 
-assign current_inst_is_branch = (icache_if.instruction.common.opcode[6:2] == 5'b11000) & icache_if.rsp_valid;
+assign current_inst_is_branch = (instruction.common.opcode[6:2] == 5'b11000) & icache_if.req_fulfilled;
 
 always_comb begin
     casez (fe_state) 
@@ -34,7 +36,7 @@ always_comb begin
             end
 
             next_pc = pc_plus_4;
-            downstream_valid = icache_if.rsp_valid;
+            downstream_valid = icache_if.req_fulfilled;
         end
 
         STALL_ON_BRANCH: begin
@@ -56,8 +58,6 @@ end
 // End FSM
 
 assign pc_plus_4 = pc + 'd4;
-assign icache_if.pc = pc;
-assign icache_if.req_valid = 1'b1;
 
 always_ff @(posedge clk) begin
     if (rst_if.reset) begin
@@ -70,8 +70,16 @@ always_ff @(posedge clk) begin
         fe_state <= next_fe_state;
     end
 
-    de_if.instruction <= icache_if.instruction;
+    de_if.instruction <= instruction;
     de_if.next_pc <= next_pc;
 end
+
+assign icache_if.req_address = pc;
+assign icache_if.req_operation = LOAD;
+assign icache_if.req_size = WORD;
+assign icache_if.req_store_word = 'x;
+assign icache_if.req_valid = 1'b1;
+
+assign instruction = icache_if.req_loaded_word;
 
 endmodule

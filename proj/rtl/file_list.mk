@@ -1,6 +1,6 @@
 SRC_FILES_RTL = \
 	interfaces/reset_if.sv \
-	interfaces/pipe_icache_if.sv \
+	interfaces/memory_if.sv \
 	interfaces/fetch_decode_if.sv \
 	interfaces/decode_execute_if.sv \
 	interfaces/execute_memory_if.sv \

@@ -3,7 +3,8 @@ module pipeline (
 
     reset_if rst_if,
 
-    pipe_icache_if.pipe icache_if
+    memory_if.requester icache_if,
+    memory_if.requester dcache_if
 );
 
 fetch_decode_if fe_de_if();

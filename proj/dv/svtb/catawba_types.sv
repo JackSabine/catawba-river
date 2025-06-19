@@ -1,7 +1,18 @@
 `include "macros.svh"
 
 package catawba_types;
-    typedef enum logic[1:0] {BYTE = 2'b11, HALF = 2'b10, WORD = 2'b00} Mem_OpSize_e;
+    typedef enum logic[1:0] {
+        BYTE = 2'b00,
+        HALF,
+        WORD
+    } memory_operation_size_e;
+
+    typedef enum logic [1:0] {
+        STORE = 2'b00,
+        LOAD = 2'b01,
+        CLFLUSH = 2'b11,
+        MO_UNKNOWN = 2'bxx
+    } memory_operation_e;
 
     typedef enum logic[3:0] {
         ADD = 4'b0000,
