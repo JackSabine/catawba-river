@@ -23,8 +23,8 @@ module decode import catawba_types::*; #(
     instruction_type_t inst_type;
 
 
-    assign rs1_index = fe_if.instruction[19:15];
-    assign rs2_index = fe_if.instruction[24:20];
+    assign rs1_index = fe_if.instruction.common.rs1;
+    assign rs2_index = fe_if.instruction.common.rs2;
 
     assign rd_index = '0; // Take from WB stage
 
@@ -123,6 +123,7 @@ module decode import catawba_types::*; #(
     end
 
     always_ff @(posedge clk) begin
+        ex_if.valid <= fe_if.valid;
         ex_if.rs1_word <= rs1_word;
         ex_if.rs2_word <= rs2_word;
         ex_if.next_pc <= fe_if.next_pc;
