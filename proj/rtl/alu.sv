@@ -16,9 +16,9 @@ always_comb begin
         OR : result = operand_a | operand_b;
         AND: result = operand_a & operand_b;
 
-        SHIFT_LEFT            : result = operand_a <<  operand_b;
-        SHIFT_RIGHT           : result = operand_a >>  operand_b;
-        SHIFT_RIGHT_ARITHMETIC: result = operand_a >>> operand_b;
+        SHIFT_LEFT            : result = operand_a <<  operand_b[4:0];
+        SHIFT_RIGHT           : result = operand_a >>  operand_b[4:0];
+        SHIFT_RIGHT_ARITHMETIC: result = operand_a >>> operand_b[4:0];
 
         SET_LESS_THAN         : result = $signed(  operand_a) < $signed(  operand_b);
         SET_LESS_THAN_UNSIGNED: result = $unsigned(operand_a) < $unsigned(operand_b);
