@@ -66,7 +66,7 @@ module decode import catawba_types::*; #(
     end
 
     always_comb begin
-        is_mem_inst = fe_if.instruction.common.opcode =?= 7'b00z0011;
+        is_mem_inst = fe_if.instruction.common.opcode =?= 7'b00z00zz;
 
         unique casez (fe_if.instruction.common.opcode)
         7'b01100??: begin
