@@ -2,6 +2,7 @@ module decode import catawba_types::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,
+    reset_if rst_if,
 
     fetch_decode_if.de fe_if,
     decode_execute_if.de ex_if,
@@ -23,6 +24,8 @@ module decode import catawba_types::*; #(
     instruction_kind_t instruction_kind;
     logic is_mem_inst;
 
+    logic scoreboard_stall;
+
 
     assign rs1_index = fe_if.instruction.common.rs1;
     assign rs2_index = fe_if.instruction.common.rs2;
@@ -37,6 +40,23 @@ module decode import catawba_types::*; #(
 
         .read_port_data_1(rs1_word),
         .read_port_data_2(rs2_word)
+    );
+
+    register_scoreboard regscoreboard (
+        .clk(clk),
+        .rst_if(rst_if),
+
+        .de_valid(fe_if.valid),
+
+        .de_instruction_kind(instruction_kind),
+        .de_read_port_select_1(rs1_index),
+        .de_read_port_select_2(rs2_index),
+        .de_write_port_select(fe_if.instruction.common.rd),
+
+        .wb_write_port_select(wb_if.rd),
+        .wb_write_enable(wb_if.write_to_rd),
+
+        .stall(scoreboard_stall)
     );
 
     always_comb begin
@@ -120,5 +140,5 @@ module decode import catawba_types::*; #(
         end
     end
 
-    assign fe_if.stall_upstream = fe_if.valid & (ex_if.stall_upstream);
+    assign fe_if.stall_upstream = fe_if.valid & (ex_if.stall_upstream | scoreboard_stall);
 endmodule

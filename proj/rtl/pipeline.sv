@@ -24,6 +24,7 @@ fetch fe (
 
 decode de (
     .clk(clk),
+    .rst_if(rst_if),
     .fe_if(fe_de_if),
     .ex_if(de_ex_if),
     .wb_if(wb_de_if)
