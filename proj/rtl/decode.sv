@@ -75,42 +75,27 @@ module decode import catawba_types::*; #(
         end
         7'b00?00??: begin
             instruction_kind = I_INST;
-            composed_immediate = fe_if.instruction.i_type.imm; // FIXME needs zero/sign extending
+            composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:20]};
         end
         7'b11?01??: begin
             instruction_kind = I_INST;
-            composed_immediate = fe_if.instruction.i_type.imm; // FIXME needs zero/sign extending
+            composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:20]};
         end
         7'b01000??: begin
             instruction_kind = S_INST;
-            composed_immediate = {fe_if.instruction.s_type.imm_11_5, fe_if.instruction.s_type.imm_4_0}; // FIXME needs zero/sign extending
+            composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:25], fe_if.instruction[11:8], fe_if.instruction[7]};
         end
         7'b11000??: begin
             instruction_kind = B_INST;
-            composed_immediate = { // FIXME needs zero/sign extending
-                fe_if.instruction.b_type.imm_12,
-                fe_if.instruction.b_type.imm_11,
-                fe_if.instruction.b_type.imm_10_5,
-                fe_if.instruction.b_type.imm_4_1,
-                1'b0
-            };
+            composed_immediate = {{20{fe_if.instruction[31]}}, fe_if.instruction[7], fe_if.instruction[30:25], fe_if.instruction[11:8], 1'b0};
         end
         7'b0?101??: begin
             instruction_kind = U_INST;
-            composed_immediate = { // FIXME needs zero/sign extending
-                fe_if.instruction.u_type.imm_31_12,
-                12'b0
-            };
+            composed_immediate = {fe_if.instruction[31:12], 12'b0};
         end
         7'b11011??: begin
             instruction_kind = J_INST;
-            composed_immediate = { // FIXME needs zero/sign extending
-                fe_if.instruction.j_type.imm_20,
-                fe_if.instruction.j_type.imm_19_12,
-                fe_if.instruction.j_type.imm_11,
-                fe_if.instruction.j_type.imm_10_1,
-                1'b0
-            };
+            composed_immediate = {{12{fe_if.instruction[31]}}, fe_if.instruction[19:12], fe_if.instruction[20], fe_if.instruction[30:21], 1'b0};
         end
         default: begin
             instruction_kind = INST_UNDEFINED;
