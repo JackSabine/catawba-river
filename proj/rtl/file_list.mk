@@ -6,10 +6,13 @@ SRC_FILES_RTL = \
 	interfaces/execute_memory_if.sv \
 	interfaces/memory_writeback_if.sv \
 	interfaces/fetch_execute_if.sv \
+	interfaces/writeback_decode_if.sv \
 	branch_alu.sv \
 	alu.sv \
 	execute.sv \
 	register_file.sv \
 	decode.sv \
 	fetch.sv \
+	memory.sv \
+	writeback.sv \
 	pipeline.sv

@@ -1,10 +1,11 @@
 `include "macros.svh"
 
 package catawba_types;
+    // Should agree with the funct3 mapping (excluding signed/unsigned)
     typedef enum logic[1:0] {
         BYTE = 2'b00,
-        HALF,
-        WORD
+        HALF = 2'b01,
+        WORD = 2'b10
     } memory_operation_size_e;
 
     typedef enum logic [1:0] {
@@ -46,7 +47,7 @@ package catawba_types;
         U_INST,
         J_INST,
         INST_UNDEFINED = 'x
-    } instruction_type_t;
+    } instruction_kind_t;
 
     typedef union packed {
         struct packed {
@@ -79,7 +80,7 @@ package catawba_types;
             logic [6:0] imm_11_5;
             logic [`REG_BITS-1:0] rs2;
             logic [`REG_BITS-1:0] rs1;
-            logic [2:0] other2;
+            logic [2:0] funct3;
             logic [4:0] imm_4_0;
             logic [`OPC_BITS-1:0] opcode;
         } s_type;

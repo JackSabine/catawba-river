@@ -35,7 +35,7 @@ module execute import catawba_types::*; #(
         .result(branch_alu_result)
     );
 
-    assign fe_if.take_branch = de_if.is_branch_inst && branch_alu_result;
+    assign fe_if.take_branch = (de_if.instruction_kind == B_INST) & branch_alu_result;
     assign fe_if.branch_target_pc = de_if.next_pc + de_if.immediate;
     assign fe_if.branch_inst_next_pc = de_if.next_pc;
 
@@ -44,5 +44,7 @@ module execute import catawba_types::*; #(
         mem_if.alu_result <= alu_result;
 
         mem_if.instruction <= de_if.instruction;
+        mem_if.instruction_kind <= de_if.instruction_kind;
+        mem_if.is_mem_inst <= de_if.is_mem_inst;
     end
 endmodule
