@@ -11,6 +11,7 @@ SRC_FILES_RTL = \
 	alu.sv \
 	execute.sv \
 	register_file.sv \
+	register_scoreboard.sv \
 	decode.sv \
 	fetch.sv \
 	memory.sv \
