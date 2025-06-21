@@ -17,6 +17,8 @@ interface decode_execute_if #(parameter XLEN = 32);
     logic b_use_imm;
     logic [XLEN-1:0] immediate;
 
+    logic stall_upstream;
+
     modport de (
         output
             valid,
@@ -30,7 +32,9 @@ interface decode_execute_if #(parameter XLEN = 32);
             branch_alu_operation,
             a_use_pc,
             b_use_imm,
-            immediate
+            immediate,
+        input
+            stall_upstream
     );
 
     modport ex (
@@ -46,7 +50,9 @@ interface decode_execute_if #(parameter XLEN = 32);
             branch_alu_operation,
             a_use_pc,
             b_use_imm,
-            immediate
+            immediate,
+        output
+            stall_upstream
     );
 
 endinterface

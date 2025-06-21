@@ -120,17 +120,20 @@ module decode import catawba_types::*; #(
     end
 
     always_ff @(posedge clk) begin
-        ex_if.valid <= fe_if.valid;
-        ex_if.rs1_word <= rs1_word;
-        ex_if.rs2_word <= rs2_word;
-        ex_if.next_pc <= fe_if.next_pc;
-        ex_if.instruction <= fe_if.instruction;
-        ex_if.instruction_kind <= instruction_kind;
-        ex_if.is_mem_inst <= is_mem_inst;
-        ex_if.immediate <= composed_immediate;
-        ex_if.branch_alu_operation <= branch_alu_operation;
-        ex_if.a_use_pc <= a_use_pc;
-        ex_if.b_use_imm <= b_use_imm;
+        if (~ex_if.stall_upstream) begin
+            ex_if.valid <= fe_if.valid;
+            ex_if.rs1_word <= rs1_word;
+            ex_if.rs2_word <= rs2_word;
+            ex_if.next_pc <= fe_if.next_pc;
+            ex_if.instruction <= fe_if.instruction;
+            ex_if.instruction_kind <= instruction_kind;
+            ex_if.is_mem_inst <= is_mem_inst;
+            ex_if.immediate <= composed_immediate;
+            ex_if.branch_alu_operation <= branch_alu_operation;
+            ex_if.a_use_pc <= a_use_pc;
+            ex_if.b_use_imm <= b_use_imm;
+        end
     end
 
+    assign fe_if.stall_upstream = fe_if.valid & (ex_if.stall_upstream);
 endmodule

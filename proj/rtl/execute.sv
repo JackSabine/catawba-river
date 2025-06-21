@@ -40,11 +40,15 @@ module execute import catawba_types::*; #(
     assign fe_if.branch_inst_next_pc = de_if.next_pc;
 
     always_ff @(posedge clk) begin
-        mem_if.rs2_word <= de_if.rs2_word;
-        mem_if.alu_result <= alu_result;
+        if (~mem_if.stall_upstream) begin
+            mem_if.rs2_word <= de_if.rs2_word;
+            mem_if.alu_result <= alu_result;
 
-        mem_if.instruction <= de_if.instruction;
-        mem_if.instruction_kind <= de_if.instruction_kind;
-        mem_if.is_mem_inst <= de_if.is_mem_inst;
+            mem_if.instruction <= de_if.instruction;
+            mem_if.instruction_kind <= de_if.instruction_kind;
+            mem_if.is_mem_inst <= de_if.is_mem_inst;
+        end
     end
+
+    assign de_if.stall_upstream = de_if.valid & (mem_if.stall_upstream);
 endmodule

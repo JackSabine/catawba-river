@@ -11,6 +11,8 @@ interface execute_memory_if #(parameter XLEN = 32);
     instruction_kind_t instruction_kind;
     logic is_mem_inst;
 
+    logic stall_upstream;
+
     modport ex(
         output
             valid,
@@ -18,7 +20,9 @@ interface execute_memory_if #(parameter XLEN = 32);
             rs2_word,
             instruction,
             instruction_kind,
-            is_mem_inst
+            is_mem_inst,
+        input
+            stall_upstream
     );
 
     modport mem(
@@ -28,6 +32,8 @@ interface execute_memory_if #(parameter XLEN = 32);
             rs2_word,
             instruction,
             instruction_kind,
-            is_mem_inst
+            is_mem_inst,
+        output
+            stall_upstream
     );
 endinterface

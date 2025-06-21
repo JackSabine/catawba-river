@@ -62,16 +62,20 @@ assign pc_plus_4 = pc + 'd4;
 always_ff @(posedge clk) begin
     if (rst_if.reset) begin
         pc <= '0;
-        de_if.valid <= 1'b1;
+        de_if.valid <= 1'b0;
         fe_state <= NORMAL_OPERATION;
     end else begin
-        pc <= next_pc;
-        de_if.valid <= downstream_valid;
-        fe_state <= next_fe_state;
+        if (~de_if.stall_upstream) begin
+            pc <= next_pc;
+            de_if.valid <= downstream_valid;
+            fe_state <= next_fe_state;
+        end
     end
 
-    de_if.instruction <= instruction;
-    de_if.next_pc <= next_pc;
+    if (~de_if.stall_upstream) begin
+        de_if.instruction <= instruction;
+        de_if.next_pc <= next_pc;
+    end
 end
 
 assign icache_if.req_address = pc;

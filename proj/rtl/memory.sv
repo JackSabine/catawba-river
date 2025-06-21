@@ -55,4 +55,6 @@ module memory import catawba_types::*; #(
         wb_if.instruction_kind <= ex_if.instruction_kind;
         wb_if.is_mem_inst <= ex_if.is_mem_inst;
     end
+
+    assign ex_if.stall_upstream = ex_if.valid & (ex_if.is_mem_inst & ~dcache_if.req_fulfilled);
 endmodule

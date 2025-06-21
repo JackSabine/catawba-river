@@ -1,24 +1,28 @@
-`include "macros.svh"
-
-interface fetch_decode_if;
+interface fetch_decode_if #(parameter XLEN = 32);
     import catawba_types::*;
 
     logic valid;
 
-    logic [`WORD-1:0]       next_pc;
+    logic [XLEN-1:0] next_pc;
     instruction_t instruction;
+
+    logic stall_upstream;
 
     modport fe (
         output
             valid,
             next_pc,
-            instruction
+            instruction,
+        input
+            stall_upstream
     );
 
     modport de (
         input
             valid,
             next_pc,
-            instruction
+            instruction,
+        output
+            stall_upstream
     );
 endinterface
