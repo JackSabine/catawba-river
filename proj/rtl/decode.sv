@@ -4,7 +4,8 @@ module decode import catawba_types::*; #(
     input logic clk,
 
     fetch_decode_if.de fe_if,
-    decode_execute_if.de ex_if
+    decode_execute_if.de ex_if,
+    writeback_decode_if.de wb_if
 );
 
     logic [`REG_BITS-1:0] rs1_index, rs2_index, rd_index;
@@ -17,24 +18,22 @@ module decode import catawba_types::*; #(
 
     alu_operation_e alu_operation;
 
-    logic is_branch_inst;
     branch_alu_operation_e branch_alu_operation;
 
-    instruction_type_t inst_type;
+    instruction_kind_t instruction_kind;
+    logic is_mem_inst;
 
 
     assign rs1_index = fe_if.instruction.common.rs1;
     assign rs2_index = fe_if.instruction.common.rs2;
 
-    assign rd_index = '0; // Take from WB stage
-
     register_file regfile (
         .clk(clk),
         .read_port_select_1(rs1_index),
         .read_port_select_2(rs2_index),
-        .write_port_select(rd_index),
-        .write_port_data('0),
-        .write_enable('0),
+        .write_port_select(wb_if.rd),
+        .write_port_data(wb_if.result),
+        .write_enable(wb_if.write_to_rd),
 
         .read_port_data_1(rs1_word),
         .read_port_data_2(rs2_word)
@@ -67,29 +66,28 @@ module decode import catawba_types::*; #(
     end
 
     always_comb begin
-        is_branch_inst = 1'b0;
+        is_mem_inst = fe_if.instruction.common.opcode =?= 7'b00z0011;
 
         unique casez (fe_if.instruction.common.opcode)
         7'b01100??: begin
-            inst_type = R_INST;
+            instruction_kind = R_INST;
             composed_immediate = 'x;
         end
         7'b00?00??: begin
-            inst_type = I_INST;
-            composed_immediate = fe_if.instruction.i_type.imm;
+            instruction_kind = I_INST;
+            composed_immediate = fe_if.instruction.i_type.imm; // FIXME needs zero/sign extending
         end
         7'b11?01??: begin
-            inst_type = I_INST;
-            composed_immediate = fe_if.instruction.i_type.imm;
+            instruction_kind = I_INST;
+            composed_immediate = fe_if.instruction.i_type.imm; // FIXME needs zero/sign extending
         end
         7'b01000??: begin
-            inst_type = S_INST;
-            composed_immediate = {fe_if.instruction.s_type.imm_11_5, fe_if.instruction.s_type.imm_4_0};
+            instruction_kind = S_INST;
+            composed_immediate = {fe_if.instruction.s_type.imm_11_5, fe_if.instruction.s_type.imm_4_0}; // FIXME needs zero/sign extending
         end
         7'b11000??: begin
-            inst_type = B_INST;
-            is_branch_inst = 1'b1;
-            composed_immediate = {
+            instruction_kind = B_INST;
+            composed_immediate = { // FIXME needs zero/sign extending
                 fe_if.instruction.b_type.imm_12,
                 fe_if.instruction.b_type.imm_11,
                 fe_if.instruction.b_type.imm_10_5,
@@ -98,15 +96,15 @@ module decode import catawba_types::*; #(
             };
         end
         7'b0?101??: begin
-            inst_type = U_INST;
-            composed_immediate = {
+            instruction_kind = U_INST;
+            composed_immediate = { // FIXME needs zero/sign extending
                 fe_if.instruction.u_type.imm_31_12,
                 12'b0
             };
         end
         7'b11011??: begin
-            inst_type = J_INST;
-            composed_immediate = {
+            instruction_kind = J_INST;
+            composed_immediate = { // FIXME needs zero/sign extending
                 fe_if.instruction.j_type.imm_20,
                 fe_if.instruction.j_type.imm_19_12,
                 fe_if.instruction.j_type.imm_11,
@@ -115,9 +113,8 @@ module decode import catawba_types::*; #(
             };
         end
         default: begin
-            inst_type = INST_UNDEFINED;
+            instruction_kind = INST_UNDEFINED;
             composed_immediate = 'x;
-            is_branch_inst = 'x;
         end
         endcase
     end
@@ -128,11 +125,12 @@ module decode import catawba_types::*; #(
         ex_if.rs2_word <= rs2_word;
         ex_if.next_pc <= fe_if.next_pc;
         ex_if.instruction <= fe_if.instruction;
+        ex_if.instruction_kind <= instruction_kind;
+        ex_if.is_mem_inst <= is_mem_inst;
         ex_if.immediate <= composed_immediate;
         ex_if.branch_alu_operation <= branch_alu_operation;
         ex_if.a_use_pc <= a_use_pc;
         ex_if.b_use_imm <= b_use_imm;
-        ex_if.is_branch_inst <= is_branch_inst;
     end
 
 endmodule

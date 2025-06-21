@@ -27,7 +27,7 @@ logic current_inst_is_branch;
 assign current_inst_is_branch = (instruction.common.opcode[6:2] == 5'b11000) & icache_if.req_fulfilled;
 
 always_comb begin
-    casez (fe_state) 
+    casez (fe_state)
         NORMAL_OPERATION: begin
             if (current_inst_is_branch) begin
                 next_fe_state = STALL_ON_BRANCH;

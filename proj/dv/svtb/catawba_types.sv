@@ -47,7 +47,7 @@ package catawba_types;
         U_INST,
         J_INST,
         INST_UNDEFINED = 'x
-    } instruction_type_t;
+    } instruction_kind_t;
 
     typedef union packed {
         struct packed {

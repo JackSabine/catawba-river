@@ -11,15 +11,15 @@ module memory import catawba_types::*; #(
 );
 
     logic mem_req_valid;
-    logic mem_op_size;
+    memory_operation_size_e mem_op_size;
 
-    logic [XLEN-1:0] sext_word, zext_word
+    logic [XLEN-1:0] sext_word, zext_word, load_result;
 
-    assign mem_req_valid = ex_if.valid & (inst == LOAD | inst == STORE);
+    assign mem_req_valid = ex_if.valid & ex_if.is_mem_inst;
     assign mem_op_size = memory_operation_size_e'(ex_if.instruction.common.funct3[1:0]);
 
     assign dcache_if.req_address = ex_if.alu_result;
-    assign dcache_if.req_operation = ?;
+    assign dcache_if.req_operation = (ex_if.instruction_kind == S_INST) ? STORE : LOAD;
     assign dcache_if.req_size = mem_op_size;
     assign dcache_if.req_store_word = ex_if.rs2_word;
     assign dcache_if.req_valid = mem_req_valid;
@@ -43,10 +43,16 @@ module memory import catawba_types::*; #(
                 zext_word = 'x;
             end
         endcase
+
+        load_result = ex_if.instruction.common.funct3[2] ? zext_word : sext_word;
     end
 
     always_ff @(posedge clk) begin
-        wb_if.load_result = ex_if.instruction.common.funct3[2] ? zext_word : sext_word;
         wb_if.valid <= ex_if.valid;
+        wb_if.alu_result <= ex_if.alu_result;
+        wb_if.load_result <= load_result;
+        wb_if.instruction <= ex_if.instruction;
+        wb_if.instruction_kind <= ex_if.instruction_kind;
+        wb_if.is_mem_inst <= ex_if.is_mem_inst;
     end
 endmodule
