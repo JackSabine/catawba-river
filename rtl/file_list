@@ -1,3 +1,4 @@
+catawba_params.sv
 interfaces/reset_if.sv
 interfaces/memory_if.sv
 interfaces/fetch_decode_if.sv

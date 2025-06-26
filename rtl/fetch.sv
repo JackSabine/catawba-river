@@ -1,4 +1,4 @@
-module fetch import catawba_types::*; #(
+module fetch import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,

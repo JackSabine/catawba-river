@@ -1,4 +1,4 @@
-interface memory_if import catawba_types::*; #(
+interface memory_if import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input bit clk

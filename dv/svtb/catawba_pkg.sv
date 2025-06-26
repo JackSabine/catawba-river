@@ -4,6 +4,7 @@
 package catawba_pkg;
     import uvm_pkg::*;
     import catawba_types::*;
+    import catawba_params::*;
 
     `include "dpi-c.sv"
     `include "../common/randomizable_2d_array.sv"

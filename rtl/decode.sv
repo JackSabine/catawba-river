@@ -1,4 +1,4 @@
-module decode import catawba_types::*; #(
+module decode import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,

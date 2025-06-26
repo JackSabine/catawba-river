@@ -1,5 +1,5 @@
 interface memory_writeback_if #(parameter XLEN = 32);
-    import catawba_types::*;
+    import catawba_params::*;
 
     logic valid;
 

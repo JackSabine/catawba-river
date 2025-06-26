@@ -1,4 +1,4 @@
-module writeback import catawba_types::*; #(
+module writeback import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,
