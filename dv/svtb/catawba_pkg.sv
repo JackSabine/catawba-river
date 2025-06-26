@@ -1,5 +1,5 @@
 `include "uvm_macros.svh"
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 package catawba_pkg;
     import uvm_pkg::*;

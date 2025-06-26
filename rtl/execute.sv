@@ -1,4 +1,4 @@
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 module execute import catawba_params::*; #(
     parameter XLEN = 32

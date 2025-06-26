@@ -1,4 +1,4 @@
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 package catawba_types;
     typedef int unsigned uint32_t;

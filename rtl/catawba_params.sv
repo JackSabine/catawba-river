@@ -1,4 +1,4 @@
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 package catawba_params;
     // Should agree with the funct3 mapping (excluding signed/unsigned)

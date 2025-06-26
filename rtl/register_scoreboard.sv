@@ -1,4 +1,4 @@
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 module register_scoreboard import catawba_params::*; #(
     parameter XLEN = 32,
