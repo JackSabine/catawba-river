@@ -39,10 +39,6 @@ s = $(RANDOM_NUMBER)
 # TB specification
 TB_TOP := tb_top
 
-# Provide files to compile (must be added below)
-include $(RTL_ROOT)/file_list.mk
-include $(DV_ROOT)/file_list.mk
-
 ####################################################################
 # Output directory configuration
 WORK := work
@@ -69,16 +65,12 @@ UVM_XVLOG_FLAGS := -L uvm
 UVM_XELAB_FLAGS := -L uvm
 
 # Other/non-UVM flags
-XVLOG_FLAGS := --sv --incr --include $(DV_ROOT)/svtb --include $(DV_ROOT)/tests
+XVLOG_FLAGS := --sv --incr --include ${WORKAREA}/dv/svtb --include ${WORKAREA}/dv/tests
 XELAB_FLAGS := --timescale=1ns/1ns --override_timeprecision $(DPIC_SV_LIB_FLAGS)
 
-# Compilation/dependency list for xvlog
-SRC_FILES_RTL_ABS_PATH := $(addprefix $(RTL_ROOT)/,$(SRC_FILES_RTL))
-SRC_FILES_DV_ABS_PATH := $(addprefix $(DV_ROOT)/,$(SRC_FILES_DV))
-
-COMPILE_LIST += ${DV_ROOT}/svtb/catawba_types.sv
-COMPILE_LIST += $(SRC_FILES_RTL_ABS_PATH)
-COMPILE_LIST += $(SRC_FILES_DV_ABS_PATH)
+COMPILE_LIST += ${WORKAREA}/dv/svtb/catawba_types.sv
+COMPILE_LIST += $(addprefix ${WORKAREA}/rtl/,$(shell cat ${WORKAREA}/rtl/file_list))
+COMPILE_LIST += $(addprefix ${WORKAREA}/dv/, $(shell cat ${WORKAREA}/dv/file_list))
 
 HDL_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "*.sv" -o -name "*.svh" -o -name "*.mk" \))
 
