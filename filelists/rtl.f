@@ -1,7 +1,6 @@
 rtl/catawba_params.sv
 
 rtl/interfaces/reset_if.sv
-rtl/interfaces/memory_if.sv
 rtl/interfaces/fetch_decode_if.sv
 rtl/interfaces/decode_execute_if.sv
 rtl/interfaces/execute_memory_if.sv
@@ -19,3 +18,4 @@ rtl/fetch.sv
 rtl/memory.sv
 rtl/writeback.sv
 rtl/pipeline.sv
+rtl/top.sv

@@ -1,3 +1,6 @@
 [submodule "scripts/qsim"]
 	path = scripts/qsim
 	url = git@github.com:JackSabine/qsim.git
+[submodule "subip/torrence-creek"]
+	path = subip/torrence-creek
+	url = git@github.com:JackSabine/torrence-creek.git

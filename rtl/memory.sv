@@ -1,6 +1,6 @@
 `include "catawba_macros.svh"
 
-module memory import catawba_params::*; #(
+module memory import catawba_params::*; import torrence_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,

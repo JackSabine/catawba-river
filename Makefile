@@ -39,6 +39,9 @@ s = $(RANDOM_NUMBER)
 # TB specification
 TB_TOP := tb_top
 
+# SUB-IPs to use
+SUBIP := torrence-creek
+
 ####################################################################
 # Output directory configuration
 WORK := work
@@ -65,9 +68,10 @@ UVM_XVLOG_FLAGS := -L uvm
 UVM_XELAB_FLAGS := -L uvm
 
 # Other/non-UVM flags
-XVLOG_FLAGS := --sv --incr --include ${WORKAREA}/dv/svtb --include ${WORKAREA}/dv/tests
+XVLOG_FLAGS := --sv --incr --include ${WORKAREA}/dv/svtb --include ${WORKAREA}/dv/tests $(addprefix --include ,$(foreach sip,$(SUBIP),${WORKAREA}/subip/$(sip)/dv/svtb))
 XELAB_FLAGS := --timescale=1ns/1ns --override_timeprecision $(DPIC_SV_LIB_FLAGS)
 
+COMPILE_LIST += $(foreach sip,$(SUBIP),$(addprefix ${WORKAREA}/subip/$(sip)/,$(shell cat ${WORKAREA}/subip/$(sip)/filelists/rtl.f)))
 COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/rtl.f))
 COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/dv.f))
 

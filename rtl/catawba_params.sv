@@ -1,20 +1,6 @@
 `include "catawba_macros.svh"
 
 package catawba_params;
-    // Should agree with the funct3 mapping (excluding signed/unsigned)
-    typedef enum logic[1:0] {
-        BYTE = 2'b00,
-        HALF = 2'b01,
-        WORD = 2'b10
-    } memory_operation_size_e;
-
-    typedef enum logic [1:0] {
-        STORE = 2'b00,
-        LOAD = 2'b01,
-        CLFLUSH = 2'b11,
-        MO_UNKNOWN = 2'bxx
-    } memory_operation_e;
-
     typedef enum logic[3:0] {
         ADD = 4'b0000,
         SUB,

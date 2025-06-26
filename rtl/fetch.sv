@@ -1,4 +1,4 @@
-module fetch import catawba_params::*; #(
+module fetch import catawba_params::*; import torrence_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,
