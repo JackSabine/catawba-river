@@ -1,5 +1,5 @@
-`ifndef MACROS__SVH
-  `define MACROS__SVH
+`ifndef CATAWBA_MACROS__SVH
+  `define CATAWBA_MACROS__SVH
 
 `define WORD        (32)
 `define HALF        (16)

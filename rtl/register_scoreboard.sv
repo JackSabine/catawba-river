@@ -1,6 +1,6 @@
-`include "macros.svh"
+`include "catawba_macros.svh"
 
-module register_scoreboard import catawba_types::*; #(
+module register_scoreboard import catawba_params::*; #(
     parameter XLEN = 32,
     parameter NUM_REGISTERS = `NUM_REGS
 ) (
@@ -44,13 +44,13 @@ module register_scoreboard import catawba_types::*; #(
 
     always_ff @(posedge clk) begin
         if (rst_if.reset) begin
-            for (uint8_t r = 1; r < NUM_REGISTERS; r++) begin
+            for (int r = 1; r < NUM_REGISTERS; r++) begin
                 ready_bits[r] = 1'b1;
             end
         end else begin
             // When wb_write_enable and de_instruction_has_rd are active while stall isn't active,
             // wb_write_port_select will not equal de_write_port_select
-            for (uint8_t r = 1; r < NUM_REGISTERS; r++) begin
+            for (int r = 1; r < NUM_REGISTERS; r++) begin
                 unique0 if (wb_write_enable & wb_write_port_select == r) begin
                     ready_bits[r] <= 1'b1;
                 end else if (de_valid & ~stall & de_instruction_has_rd & de_write_port_select == r) begin

@@ -1,4 +1,4 @@
-module branch_alu import catawba_types::*; #(
+module branch_alu import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input logic [XLEN-1:0] operand_a,

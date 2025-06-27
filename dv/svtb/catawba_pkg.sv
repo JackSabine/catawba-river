@@ -1,9 +1,10 @@
 `include "uvm_macros.svh"
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 package catawba_pkg;
     import uvm_pkg::*;
     import catawba_types::*;
+    import catawba_params::*;
 
     `include "dpi-c.sv"
     `include "../common/randomizable_2d_array.sv"

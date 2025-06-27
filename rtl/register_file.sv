@@ -1,4 +1,4 @@
-`include "macros.svh"
+`include "catawba_macros.svh"
 
 module register_file #(
     parameter XLEN = 32,

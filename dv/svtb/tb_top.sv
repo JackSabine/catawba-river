@@ -8,15 +8,13 @@ module tb_top;
     logic clk = 1'b0;
     reset_if rst_if(clk);
 
-    memory_if icache_if(clk);
-    memory_if dcache_if(clk);
+    memory_if hmem_if(clk);
 
     // Dut instantiation
-    pipeline dut(
+    top dut (
         .clk(clk),
         .rst_if(rst_if),
-        .icache_if(icache_if),
-        .dcache_if(dcache_if)
+        .hmem_if(hmem_if)
     );
 
     initial begin
