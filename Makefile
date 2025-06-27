@@ -101,14 +101,6 @@ $(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE)
 all: $(XSIM_BINARY)
 	@echo "----- Compilation complete -----"
 
-.PHONY: waves
-waves: | $(WORKDIR)
-	@echo "----- Opening waves -----"
-	@if [ -f $(TB_TOP)_snapshot.wcfg ]; then \
-		cp $(TB_TOP)_snapshot.wcfg $(WORKDIR); \
-	fi
-	cd $(WORKDIR) && xsim -autoloadwcfg --gui $(TB_TOP)_snapshot.wdb &
-
 $(WORKDIR):
 	@mkdir $(WORKDIR)
 
@@ -120,4 +112,3 @@ clean:
 help:
 	@echo "#### RULES ####"
 	@echo "* all - compile with xvlog and xelab"
-	@echo "* waves - show most recent simulation in waveform"

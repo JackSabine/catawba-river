@@ -13,3 +13,5 @@ export REGRDIR="${WORKAREA}/regr"
 for s in "${scripts[@]}"; do
   export PATH="${s}:${PATH}"
 done
+
+alias waves="xsim -autoloadwcfg --gui *_snapshot.wdb &"
