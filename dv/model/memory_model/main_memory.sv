@@ -13,8 +13,8 @@ class main_memory extends uvm_object;
         uint32_t result;
 
         if (addr < `RO_RW_MEMORY_BOUNDARY) begin
-            // ICache Request (just pass a NOP === add x0, x0, #0)
-            result = {'0, 7'b0010011};
+            // ICache Request with no present instruction -> return a custom HALT code
+            result = {'0, `HALT_OPC};
         end else begin
             result = 0;
             while (addr != 0) begin

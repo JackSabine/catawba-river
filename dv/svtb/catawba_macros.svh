@@ -8,4 +8,6 @@
 `define REG_BITS    ($clog2(`NUM_REGS))
 `define OPC_BITS    (7)
 
+`define HALT_OPC    (7'h0)
+
 `endif

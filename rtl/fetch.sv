@@ -16,28 +16,35 @@ logic downstream_valid;
 instruction_t instruction;
 
 // FSM
-typedef enum logic [0:0] {
-    STALL_ON_BRANCH = 1'b0,
-    NORMAL_OPERATION = 1'b1
+typedef enum logic [1:0] {
+    STALL_ON_BRANCH = 2'b00,
+    NORMAL_OPERATION,
+    HALTED
 } fetch_state_e;
 
 fetch_state_e fe_state, next_fe_state;
 logic current_inst_is_branch;
+logic current_inst_is_halt;
 
 assign current_inst_is_branch = (instruction.common.opcode[6:2] == 5'b11000) & icache_if.req_fulfilled;
+assign current_inst_is_halt = (instruction.common.opcode[1:0] == 2'b00) & icache_if.req_fulfilled;
 
 always_comb begin
     casez (fe_state)
         NORMAL_OPERATION: begin
-            if (current_inst_is_branch) begin
+            if (current_inst_is_halt) begin
+                next_fe_state = HALTED;
+                next_pc = pc;
+                downstream_valid = 1'b0;
+            end else if (current_inst_is_branch) begin
                 next_fe_state = STALL_ON_BRANCH;
                 next_pc = pc;
+                downstream_valid = 1'b1;
             end else begin
                 next_fe_state = NORMAL_OPERATION;
                 next_pc = icache_if.req_fulfilled ? pc_plus_4 : pc;
+                downstream_valid = icache_if.req_fulfilled;
             end
-
-            downstream_valid = icache_if.req_fulfilled;
         end
 
         STALL_ON_BRANCH: begin
@@ -52,6 +59,12 @@ always_comb begin
                 next_pc = pc;
             end
 
+            downstream_valid = 1'b0;
+        end
+
+        HALTED: begin
+            next_fe_state = HALTED;
+            next_pc = pc;
             downstream_valid = 1'b0;
         end
     endcase
