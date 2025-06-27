@@ -10,7 +10,8 @@ module top #(
 ) (
     input logic clk,
     reset_if rst_if,
-    memory_if.requester hmem_if
+    memory_if.requester hmem_if,
+    output logic halted
 );
 
     memory_if icache_req_if(clk);
@@ -24,7 +25,8 @@ module top #(
         .clk(clk),
         .rst_if(rst_if),
         .icache_if(icache_req_if),
-        .dcache_if(dcache_req_if)
+        .dcache_if(dcache_req_if),
+        .halted(halted)
     );
 
     memory_system #(

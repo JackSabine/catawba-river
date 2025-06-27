@@ -11,11 +11,14 @@ module tb_top;
 
     memory_if hmem_if(clk);
 
+    logic halted;
+
     // Dut instantiation
     top dut (
         .clk(clk),
         .rst_if(rst_if),
-        .hmem_if(hmem_if)
+        .hmem_if(hmem_if),
+        .halted(halted)
     );
 
     initial begin

@@ -51,8 +51,10 @@ module memory import catawba_params::*; import torrence_params::*; #(
     always_ff @(posedge clk) begin
         if (rst_if.reset) begin
             wb_if.valid <= 1'b0;
+            wb_if.halt <= 1'b0;
         end else begin
             wb_if.valid <= ex_if.valid;
+            wb_if.halt <= ex_if.halt;
         end
 
         wb_if.alu_result <= ex_if.alu_result;

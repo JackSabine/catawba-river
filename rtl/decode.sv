@@ -132,8 +132,10 @@ module decode import catawba_params::*; #(
     always_ff @(posedge clk) begin
         if (rst_if.reset) begin
             ex_if.valid <= 1'b0;
+            ex_if.halt <= 1'b0;
         end else if (~ex_if.stall_upstream) begin
             ex_if.valid <= fe_if.valid;
+            ex_if.halt <= fe_if.halt;
         end
 
         if (~ex_if.stall_upstream) begin

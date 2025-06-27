@@ -4,7 +4,8 @@ module pipeline (
     reset_if rst_if,
 
     memory_if.requester icache_if,
-    memory_if.requester dcache_if
+    memory_if.requester dcache_if,
+    output logic halted
 );
 
 fetch_decode_if fe_de_if();
@@ -49,7 +50,8 @@ memory mem (
 writeback wb (
     .clk(clk),
     .mem_if(mem_wb_if),
-    .de_if(wb_de_if)
+    .de_if(wb_de_if),
+    .halted(halted)
 );
 
 endmodule

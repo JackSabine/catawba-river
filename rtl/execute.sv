@@ -43,8 +43,10 @@ module execute import catawba_params::*; #(
     always_ff @(posedge clk) begin
         if (rst_if.reset) begin
             mem_if.valid <= 1'b0;
+            mem_if.halt <= 1'b0;
         end else if (~mem_if.stall_upstream) begin
             mem_if.valid <= de_if.valid;
+            mem_if.halt <= de_if.halt;
         end
 
         if (~mem_if.stall_upstream) begin

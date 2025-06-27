@@ -3,6 +3,7 @@ interface execute_memory_if #(parameter XLEN = 32);
     import catawba_params::*;
 
     logic valid;
+    logic halt;
 
     logic [XLEN-1:0] alu_result;
     logic [XLEN-1:0] rs2_word;
@@ -16,6 +17,7 @@ interface execute_memory_if #(parameter XLEN = 32);
     modport ex(
         output
             valid,
+            halt,
             alu_result,
             rs2_word,
             instruction,
@@ -28,6 +30,7 @@ interface execute_memory_if #(parameter XLEN = 32);
     modport mem(
         input
             valid,
+            halt,
             alu_result,
             rs2_word,
             instruction,

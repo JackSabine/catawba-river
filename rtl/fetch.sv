@@ -25,9 +25,12 @@ typedef enum logic [1:0] {
 fetch_state_e fe_state, next_fe_state;
 logic current_inst_is_branch;
 logic current_inst_is_halt;
+logic halt;
 
 assign current_inst_is_branch = (instruction.common.opcode[6:2] == 5'b11000) & icache_if.req_fulfilled;
 assign current_inst_is_halt = (instruction.common.opcode[1:0] == 2'b00) & icache_if.req_fulfilled;
+
+assign halt = (fe_state == HALTED);
 
 always_comb begin
     casez (fe_state)
@@ -78,11 +81,13 @@ always_ff @(posedge clk) begin
         pc <= '0;
         de_if.valid <= 1'b0;
         fe_state <= NORMAL_OPERATION;
+        de_if.halt <= 1'b0;
     end else begin
         if (~de_if.stall_upstream) begin
             pc <= next_pc;
             de_if.valid <= downstream_valid;
             fe_state <= next_fe_state;
+            de_if.halt <= halt;
         end
     end
 

@@ -2,6 +2,7 @@ interface decode_execute_if #(parameter XLEN = 32);
     import catawba_params::*;
 
     logic valid;
+    logic halt;
 
     logic [XLEN-1:0] rs1_word;
     logic [XLEN-1:0] rs2_word;
@@ -22,6 +23,7 @@ interface decode_execute_if #(parameter XLEN = 32);
     modport de (
         output
             valid,
+            halt,
             rs1_word,
             rs2_word,
             next_pc,
@@ -40,6 +42,7 @@ interface decode_execute_if #(parameter XLEN = 32);
     modport ex (
         input
             valid,
+            halt,
             rs1_word,
             rs2_word,
             next_pc,
