@@ -9,7 +9,7 @@ module decode import catawba_params::*; #(
     writeback_decode_if.de wb_if
 );
 
-    logic [`REG_BITS-1:0] rs1_index, rs2_index, rd_index;
+    logic [`REG_BITS-1:0] rs1_index, rs2_index;
     logic [XLEN-1:0] rs1_word, rs2_word;
 
     logic a_use_pc;
@@ -60,6 +60,11 @@ module decode import catawba_params::*; #(
     );
 
     always_comb begin
+        a_use_pc = 1'b0; // FIXME
+        b_use_imm = 1'b1; // FIXME
+    end
+
+    always_comb begin
         unique casez (fe_if.instruction.common.funct3)
         3'h0: alu_operation = fe_if.instruction.common.funct7[6] ? SUB : ADD;
         3'h1: alu_operation = SHIFT_LEFT;
@@ -86,7 +91,7 @@ module decode import catawba_params::*; #(
     end
 
     always_comb begin
-        is_mem_inst = fe_if.instruction.common.opcode =?= 7'b00z00zz;
+        is_mem_inst = fe_if.instruction.common.opcode =?= 7'b0z000zz;
 
         unique casez (fe_if.instruction.common.opcode)
         7'b01100??: begin
@@ -125,8 +130,13 @@ module decode import catawba_params::*; #(
     end
 
     always_ff @(posedge clk) begin
-        if (~ex_if.stall_upstream) begin
+        if (rst_if.reset) begin
+            ex_if.valid <= 1'b0;
+        end else if (~ex_if.stall_upstream) begin
             ex_if.valid <= fe_if.valid;
+        end
+
+        if (~ex_if.stall_upstream) begin
             ex_if.rs1_word <= rs1_word;
             ex_if.rs2_word <= rs2_word;
             ex_if.next_pc <= fe_if.next_pc;
@@ -134,6 +144,7 @@ module decode import catawba_params::*; #(
             ex_if.instruction_kind <= instruction_kind;
             ex_if.is_mem_inst <= is_mem_inst;
             ex_if.immediate <= composed_immediate;
+            ex_if.alu_operation <= alu_operation;
             ex_if.branch_alu_operation <= branch_alu_operation;
             ex_if.a_use_pc <= a_use_pc;
             ex_if.b_use_imm <= b_use_imm;

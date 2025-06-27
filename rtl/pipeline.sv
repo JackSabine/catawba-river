@@ -32,6 +32,7 @@ decode de (
 
 execute ex (
     .clk(clk),
+    .rst_if(rst_if),
     .de_if(de_ex_if),
     .fe_if(fe_ex_if),
     .mem_if(ex_mem_if)
@@ -39,6 +40,7 @@ execute ex (
 
 memory mem (
     .clk(clk),
+    .rst_if(rst_if),
     .ex_if(ex_mem_if),
     .wb_if(mem_wb_if),
     .dcache_if(dcache_if)

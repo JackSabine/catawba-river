@@ -1,3 +1,5 @@
+`include "torrence_macros.svh"
+
 class main_memory extends uvm_object;
     `uvm_object_utils(main_memory)
 
@@ -10,10 +12,15 @@ class main_memory extends uvm_object;
     local function uint32_t compute_default_value(uint32_t addr);
         uint32_t result;
 
-        result = 0;
-        while (addr != 0) begin
-            result = (result * 16) + (addr % 16);
-            addr = addr / 16;
+        if (addr < `RO_RW_MEMORY_BOUNDARY) begin
+            // ICache Request (just pass a NOP === add x0, x0, #0)
+            result = {'0, 7'b0010011};
+        end else begin
+            result = 0;
+            while (addr != 0) begin
+                result = (result * 16) + (addr % 16);
+                addr = addr / 16;
+            end
         end
 
         return result;

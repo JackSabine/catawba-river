@@ -31,11 +31,12 @@ always_comb begin
         NORMAL_OPERATION: begin
             if (current_inst_is_branch) begin
                 next_fe_state = STALL_ON_BRANCH;
+                next_pc = pc;
             end else begin
                 next_fe_state = NORMAL_OPERATION;
+                next_pc = icache_if.req_fulfilled ? pc_plus_4 : pc;
             end
 
-            next_pc = pc_plus_4;
             downstream_valid = icache_if.req_fulfilled;
         end
 

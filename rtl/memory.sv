@@ -4,6 +4,7 @@ module memory import catawba_params::*; import torrence_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,
+    reset_if rst_if,
 
     execute_memory_if.mem ex_if,
     memory_writeback_if.mem wb_if,
@@ -48,7 +49,12 @@ module memory import catawba_params::*; import torrence_params::*; #(
     end
 
     always_ff @(posedge clk) begin
-        wb_if.valid <= ex_if.valid;
+        if (rst_if.reset) begin
+            wb_if.valid <= 1'b0;
+        end else begin
+            wb_if.valid <= ex_if.valid;
+        end
+
         wb_if.alu_result <= ex_if.alu_result;
         wb_if.load_result <= load_result;
         wb_if.instruction <= ex_if.instruction;

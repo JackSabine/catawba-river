@@ -39,7 +39,7 @@ module top #(
 
         .L2_SIZE(L2_SIZE),
         .L2_ASSOC(L2_ASSOC)
-    ) dut (
+    ) l1_l2_cache (
         .clk(clk),
         .rst_if(rst_if),
         .icache_req_if(icache_req_if),

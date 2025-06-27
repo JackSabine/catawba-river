@@ -4,6 +4,7 @@ module execute import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input logic clk,
+    reset_if rst_if,
 
     fetch_execute_if.ex fe_if,
     decode_execute_if.ex de_if,
@@ -40,6 +41,12 @@ module execute import catawba_params::*; #(
     assign fe_if.branch_inst_next_pc = de_if.next_pc;
 
     always_ff @(posedge clk) begin
+        if (rst_if.reset) begin
+            mem_if.valid <= 1'b0;
+        end else if (~mem_if.stall_upstream) begin
+            mem_if.valid <= de_if.valid;
+        end
+
         if (~mem_if.stall_upstream) begin
             mem_if.rs2_word <= de_if.rs2_word;
             mem_if.alu_result <= alu_result;
