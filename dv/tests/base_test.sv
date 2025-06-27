@@ -34,8 +34,18 @@ class base_test extends uvm_test;
         phase.drop_objection(this);
     endtask
 
+    task run_phase(uvm_phase phase);
+        memory_response_seq mem_rsp_seq;
+
+        // Don't raise an objection, that way it doesn't hold up the end of simulation
+        mem_rsp_seq = memory_response_seq::type_id::create(.name("mem_rsp_seq"));
+        mem_rsp_seq.start(env.mem_rsp_agent.mrsp_seqr); // Runs forever
+    endtask
+
     virtual task main_phase(uvm_phase phase);
         phase.raise_objection(this);
+
+        #10000ns;
 
         phase.drop_objection(this);
     endtask

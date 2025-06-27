@@ -3,6 +3,7 @@ module tb_top;
     import catawba_pkg::*;
 
     clock_config clk_config;
+    main_memory dut_memory_model;
 
     bit clk_enabled = 1'b0;
     logic clk = 1'b0;
@@ -33,6 +34,22 @@ module tb_top;
             .inst_name("uvm_test_top.*"),
             .field_name("reset_if"),
             .value(rst_if)
+        );
+
+        // Higher memory interface
+        uvm_config_db #(virtual memory_if)::set(
+            .cntxt(null),
+            .inst_name("uvm_test_top.*"),
+            .field_name("memory_responder_if"),
+            .value(hmem_if)
+        );
+
+        dut_memory_model = main_memory::type_id::create(.name("dut_memory_model"), .parent(null));
+        uvm_config_db #(main_memory)::set(
+            .cntxt(null),
+            .inst_name("uvm_test_top.*"),
+            .field_name("dut_memory_model"),
+            .value(dut_memory_model)
         );
 
 
