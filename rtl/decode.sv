@@ -27,8 +27,8 @@ module decode import catawba_params::*; #(
     logic scoreboard_stall;
 
 
-    assign rs1_index = fe_if.instruction.common.rs1;
-    assign rs2_index = fe_if.instruction.common.rs2;
+    assign rs1_index = fe_if.instruction.rs1;
+    assign rs2_index = fe_if.instruction.rs2;
 
     register_file regfile (
         .clk(clk),
@@ -51,7 +51,7 @@ module decode import catawba_params::*; #(
         .de_instruction_kind(instruction_kind),
         .de_read_port_select_1(rs1_index),
         .de_read_port_select_2(rs2_index),
-        .de_write_port_select(fe_if.instruction.common.rd),
+        .de_write_port_select(fe_if.instruction.rd),
 
         .wb_write_port_select(wb_if.rd),
         .wb_write_enable(wb_if.write_to_rd),
@@ -91,9 +91,9 @@ module decode import catawba_params::*; #(
     end
 
     always_comb begin
-        is_mem_inst = fe_if.instruction.common.opcode =?= 7'b0z000zz;
+        is_mem_inst = fe_if.instruction.opcode =?= 7'b0z000zz;
 
-        unique casez (fe_if.instruction.common.opcode)
+        unique casez (fe_if.instruction.opcode)
         7'b01100??: begin
             instruction_kind = R_INST;
             composed_immediate = 'x;

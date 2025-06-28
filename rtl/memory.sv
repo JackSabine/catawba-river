@@ -17,7 +17,7 @@ module memory import catawba_params::*; import torrence_params::*; #(
     logic [XLEN-1:0] sext_word, zext_word, load_result;
 
     assign mem_req_valid = ex_if.valid & ex_if.is_mem_inst;
-    assign mem_op_size = memory_operation_size_e'(ex_if.instruction.common.funct3[1:0]);
+    assign mem_op_size = memory_operation_size_e'(ex_if.instruction.funct3[1:0]);
 
     assign dcache_if.req_address = ex_if.alu_result;
     assign dcache_if.req_operation = (ex_if.instruction_kind == S_INST) ? STORE : LOAD;
@@ -45,7 +45,7 @@ module memory import catawba_params::*; import torrence_params::*; #(
             end
         endcase
 
-        load_result = ex_if.instruction.common.funct3[2] ? zext_word : sext_word;
+        load_result = ex_if.instruction.funct3[2] ? zext_word : sext_word;
     end
 
     always_ff @(posedge clk) begin

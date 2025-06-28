@@ -27,8 +27,8 @@ logic current_inst_is_branch;
 logic current_inst_is_halt;
 logic halt;
 
-assign current_inst_is_branch = (instruction.common.opcode[6:2] == 5'b11000) & icache_if.req_fulfilled;
-assign current_inst_is_halt = (instruction.common.opcode[1:0] == 2'b00) & icache_if.req_fulfilled;
+assign current_inst_is_branch = (instruction.opcode[6:2] == 5'b11000) & icache_if.req_fulfilled;
+assign current_inst_is_halt = (instruction.opcode[1:0] == 2'b00) & icache_if.req_fulfilled;
 
 assign halt = (fe_state == HALTED);
 

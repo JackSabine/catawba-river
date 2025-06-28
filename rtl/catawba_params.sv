@@ -35,66 +35,12 @@ package catawba_params;
         INST_UNDEFINED = 'x
     } instruction_kind_t;
 
-    typedef union packed {
-        struct packed {
-            logic [6:0] funct7;
-            logic [`REG_BITS-1:0] rs2;
-            logic [`REG_BITS-1:0] rs1;
-            logic [2:0] funct3;
-            logic [`REG_BITS-1:0] rd;
-            logic [`OPC_BITS-1:0] opcode;
-        } common;
-
-        struct packed {
-            logic [6:0] funct7;
-            logic [`REG_BITS-1:0] rs2;
-            logic [`REG_BITS-1:0] rs1;
-            logic [2:0] funct3;
-            logic [`REG_BITS-1:0] rd;
-            logic [`OPC_BITS-1:0] opcode;
-        } r_type;
-
-        struct packed {
-            logic [11:0] imm;
-            logic [`REG_BITS-1:0] rs1;
-            logic [2:0] funct3;
-            logic [`REG_BITS-1:0] rd;
-            logic [`OPC_BITS-1:0] opcode;
-        } i_type;
-
-        struct packed {
-            logic [6:0] imm_11_5;
-            logic [`REG_BITS-1:0] rs2;
-            logic [`REG_BITS-1:0] rs1;
-            logic [2:0] funct3;
-            logic [4:0] imm_4_0;
-            logic [`OPC_BITS-1:0] opcode;
-        } s_type;
-
-        struct packed {
-            logic imm_12;
-            logic [5:0] imm_10_5;
-            logic [`REG_BITS-1:0] rs2;
-            logic [`REG_BITS-1:0] rs1;
-            logic [2:0] funct3;
-            logic [3:0] imm_4_1;
-            logic imm_11;
-            logic [`OPC_BITS-1:0] opcode;
-        } b_type;
-
-        struct packed {
-            logic [19:0] imm_31_12;
-            logic [`REG_BITS-1:0] rd;
-            logic [`OPC_BITS-1:0] opcode;
-        } u_type;
-
-        struct packed {
-            logic imm_20;
-            logic [9:0] imm_10_1;
-            logic imm_11;
-            logic [7:0] imm_19_12;
-            logic [`REG_BITS-1:0] rd;
-            logic [`OPC_BITS-1:0] opcode;
-        } j_type;
+    typedef struct packed {
+        logic [6:0] funct7;
+        logic [`REG_BITS-1:0] rs2;
+        logic [`REG_BITS-1:0] rs1;
+        logic [2:0] funct3;
+        logic [`REG_BITS-1:0] rd;
+        logic [`OPC_BITS-1:0] opcode;
     } instruction_t;
 endpackage
