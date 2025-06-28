@@ -10,12 +10,12 @@ module branch_alu import catawba_params::*; #(
 
 always_comb begin
     case (operation)
-        EQ:      result = (operand_a == operand_b);
-        NEQ:     result = (operand_a != operand_b);
-        LT:      result = $signed(  operand_a) <  $signed(  operand_b);
-        GTE:     result = $signed(  operand_a) >= $signed(  operand_b);
-        LT_U:    result = $unsigned(operand_a) <  $unsigned(operand_b);
-        GTE_U:   result = $unsigned(operand_a) >= $unsigned(operand_b);
+        EQ:  result = (operand_a == operand_b);
+        NE:  result = (operand_a != operand_b);
+        LT:  result = $signed(  operand_a) <  $signed(  operand_b);
+        GE:  result = $signed(  operand_a) >= $signed(  operand_b);
+        LTU: result = $unsigned(operand_a) <  $unsigned(operand_b);
+        GEU: result = $unsigned(operand_a) >= $unsigned(operand_b);
         default: result = 'bx;
     endcase
 end

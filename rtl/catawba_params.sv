@@ -2,26 +2,26 @@
 
 package catawba_params;
     typedef enum logic[3:0] {
-        ADD = 4'b0000,
-        SUB,
-        XOR,
-        OR,
-        AND,
-        SHIFT_LEFT,
-        SHIFT_RIGHT,
-        SHIFT_RIGHT_ARITHMETIC,
-        SET_LESS_THAN,
-        SET_LESS_THAN_UNSIGNED,
+        ADD  = 4'b0_000,
+        SUB  = 4'b1_000,
+        SLL  = 4'b?_001,
+        SLT  = 4'b?_010,
+        SLTU = 4'b?_011,
+        XOR  = 4'b?_100,
+        SRL  = 4'b0_101,
+        SRA  = 4'b1_101,
+        OR   = 4'b?_110,
+        AND  = 4'b?_111,
         ALU_OP_UNDEFINED = 'x
     } alu_operation_e;
 
     typedef enum logic [2:0] {
-        EQ = 3'b000,
-        NEQ,
-        LT,
-        GTE,
-        LT_U,
-        GTE_U,
+        EQ  = 3'b000,
+        NE  = 3'b001,
+        LT  = 3'b100,
+        GE  = 3'b101,
+        LTU = 3'b110,
+        GEU = 3'b111,
         BRANCH_OP_UNDEFINED = 'x
     } branch_alu_operation_e;
 

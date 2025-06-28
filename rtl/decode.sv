@@ -65,29 +65,8 @@ module decode import catawba_params::*; #(
     end
 
     always_comb begin
-        unique casez (fe_if.instruction.common.funct3)
-        3'h0: alu_operation = fe_if.instruction.common.funct7[6] ? SUB : ADD;
-        3'h1: alu_operation = SHIFT_LEFT;
-        3'h2: alu_operation = SET_LESS_THAN;
-        3'h3: alu_operation = SET_LESS_THAN_UNSIGNED;
-        3'h4: alu_operation = XOR;
-        3'h5: alu_operation = fe_if.instruction.common.funct7[6] ? SHIFT_RIGHT : SHIFT_RIGHT_ARITHMETIC;
-        3'h6: alu_operation = OR;
-        3'h7: alu_operation = AND;
-        default: alu_operation = ALU_OP_UNDEFINED;
-        endcase
-    end
-
-    always_comb begin
-        unique casez (fe_if.instruction.b_type.funct3)
-        3'h0: branch_alu_operation = EQ;
-        3'h1: branch_alu_operation = NEQ;
-        3'h4: branch_alu_operation = LT;
-        3'h5: branch_alu_operation = GTE;
-        3'h6: branch_alu_operation = LT_U;
-        3'h7: branch_alu_operation = GTE_U;
-        default: branch_alu_operation = BRANCH_OP_UNDEFINED;
-        endcase
+        alu_operation = alu_operation_e'({fe_if.instruction.funct7[6], fe_if.instruction.funct3});
+        branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
     end
 
     always_comb begin
