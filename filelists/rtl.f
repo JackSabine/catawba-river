@@ -18,4 +18,3 @@ rtl/fetch.sv
 rtl/memory.sv
 rtl/writeback.sv
 rtl/pipeline.sv
-rtl/top.sv

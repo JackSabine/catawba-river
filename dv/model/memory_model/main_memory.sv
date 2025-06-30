@@ -1,9 +1,8 @@
-`include "torrence_macros.svh"
-
 class main_memory extends uvm_object;
     `uvm_object_utils(main_memory)
 
     local uint32_t memory [uint32_t];
+    local cache_type_e cache_type;
 
     function new(string name = "");
         super.new(name);
@@ -12,16 +11,17 @@ class main_memory extends uvm_object;
     local function uint32_t compute_default_value(uint32_t addr);
         uint32_t result;
 
-        if (addr < `RO_RW_MEMORY_BOUNDARY) begin
-            // ICache Request with no present instruction -> return a custom HALT code
-            result = {'0, `HALT_OPC};
-        end else begin
-            result = 0;
-            while (addr != 0) begin
-                result = (result * 16) + (addr % 16);
-                addr = addr / 16;
+        case (this.cache_type)
+            ICACHE: result = {'0, `HALT_OPC};
+            DCACHE: begin
+                result = 0;
+                while (addr != 0) begin
+                    result = (result * 16) + (addr % 16);
+                    addr = addr / 16;
+                end
             end
-        end
+            default: result = 32'hABCD_DCBA;
+        endcase
 
         return result;
     endfunction
@@ -36,7 +36,6 @@ class main_memory extends uvm_object;
         return resp;
     endfunction
 
-
     function memory_response_t write(uint32_t addr, memory_operation_size_e op_size, uint32_t data);
         memory_response_t resp;
 
@@ -44,5 +43,13 @@ class main_memory extends uvm_object;
         memory[addr] = data;
 
         return resp;
+    endfunction
+
+    function void tb_write(uint32_t addr, uint32_t data);
+        memory[addr] = data;
+    endfunction
+
+    function void set_cache_type(cache_type_e cache_type);
+        this.cache_type = cache_type;
     endfunction
 endclass

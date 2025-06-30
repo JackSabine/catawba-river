@@ -2,7 +2,8 @@ class environment extends uvm_env;
     `uvm_component_utils(environment)
 
     reset_agent rst_agent;
-    memory_rsp_agent mem_rsp_agent;
+    memory_rsp_agent icache_rsp_agent;
+    memory_rsp_agent dcache_rsp_agent;
     scoreboard sb;
 
     function new (string name, uvm_component parent);
@@ -12,7 +13,8 @@ class environment extends uvm_env;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         rst_agent  = reset_agent::type_id::create(.name("rst_agent"), .parent(this));
-        mem_rsp_agent = memory_rsp_agent::type_id::create(.name("mem_rsp_agent"), .parent(this));
+        icache_rsp_agent = memory_rsp_agent::type_id::create(.name("icache_rsp_agent"), .parent(this));
+        dcache_rsp_agent = memory_rsp_agent::type_id::create(.name("dcache_rsp_agent"), .parent(this));
         sb         = scoreboard::type_id::create(.name("sb"), .parent(this));
     endfunction
 
