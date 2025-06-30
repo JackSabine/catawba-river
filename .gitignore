@@ -4,3 +4,4 @@ synth/*
 __pycache__
 .vscode/settings.json
 .venv
+assembled.txt

@@ -76,14 +76,22 @@ COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/rtl.f
 COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/dv.f))
 
 HDL_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "*.sv" -o -name "*.svh" -o -name "*.mk" \))
+ASM_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "code.s" \))
 
 ####################################################################
 # Vivado output/rule aliases
 XVLOG_WORK_FILE = $(WORKDIR)/xsim.dir/$(WORK)/$(WORK).rlx
 XSIM_BINARY = $(WORKDIR)/xsim.dir/$(TB_TOP)_snapshot/xsimk
 
+ASM_COMPILE_WORK_FILE = $(WORKDIR)/asm-complete
+
 ####################################################################
 # Rules
+
+$(ASM_COMPILE_WORK_FILE): $(ASM_SENSITIVITY_LIST) ${WORKAREA}/scripts/convert_asm_programs.py | $(WORKDIR)
+	@echo "----- Assembling code tests -----"
+	@${WORKAREA}/scripts/convert_asm_programs.py
+	@touch $(ASM_COMPILE_WORK_FILE)
 
 $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	@echo "----- Compiling DPI-C -----"
@@ -98,7 +106,7 @@ $(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE)
 	cd $(WORKDIR) && xelab -top $(TB_TOP) -snapshot $(TB_TOP)_snapshot -debug all $(UVM_XELAB_FLAGS) $(XELAB_FLAGS)
 
 .PHONY: all
-all: $(XSIM_BINARY)
+all: $(XSIM_BINARY) $(ASM_COMPILE_WORK_FILE)
 	@echo "----- Compilation complete -----"
 
 $(WORKDIR):
