@@ -68,7 +68,7 @@ UVM_XVLOG_FLAGS := -L uvm
 UVM_XELAB_FLAGS := -L uvm
 
 # Other/non-UVM flags
-XVLOG_FLAGS := --sv --incr --include ${WORKAREA}/dv/svtb --include ${WORKAREA}/dv/tests $(addprefix --include ,$(foreach sip,$(SUBIP),${WORKAREA}/subip/$(sip)/dv/svtb))
+XVLOG_FLAGS := --sv --incr --include ${WORKAREA}/dv/svtb --include ${WORKAREA}/dv/tests --include ${WORKAREA}/dv/probe $(addprefix --include ,$(foreach sip,$(SUBIP),${WORKAREA}/subip/$(sip)/dv/svtb))
 XELAB_FLAGS := --timescale=1ns/1ns --override_timeprecision $(DPIC_SV_LIB_FLAGS)
 
 COMPILE_LIST += $(foreach sip,$(SUBIP),$(addprefix ${WORKAREA}/subip/$(sip)/,$(shell cat ${WORKAREA}/subip/$(sip)/filelists/rtl.f)))

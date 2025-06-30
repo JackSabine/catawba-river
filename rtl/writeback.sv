@@ -4,11 +4,8 @@ module writeback import catawba_params::*; #(
     input logic clk,
 
     memory_writeback_if.wb mem_if,
-    writeback_decode_if.wb de_if,
-    output logic halted
+    writeback_decode_if.wb de_if
 );
-    assign halted = mem_if.halt;
-
     assign de_if.result = mem_if.is_mem_inst ? mem_if.load_result : mem_if.alu_result;
     assign de_if.rd = mem_if.instruction.rd;
     assign de_if.write_to_rd =

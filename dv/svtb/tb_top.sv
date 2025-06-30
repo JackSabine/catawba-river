@@ -14,16 +14,15 @@ module tb_top;
     memory_if icache_if(clk);
     memory_if dcache_if(clk);
 
-    logic halted;
-
     // Dut instantiation
     pipeline dut(
         .clk(clk),
         .rst_if(rst_if),
         .icache_if(icache_if),
-        .dcache_if(dcache_if),
-        .halted(halted)
+        .dcache_if(dcache_if)
     );
+
+    `include "catawba_probes.svh"
 
     initial begin
         @(posedge clk_enabled);

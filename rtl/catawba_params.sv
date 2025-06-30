@@ -43,4 +43,6 @@ package catawba_params;
         logic [`REG_BITS-1:0] rd;
         logic [`OPC_BITS-1:0] opcode;
     } instruction_t;
+
+    parameter XLEN = 32;
 endpackage
