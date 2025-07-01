@@ -60,8 +60,14 @@ module decode import catawba_params::*; #(
     );
 
     always_comb begin
-        a_use_pc = 1'b0; // FIXME
-        b_use_imm = 1'b1; // FIXME
+        a_use_pc = fe_if.instruction.opcode[6:2] inside {
+            5'b11000, // branch
+            5'b11011, // jal
+            5'b11001, // jalr
+            5'b01101, // lui
+            5'b00101  // auipc
+        };
+        b_use_imm = (instruction_kind != R_INST);
     end
 
     always_comb begin
