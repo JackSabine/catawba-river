@@ -1,7 +1,7 @@
 class main_memory extends uvm_object;
     `uvm_object_utils(main_memory)
 
-    local uint32_t memory [uint32_t];
+    local memory_t memory;
     local cache_type_e cache_type;
 
     function new(string name = "");
@@ -49,7 +49,15 @@ class main_memory extends uvm_object;
         memory[addr] = data;
     endfunction
 
+    function memory_t tb_pull_memory();
+        return this.memory;
+    endfunction
+
     function void set_cache_type(cache_type_e cache_type);
         this.cache_type = cache_type;
+    endfunction
+
+    function cache_type_e get_cache_type();
+        return this.cache_type;
     endfunction
 endclass

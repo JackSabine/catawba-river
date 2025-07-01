@@ -17,26 +17,33 @@ class base_test extends uvm_test;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         env = environment::type_id::create(.name("env"), .parent(this));
-        assert(uvm_config_db #(main_memory)::get(
+        insn_memory = main_memory::type_id::create(.name("insn_memory"), .parent(this));
+        insn_memory.set_cache_type(ICACHE);
+        data_memory = main_memory::type_id::create(.name("data_memory"), .parent(this));
+        data_memory.set_cache_type(DCACHE);
+
+        uvm_config_db #(main_memory)::set(
             .cntxt(this),
-            .inst_name("*"),
-            .field_name("insn_memory"),
+            .inst_name("env.icache_rsp_agent.*"),
+            .field_name("dut_memory_model"),
             .value(insn_memory)
-        )) else `uvm_fatal(get_full_name(), "Couldn't get insn_memory from config db")
-        // pass the same data memory model under a special name for tests to examine
-        assert(uvm_config_db #(main_memory)::get(
+        );
+
+        uvm_config_db #(main_memory)::set(
             .cntxt(this),
-            .inst_name("*"),
+            .inst_name("env.dcache_rsp_agent.*"),
+            .field_name("dut_memory_model"),
+            .value(data_memory)
+        );
+        uvm_config_db #(main_memory)::set(
+            .cntxt(this),
+            .inst_name("env.sb.*"),
             .field_name("data_memory"),
             .value(data_memory)
-        )) else `uvm_fatal(get_full_name(), "Couldn't get data_memory from config db")
+        );
     endfunction
 
-    function void end_of_elaboration_phase(uvm_phase phase);
-        super.end_of_elaboration_phase(phase);
-    endfunction
-
-    task reset_phase(uvm_phase phase);
+    virtual task reset_phase(uvm_phase phase);
         reset_seq rst_seq;
 
         phase.raise_objection(this);
@@ -49,13 +56,13 @@ class base_test extends uvm_test;
         phase.drop_objection(this);
     endtask
 
-    task run_phase(uvm_phase phase);
-        memory_response_seq icache_rsp_seq;
-        memory_response_seq dcache_rsp_seq;
+    virtual task run_phase(uvm_phase phase);
+        base_memory_response_seq icache_rsp_seq;
+        base_memory_response_seq dcache_rsp_seq;
 
         // Don't raise an objection, that way it doesn't hold up the end of simulation
-        icache_rsp_seq = memory_response_seq::type_id::create(.name("icache_rsp_seq"));
-        dcache_rsp_seq = memory_response_seq::type_id::create(.name("dcache_rsp_seq"));
+        icache_rsp_seq = base_memory_response_seq::type_id::create(.name("icache_rsp_seq"));
+        dcache_rsp_seq = base_memory_response_seq::type_id::create(.name("dcache_rsp_seq"));
         icache_rsp_seq.start(env.icache_rsp_agent.mrsp_seqr); // Runs forever
         dcache_rsp_seq.start(env.dcache_rsp_agent.mrsp_seqr); // Runs forever
     endtask

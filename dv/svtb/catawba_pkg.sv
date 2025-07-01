@@ -16,7 +16,8 @@ package catawba_pkg;
     `include "../model/memory_model/files.sv"
     `include "../configs/clock_config.sv"
 
-    `include "../seq/memory_response_seq.sv"
+    `include "../seq/base_memory_response_seq.sv"
+    `include "../seq/asm_memory_response_seq.sv"
     `include "../seq/reset_seq.sv"
 
     `include "../agents/memory_rsp_agent/memory_rsp_sequencer.sv"
