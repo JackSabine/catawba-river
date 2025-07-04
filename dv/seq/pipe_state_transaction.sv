@@ -1,0 +1,48 @@
+class pipe_state_transaction extends uvm_sequence_item;
+    `uvm_object_utils(pipe_state_transaction)
+
+    bit [catawba_params::XLEN-1:0] int_regs [uint32_t];
+    memory_t data_memory;
+
+    function new(string name = "");
+        super.new(name);
+    endfunction
+
+    function string convert2string();
+        uint32_t index;
+        string s;
+
+        s = "";
+
+        s = {s, "----- Registers -----\n"};
+        foreach (int_regs[index]) begin
+            s = {s, $sformatf("x%0d: %0d\n", index, int_regs[index])};
+        end
+
+        s = {s, "----- Data Memory -----\n"};
+        foreach (data_memory[index]) begin
+            s = {s, $sformatf("0x%08x: %08x\n", index, data_memory[index])};
+        end
+
+        return s;
+    endfunction
+
+    virtual function void do_copy(uvm_object rhs);
+        pipe_state_transaction _obj;
+        $cast(_obj, rhs);
+
+        // https://verificationacademy.com/forums/t/copy-assoc-array-to-assoc-arry/30549
+        int_regs    = _obj.int_regs;
+        data_memory = _obj.data_memory;
+    endfunction
+
+    virtual function bit do_compare(uvm_object rhs, uvm_comparer comparer);
+        pipe_state_transaction _obj;
+        $cast(_obj, rhs);
+
+        // https://verificationacademy.com/forums/t/compare-2-queues-2-associative-arrays-2-dynamic-arrays/36900
+        return
+            int_regs    == _obj.int_regs    &
+            data_memory == _obj.data_memory ;
+    endfunction
+endclass

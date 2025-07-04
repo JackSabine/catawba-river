@@ -12,6 +12,7 @@ package catawba_pkg;
 
     `include "../seq/memory_transaction.sv"
     `include "../seq/reset_transaction.sv"
+    `include "../seq/pipe_state_transaction.sv"
 
     `include "../model/memory_model/files.sv"
     `include "../configs/clock_config.sv"
