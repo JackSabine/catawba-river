@@ -29,9 +29,6 @@ MAKEFLAGS += -j$(NPROCS)
 # DPI-C Modules/Filenames
 DPIC_SOURCES := get_environment_variable
 
-# UVM Verbosity
-v = UVM_LOW
-
 # xsim random number generation
 RANDOM_NUMBER = $(shell shuf -i 0-4294967296 -n 1)
 s = $(RANDOM_NUMBER)
