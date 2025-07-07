@@ -29,7 +29,8 @@ class asm_memory_response_seq extends base_memory_response_seq;
         address = 0;
         while ($fscanf(fd, "%32b", data) == 1) begin
             `uvm_info(get_full_name(), $sformatf("Placing %32b at address 0x%08h", data, address), UVM_HIGH)
-            memory[address++] = data;
+            memory[address] = data;
+            address += 4; // instructions are 4 bytes wide, next insn falls 4 steps away
         end
 
         $fclose(fd);
