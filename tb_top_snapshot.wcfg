@@ -157,9 +157,9 @@
       <obj_property name="ElementShortName">composed_immediate[31:0]</obj_property>
       <obj_property name="ObjectShortName">composed_immediate[31:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_top/dut/de/is_mem_inst">
-      <obj_property name="ElementShortName">is_mem_inst</obj_property>
-      <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+   <wvobject type="logic" fp_name="/tb_top/dut/de/is_mem_insn">
+      <obj_property name="ElementShortName">is_mem_insn</obj_property>
+      <obj_property name="ObjectShortName">is_mem_insn</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/tb_top/dut/de/scoreboard_stall">
       <obj_property name="ElementShortName">scoreboard_stall</obj_property>
@@ -225,9 +225,9 @@
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_mem_inst">
-         <obj_property name="ElementShortName">is_mem_inst</obj_property>
-         <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/alu_operation">
          <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
@@ -290,9 +290,9 @@
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_mem_inst">
-         <obj_property name="ElementShortName">is_mem_inst</obj_property>
-         <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/alu_operation">
          <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
@@ -378,9 +378,9 @@
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/is_mem_inst">
-         <obj_property name="ElementShortName">is_mem_inst</obj_property>
-         <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/stall_upstream">
          <obj_property name="ElementShortName">stall_upstream</obj_property>
@@ -419,9 +419,9 @@
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/is_mem_inst">
-         <obj_property name="ElementShortName">is_mem_inst</obj_property>
-         <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/stall_upstream">
          <obj_property name="ElementShortName">stall_upstream</obj_property>
@@ -476,9 +476,9 @@
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/is_mem_inst">
-         <obj_property name="ElementShortName">is_mem_inst</obj_property>
-         <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider84" type="divider">
@@ -513,9 +513,9 @@
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/is_mem_inst">
-         <obj_property name="ElementShortName">is_mem_inst</obj_property>
-         <obj_property name="ObjectShortName">is_mem_inst</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group184">

@@ -22,7 +22,8 @@ module decode import catawba_params::*; #(
     branch_alu_operation_e branch_alu_operation;
 
     instruction_kind_t instruction_kind;
-    logic is_mem_inst;
+    logic is_branch_insn;
+    logic is_mem_insn;
 
     logic scoreboard_stall;
 
@@ -79,7 +80,8 @@ module decode import catawba_params::*; #(
     end
 
     always_comb begin
-        is_mem_inst = fe_if.instruction.opcode =?= 7'b0z000zz;
+        is_branch_insn = (instruction_kind == B_INST);
+        is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
 
         unique casez (fe_if.instruction.opcode)
         7'b01100??: begin
@@ -138,7 +140,8 @@ module decode import catawba_params::*; #(
             ex_if.next_pc <= fe_if.next_pc;
             ex_if.instruction <= fe_if.instruction;
             ex_if.instruction_kind <= instruction_kind;
-            ex_if.is_mem_inst <= is_mem_inst;
+            ex_if.is_branch_insn <= is_branch_insn;
+            ex_if.is_mem_insn <= is_mem_insn;
             ex_if.immediate <= composed_immediate;
             ex_if.alu_operation <= alu_operation;
             ex_if.branch_alu_operation <= branch_alu_operation;

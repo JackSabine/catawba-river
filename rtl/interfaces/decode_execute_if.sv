@@ -10,7 +10,8 @@ interface decode_execute_if #(parameter XLEN = 32);
 
     instruction_t instruction;
     instruction_kind_t instruction_kind;
-    logic is_mem_inst;
+    logic is_branch_insn;
+    logic is_mem_insn;
 
     alu_operation_e alu_operation;
     branch_alu_operation_e branch_alu_operation;
@@ -29,7 +30,8 @@ interface decode_execute_if #(parameter XLEN = 32);
             next_pc,
             instruction,
             instruction_kind,
-            is_mem_inst,
+            is_branch_insn,
+            is_mem_insn,
             alu_operation,
             branch_alu_operation,
             a_use_pc,
@@ -48,7 +50,8 @@ interface decode_execute_if #(parameter XLEN = 32);
             next_pc,
             instruction,
             instruction_kind,
-            is_mem_inst,
+            is_branch_insn,
+            is_mem_insn,
             alu_operation,
             branch_alu_operation,
             a_use_pc,

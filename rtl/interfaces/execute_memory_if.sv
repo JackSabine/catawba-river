@@ -10,7 +10,7 @@ interface execute_memory_if #(parameter XLEN = 32);
 
     instruction_t instruction;
     instruction_kind_t instruction_kind;
-    logic is_mem_inst;
+    logic is_mem_insn;
 
     logic stall_upstream;
 
@@ -22,7 +22,7 @@ interface execute_memory_if #(parameter XLEN = 32);
             rs2_word,
             instruction,
             instruction_kind,
-            is_mem_inst,
+            is_mem_insn,
         input
             stall_upstream
     );
@@ -35,7 +35,7 @@ interface execute_memory_if #(parameter XLEN = 32);
             rs2_word,
             instruction,
             instruction_kind,
-            is_mem_inst,
+            is_mem_insn,
         output
             stall_upstream
     );

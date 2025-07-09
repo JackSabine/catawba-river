@@ -19,7 +19,7 @@ module memory import catawba_params::*; import torrence_params::*; #(
     logic local_stall_request;
     logic propagate_upstream_data;
 
-    assign mem_req_valid = ex_if.valid & ex_if.is_mem_inst;
+    assign mem_req_valid = ex_if.valid & ex_if.is_mem_insn;
     assign mem_op_size = memory_operation_size_e'(ex_if.instruction.funct3[1:0]);
 
     assign dcache_if.req_address = ex_if.alu_result;
@@ -71,10 +71,10 @@ module memory import catawba_params::*; import torrence_params::*; #(
             wb_if.load_result <= load_result;
             wb_if.instruction <= ex_if.instruction;
             wb_if.instruction_kind <= ex_if.instruction_kind;
-            wb_if.is_mem_inst <= ex_if.is_mem_inst;
+            wb_if.is_mem_insn <= ex_if.is_mem_insn;
         end
     end
 
-    assign local_stall_request = (ex_if.is_mem_inst & ~dcache_if.req_fulfilled);
+    assign local_stall_request = (ex_if.is_mem_insn & ~dcache_if.req_fulfilled);
     assign ex_if.stall_upstream = local_stall_request;
 endmodule

@@ -10,7 +10,7 @@ interface memory_writeback_if #(parameter XLEN = 32);
     instruction_t instruction;
     instruction_kind_t instruction_kind;
 
-    logic is_mem_inst;
+    logic is_mem_insn;
 
     modport mem (
         output
@@ -20,7 +20,7 @@ interface memory_writeback_if #(parameter XLEN = 32);
             load_result,
             instruction,
             instruction_kind,
-            is_mem_inst
+            is_mem_insn
     );
 
     modport wb (
@@ -31,6 +31,6 @@ interface memory_writeback_if #(parameter XLEN = 32);
             load_result,
             instruction,
             instruction_kind,
-            is_mem_inst
+            is_mem_insn
     );
 endinterface
