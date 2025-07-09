@@ -27,12 +27,4 @@ class asm_test extends base_test;
         icache_rsp_seq.start(env.icache_rsp_agent.mrsp_seqr); // Runs forever
         dcache_rsp_seq.start(env.dcache_rsp_agent.mrsp_seqr); // Runs forever
     endtask
-
-    virtual task main_phase(uvm_phase phase);
-        phase.raise_objection(this);
-
-        #100ns;
-
-        phase.drop_objection(this);
-    endtask
 endclass

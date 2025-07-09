@@ -5,6 +5,8 @@ class base_test extends uvm_test;
     main_memory insn_memory;
     main_memory data_memory;
 
+    virtual catawba_probe_if probe_if;
+
     function new (string name, uvm_component parent);
         super.new(name, parent);
     endfunction
@@ -41,6 +43,13 @@ class base_test extends uvm_test;
             .field_name("data_memory"),
             .value(data_memory)
         );
+
+        assert(uvm_config_db #(virtual catawba_probe_if)::get(
+            .cntxt(this),
+            .inst_name("*"),
+            .field_name("probe_if"),
+            .value(probe_if)
+        )) else `uvm_fatal(get_full_name(), "Couldn't retrieve probe_if from uvm_config_db")
     endfunction
 
     virtual task reset_phase(uvm_phase phase);
@@ -70,7 +79,16 @@ class base_test extends uvm_test;
     virtual task main_phase(uvm_phase phase);
         phase.raise_objection(this);
 
-        #100ns;
+        wait (probe_if.fe_halted);
+
+        phase.drop_objection(this);
+    endtask
+
+    virtual task shutdown_phase(uvm_phase phase);
+        phase.raise_objection(this);
+
+        wait (probe_if.wb_halted);
+        repeat (4) @(posedge probe_if.clk);
 
         phase.drop_objection(this);
     endtask
