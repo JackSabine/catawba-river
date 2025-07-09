@@ -36,7 +36,6 @@ module decode import catawba_params::*; #(
         .read_port_select_2(rs2_index),
         .write_port_select(wb_if.rd),
         .write_port_data(wb_if.result),
-        .write_enable(wb_if.write_to_rd),
 
         .read_port_data_1(rs1_word),
         .read_port_data_2(rs2_word)
@@ -54,7 +53,6 @@ module decode import catawba_params::*; #(
         .de_write_port_select(fe_if.instruction.rd),
 
         .wb_write_port_select(wb_if.rd),
-        .wb_write_enable(wb_if.write_to_rd),
 
         .stall(scoreboard_stall)
     );

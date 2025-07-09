@@ -10,7 +10,6 @@ module register_file #(
     input logic [`REG_BITS-1:0] read_port_select_2,
     input logic [`REG_BITS-1:0] write_port_select,
     input logic [XLEN-1:0] write_port_data,
-    input logic write_enable,
 
     output logic [XLEN-1:0] read_port_data_1,
     output logic [XLEN-1:0] read_port_data_2
@@ -21,7 +20,7 @@ module register_file #(
     assign register_file[0] = '0;
 
     always_ff @(posedge clk) begin
-        if (write_enable && (write_port_select != '0)) begin
+        if (write_port_select != '0) begin
             register_file[write_port_select] <= write_port_data;
         end
     end

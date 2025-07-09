@@ -15,7 +15,6 @@ module register_scoreboard import catawba_params::*; #(
     input logic [`REG_BITS-1:0] de_write_port_select,
 
     input logic [`REG_BITS-1:0] wb_write_port_select,
-    input logic wb_write_enable,
 
     output logic stall
 );
@@ -23,10 +22,21 @@ module register_scoreboard import catawba_params::*; #(
     logic ready_bits [0:NUM_REGISTERS-1];
 
     logic de_instruction_has_rd, de_instruction_reads_rs1, de_instruction_reads_rs2;
+    logic [NUM_REGISTERS-1:0] de_write_vector, wb_write_vector;
 
     assign de_instruction_has_rd = de_instruction_kind inside {R_INST, I_INST, U_INST, J_INST};
     assign de_instruction_reads_rs1 = de_instruction_kind inside {R_INST, I_INST, S_INST, B_INST};
     assign de_instruction_reads_rs2 = de_instruction_kind inside {R_INST,         S_INST, B_INST};
+
+
+    assign de_write_vector[0] = 1'b0;
+    assign wb_write_vector[0] = 1'b0;
+    always_comb begin
+        for (int r = 1; r < NUM_REGISTERS; r++) begin
+            de_write_vector[r] = (de_write_port_select == r);
+            wb_write_vector[r] = (wb_write_port_select == r);
+        end
+    end
 
     // stall on non-ready rd to prevent younger instructions from advancing
     // when the older writer of rd finishes
@@ -51,9 +61,9 @@ module register_scoreboard import catawba_params::*; #(
             // When wb_write_enable and de_instruction_has_rd are active while stall isn't active,
             // wb_write_port_select will not equal de_write_port_select
             for (int r = 1; r < NUM_REGISTERS; r++) begin
-                unique0 if (wb_write_enable & wb_write_port_select == r) begin
+                unique0 if (wb_write_vector[r]) begin
                     ready_bits[r] <= 1'b1;
-                end else if (de_valid & ~stall & de_instruction_has_rd & de_write_port_select == r) begin
+                end else if (de_valid & ~stall & de_instruction_has_rd & de_write_vector[r]) begin
                     ready_bits[r] <= 1'b0;
                 end
             end
@@ -62,7 +72,12 @@ module register_scoreboard import catawba_params::*; #(
 
     CONFLICTING_WRITE_PORT_SELECTS: assert property (
         @(posedge clk) disable iff (rst_if.reset)
-        wb_write_enable & (~stall & de_instruction_has_rd) |-> wb_write_port_select != de_write_port_select
+        (wb_write_vector != '0) & (~stall & de_instruction_has_rd) |-> wb_write_port_select != de_write_port_select
+    );
+
+    WRITE_VECTOR_IS_ONEHOT0_AND_VALID: assert property (
+        @(posedge clk) disable iff (rst_if.reset)
+        !$isunknown(wb_write_vector) && $onehot0(wb_write_vector) && (wb_write_vector[0] == 1'b0)
     );
 
 endmodule
