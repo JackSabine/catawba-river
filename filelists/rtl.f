@@ -10,9 +10,10 @@ rtl/interfaces/writeback_decode_if.sv
 
 rtl/branch_alu.sv
 rtl/alu.sv
-rtl/execute.sv
 rtl/register_file.sv
 rtl/register_scoreboard.sv
+rtl/advance_control.sv
+rtl/execute.sv
 rtl/decode.sv
 rtl/fetch.sv
 rtl/memory.sv

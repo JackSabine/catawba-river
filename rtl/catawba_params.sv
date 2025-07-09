@@ -44,5 +44,11 @@ package catawba_params;
         logic [`OPC_BITS-1:0] opcode;
     } instruction_t;
 
+    typedef enum logic [1:0] {
+        STALL_ON_BRANCH = 2'b00,
+        NORMAL_OPERATION,
+        HALTED
+    } fetch_state_e;
+
     parameter XLEN = 32;
 endpackage

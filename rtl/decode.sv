@@ -9,7 +9,7 @@ module decode import catawba_params::*; #(
     writeback_decode_if.de wb_if
 );
 
-    logic [`REG_BITS-1:0] rs1_index, rs2_index;
+    logic [`REG_BITS-1:0] rs1_index, rs2_index, de_rd_index, wb_rd_index;
     logic [XLEN-1:0] rs1_word, rs2_word;
 
     logic a_use_pc;
@@ -26,15 +26,20 @@ module decode import catawba_params::*; #(
 
     logic scoreboard_stall;
 
+    logic local_stall_request;
+    logic propagate_upstream_data;
+
 
     assign rs1_index = fe_if.instruction.rs1;
     assign rs2_index = fe_if.instruction.rs2;
+    assign de_rd_index = fe_if.instruction.rd;
+    assign wb_rd_index = wb_if.rd;
 
     register_file regfile (
         .clk(clk),
         .read_port_select_1(rs1_index),
         .read_port_select_2(rs2_index),
-        .write_port_select(wb_if.rd),
+        .write_port_select(wb_rd_index),
         .write_port_data(wb_if.result),
 
         .read_port_data_1(rs1_word),
@@ -50,9 +55,9 @@ module decode import catawba_params::*; #(
         .de_instruction_kind(instruction_kind),
         .de_read_port_select_1(rs1_index),
         .de_read_port_select_2(rs2_index),
-        .de_write_port_select(fe_if.instruction.rd),
+        .de_write_port_select(de_rd_index),
 
-        .wb_write_port_select(wb_if.rd),
+        .wb_write_port_select(wb_rd_index),
 
         .stall(scoreboard_stall)
     );
@@ -112,16 +117,22 @@ module decode import catawba_params::*; #(
         endcase
     end
 
-    always_ff @(posedge clk) begin
-        if (rst_if.reset) begin
-            ex_if.valid <= 1'b0;
-            ex_if.halt <= 1'b0;
-        end else if (~ex_if.stall_upstream) begin
-            ex_if.valid <= fe_if.valid;
-            ex_if.halt <= fe_if.halt;
-        end
+    advance_control advance_ctrl (
+        .clk(clk),
+        .rst_if(rst_if),
+        .upstream_valid(fe_if.valid),
+        .local_stall_request(local_stall_request),
+        .downstream_stall_request(ex_if.stall_upstream),
+        .upstream_halt(fe_if.halt),
 
-        if (~ex_if.stall_upstream) begin
+        .propagate_upstream_data(propagate_upstream_data),
+        .downstream_valid(ex_if.valid),
+        .downstream_halt(ex_if.halt),
+        .request_upstream_stall(fe_if.stall_upstream)
+    );
+
+    always_ff @(posedge clk) begin
+        if (propagate_upstream_data) begin
             ex_if.rs1_word <= rs1_word;
             ex_if.rs2_word <= rs2_word;
             ex_if.next_pc <= fe_if.next_pc;
@@ -136,5 +147,5 @@ module decode import catawba_params::*; #(
         end
     end
 
-    assign fe_if.stall_upstream = fe_if.valid & (ex_if.stall_upstream | scoreboard_stall);
+    assign local_stall_request = scoreboard_stall;
 endmodule

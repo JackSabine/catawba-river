@@ -16,6 +16,9 @@ module memory import catawba_params::*; import torrence_params::*; #(
 
     logic [XLEN-1:0] sext_word, zext_word, load_result;
 
+    logic local_stall_request;
+    logic propagate_upstream_data;
+
     assign mem_req_valid = ex_if.valid & ex_if.is_mem_inst;
     assign mem_op_size = memory_operation_size_e'(ex_if.instruction.funct3[1:0]);
 
@@ -48,21 +51,30 @@ module memory import catawba_params::*; import torrence_params::*; #(
         load_result = ex_if.instruction.funct3[2] ? zext_word : sext_word;
     end
 
-    always_ff @(posedge clk) begin
-        if (rst_if.reset) begin
-            wb_if.valid <= 1'b0;
-            wb_if.halt <= 1'b0;
-        end else begin
-            wb_if.valid <= ex_if.valid;
-            wb_if.halt <= ex_if.halt;
-        end
+    advance_control advance_ctrl (
+        .clk(clk),
+        .rst_if(rst_if),
+        .upstream_valid(ex_if.valid),
+        .local_stall_request(local_stall_request),
+        .downstream_stall_request(1'b0),
+        .upstream_halt(ex_if.halt),
 
-        wb_if.alu_result <= ex_if.alu_result;
-        wb_if.load_result <= load_result;
-        wb_if.instruction <= ex_if.instruction;
-        wb_if.instruction_kind <= ex_if.instruction_kind;
-        wb_if.is_mem_inst <= ex_if.is_mem_inst;
+        .propagate_upstream_data(propagate_upstream_data),
+        .downstream_valid(wb_if.valid),
+        .downstream_halt(wb_if.halt),
+        .request_upstream_stall(ex_if.stall_upstream)
+    );
+
+    always_ff @(posedge clk) begin
+        if (propagate_upstream_data) begin
+            wb_if.alu_result <= ex_if.alu_result;
+            wb_if.load_result <= load_result;
+            wb_if.instruction <= ex_if.instruction;
+            wb_if.instruction_kind <= ex_if.instruction_kind;
+            wb_if.is_mem_inst <= ex_if.is_mem_inst;
+        end
     end
 
-    assign ex_if.stall_upstream = ex_if.valid & (ex_if.is_mem_inst & ~dcache_if.req_fulfilled);
+    assign local_stall_request = (ex_if.is_mem_inst & ~dcache_if.req_fulfilled);
+    assign ex_if.stall_upstream = local_stall_request;
 endmodule

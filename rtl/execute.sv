@@ -15,6 +15,8 @@ module execute import catawba_params::*; #(
     logic [XLEN-1:0] alu_operand_a, alu_operand_b;
     logic branch_alu_result;
 
+    logic propagate_upstream_data;
+
     assign alu_operand_a = de_if.a_use_pc ? de_if.next_pc : de_if.rs1_word;
     assign alu_operand_b = de_if.b_use_imm ? de_if.immediate : de_if.rs2_word;
 
@@ -40,16 +42,22 @@ module execute import catawba_params::*; #(
     assign fe_if.branch_target_pc = de_if.next_pc + de_if.immediate;
     assign fe_if.branch_inst_next_pc = de_if.next_pc;
 
-    always_ff @(posedge clk) begin
-        if (rst_if.reset) begin
-            mem_if.valid <= 1'b0;
-            mem_if.halt <= 1'b0;
-        end else if (~mem_if.stall_upstream) begin
-            mem_if.valid <= de_if.valid;
-            mem_if.halt <= de_if.halt;
-        end
+    advance_control advance_ctrl (
+        .clk(clk),
+        .rst_if(rst_if),
+        .upstream_valid(de_if.valid),
+        .local_stall_request(1'b0),
+        .downstream_stall_request(mem_if.stall_upstream),
+        .upstream_halt(de_if.halt),
 
-        if (~mem_if.stall_upstream) begin
+        .propagate_upstream_data(propagate_upstream_data),
+        .downstream_valid(mem_if.valid),
+        .downstream_halt(mem_if.halt),
+        .request_upstream_stall(de_if.stall_upstream)
+    );
+
+    always_ff @(posedge clk) begin
+        if (propagate_upstream_data) begin
             mem_if.rs2_word <= de_if.rs2_word;
             mem_if.alu_result <= alu_result;
 
@@ -58,6 +66,4 @@ module execute import catawba_params::*; #(
             mem_if.is_mem_inst <= de_if.is_mem_inst;
         end
     end
-
-    assign de_if.stall_upstream = de_if.valid & (mem_if.stall_upstream);
 endmodule
