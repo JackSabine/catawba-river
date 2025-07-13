@@ -27,7 +27,7 @@ MAKEFLAGS += -j$(NPROCS)
 # Manual configure
 
 # DPI-C Modules/Filenames
-DPIC_SOURCES := get_environment_variable
+DPIC_SOURCES := get_environment_variable disassemble_rv32i
 
 # xsim random number generation
 RANDOM_NUMBER = $(shell shuf -i 0-4294967296 -n 1)
@@ -91,7 +91,6 @@ $(ASM_COMPILE_WORK_FILE): $(ASM_SENSITIVITY_LIST) ${WORKAREA}/scripts/convert_as
 	@touch $(ASM_COMPILE_WORK_FILE)
 
 $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
-	@echo "----- Compiling DPI-C -----"
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
 
 $(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) | $(WORKDIR)

@@ -6,4 +6,5 @@ package catawba_types;
 
     typedef uint32_t memory_t [uint32_t];
 
+    typedef logic [`TB_STRING_NUM_BITS-1:0] tb_string_t;
 endpackage

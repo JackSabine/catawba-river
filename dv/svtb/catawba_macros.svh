@@ -10,4 +10,7 @@
 
 `define HALT_OPC    (7'h0)
 
+`define TB_STRING_MAX_CHARS (31)
+`define TB_STRING_NUM_BITS ( (`TB_STRING_MAX_CHARS + 1) * 8)
+
 `endif
