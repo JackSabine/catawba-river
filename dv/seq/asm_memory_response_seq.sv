@@ -23,14 +23,16 @@ class asm_memory_response_seq extends base_memory_response_seq;
 
         fd = $fopen({get_environment_variable("WORKAREA"), "/dv/asm/", asm_test, "/assembled.txt"}, "r");
 
-        if (fd) `uvm_info(get_full_name(), $sformatf("Opened %s successfully :)", asm_test), UVM_HIGH)
-        else `uvm_error(get_full_name(), $sformatf("Couldn't open %s :(", asm_test))
-
-        address = 0;
-        while ($fscanf(fd, "%32b", data) == 1) begin
-            `uvm_info(get_full_name(), $sformatf("Placing %32b at address 0x%08h", data, address), UVM_HIGH)
-            memory[address] = data;
-            address += 4; // instructions are 4 bytes wide, next insn falls 4 steps away
+        if (fd) begin
+            `uvm_info(get_full_name(), $sformatf("Opened %s successfully :)", asm_test), UVM_HIGH)
+            address = 0;
+            while ($fscanf(fd, "%32b", data) == 1) begin
+                `uvm_info(get_full_name(), $sformatf("Placing %32b at address 0x%08h", data, address), UVM_HIGH)
+                memory[address] = data;
+                address += 4; // instructions are 4 bytes wide, next insn falls 4 steps away
+            end
+        end else begin
+            `uvm_error(get_full_name(), $sformatf("Couldn't open assembled.txt for %s", asm_test))
         end
 
         $fclose(fd);
@@ -51,37 +53,36 @@ class asm_memory_response_seq extends base_memory_response_seq;
 
         fd = $fopen({get_environment_variable("WORKAREA"), "/dv/asm/", asm_test, "/result"}, "r");
 
-        if (fd) `uvm_info(get_full_name(), $sformatf("Opened result for asm_test %s successfully", asm_test), UVM_DEBUG)
-        else `uvm_error(get_full_name(), $sformatf("Couldn't open result for asm_test %s", asm_test))
-
-        // Replace $fscanf calls with $sscanf, read the line with $fgets and then pass to $fscanf
-        // $fscanf, even when it fails, is destructive and moves the read pointer
-
-        line_number = 1;
-        while ($fgets(line, fd)) begin
-            if (
-                $sscanf(line, "x%0d: 0x%08h", index, data) == 2 ||
-                $sscanf(line, "x%0d: 0b%32b", index, data) == 2 ||
-                $sscanf(line, "x%0d: %0d", index, data) == 2
-            ) begin
-                if (index < `NUM_REGS) begin
-                    pipe_state_tx.int_regs[index] = data;
-                    `uvm_info(get_full_name(), $sformatf("Expecting %0d/0x%08h/0b%32b in register %0d", data, data, data, index), UVM_HIGH)
+        if (fd) begin
+            `uvm_info(get_full_name(), $sformatf("Opened result for asm_test %s successfully", asm_test), UVM_DEBUG)
+            line_number = 1;
+            while ($fgets(line, fd)) begin
+                if (
+                    $sscanf(line, "x%0d: 0x%08h", index, data) == 2 ||
+                    $sscanf(line, "x%0d: 0b%32b", index, data) == 2 ||
+                    $sscanf(line, "x%0d: %0d", index, data) == 2
+                ) begin
+                    if (index < `NUM_REGS) begin
+                        pipe_state_tx.int_regs[index] = data;
+                        `uvm_info(get_full_name(), $sformatf("Expecting %0d/0x%08h/0b%32b in register %0d", data, data, data, index), UVM_HIGH)
+                    end else begin
+                        `uvm_error(get_full_name(), $sformatf("While reading asm result file, encountered an out of range register index %0d", index))
+                    end
+                end else if (
+                    $sscanf(line, "0x%08h: 0x%08h", index, data) == 2 ||
+                    $sscanf(line, "0x%08h: 0b%32b", index, data) == 2 ||
+                    $sscanf(line, "0x%08h: %d", index, data) == 2
+                ) begin
+                    `uvm_info(get_full_name(), $sformatf("Expecting %0d/0x%08h/0b%32b at index 0x%08h", data, data, data, index), UVM_HIGH)
+                    pipe_state_tx.data_memory[index++] = data;
                 end else begin
-                    `uvm_error(get_full_name(), $sformatf("While reading asm result file, encountered an out of range register index %0d", index))
+                    `uvm_error(get_full_name(), $sformatf("Discarding line %0d that did not match any pattern: `%s`", line_number, line))
                 end
-            end else if (
-                $sscanf(line, "0x%08h: 0x%08h", index, data) == 2 ||
-                $sscanf(line, "0x%08h: 0b%32b", index, data) == 2 ||
-                $sscanf(line, "0x%08h: %d", index, data) == 2
-            ) begin
-                `uvm_info(get_full_name(), $sformatf("Expecting %0d/0x%08h/0b%32b at index 0x%08h", data, data, data, index), UVM_HIGH)
-                pipe_state_tx.data_memory[index++] = data;
-            end else begin
-                `uvm_error(get_full_name(), $sformatf("Discarding line %0d that did not match any pattern: `%s`", line_number, line))
-            end
 
-            line_number++;
+                line_number++;
+            end
+        end else begin
+            `uvm_error(get_full_name(), $sformatf("Couldn't open result for asm_test %s", asm_test))
         end
 
         $fclose(fd);
