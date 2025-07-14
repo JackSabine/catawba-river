@@ -4,7 +4,7 @@ interface fetch_decode_if #(parameter XLEN = 32);
     logic valid;
     logic halt;
 
-    logic [XLEN-1:0] next_pc;
+    logic [XLEN-1:0] pc;
     instruction_t instruction;
 
     logic stall_upstream;
@@ -13,7 +13,7 @@ interface fetch_decode_if #(parameter XLEN = 32);
         output
             valid,
             halt,
-            next_pc,
+            pc,
             instruction,
         input
             stall_upstream
@@ -23,7 +23,7 @@ interface fetch_decode_if #(parameter XLEN = 32);
         input
             valid,
             halt,
-            next_pc,
+            pc,
             instruction,
         output
             stall_upstream

@@ -16,13 +16,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="8 ns"></ZoomStartTime>
-      <ZoomEndTime time="33 ns"></ZoomEndTime>
-      <Cursor1Time time="19 ns"></Cursor1Time>
+      <ZoomStartTime time="0 ns"></ZoomStartTime>
+      <ZoomEndTime time="36 ns"></ZoomEndTime>
+      <Cursor1Time time="18 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="413"></NameColumnWidth>
-      <ValueColumnWidth column_width="118"></ValueColumnWidth>
+      <ValueColumnWidth column_width="108"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="26" />
    <wvobject type="logic" fp_name="/tb_top/clk">
@@ -50,6 +50,10 @@
    <wvobject type="group" fp_name="group104">
       <obj_property name="label">ex_fe inteface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe_ex_if/take_branch_valid">
+         <obj_property name="ElementShortName">take_branch_valid</obj_property>
+         <obj_property name="ObjectShortName">take_branch_valid</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/fe_ex_if/take_branch">
          <obj_property name="ElementShortName">take_branch</obj_property>
          <obj_property name="ObjectShortName">take_branch</obj_property>
@@ -134,10 +138,6 @@
          <obj_property name="ElementShortName">halt</obj_property>
          <obj_property name="ObjectShortName">halt</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/fe_de_if/next_pc">
-         <obj_property name="ElementShortName">next_pc[31:0]</obj_property>
-         <obj_property name="ObjectShortName">next_pc[31:0]</obj_property>
-      </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fe_de_if/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
@@ -175,9 +175,17 @@
    <wvobject type="group" fp_name="group170">
       <obj_property name="label">de</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/de/instruction_kind">
+         <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
+         <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de/scoreboard_stall">
          <obj_property name="ElementShortName">scoreboard_stall</obj_property>
          <obj_property name="ObjectShortName">scoreboard_stall</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/is_branch_insn">
+         <obj_property name="ElementShortName">is_branch_insn</obj_property>
+         <obj_property name="ObjectShortName">is_branch_insn</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de/regscoreboard/de_write_vector">
          <obj_property name="ElementShortName">de_write_vector[31:0]</obj_property>
@@ -220,10 +228,6 @@
          <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
          <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/next_pc">
-         <obj_property name="ElementShortName">next_pc[31:0]</obj_property>
-         <obj_property name="ObjectShortName">next_pc[31:0]</obj_property>
-      </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
@@ -235,6 +239,10 @@
       <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_mem_insn">
          <obj_property name="ElementShortName">is_mem_insn</obj_property>
          <obj_property name="ObjectShortName">is_mem_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_branch_insn">
+         <obj_property name="ElementShortName">is_branch_insn</obj_property>
+         <obj_property name="ObjectShortName">is_branch_insn</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/alu_operation">
          <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
@@ -296,6 +304,10 @@
    <wvobject type="group" fp_name="group104">
       <obj_property name="label">ex_fe interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe_ex_if/take_branch_valid">
+         <obj_property name="ElementShortName">take_branch_valid</obj_property>
+         <obj_property name="ObjectShortName">take_branch_valid</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/fe_ex_if/take_branch">
          <obj_property name="ElementShortName">take_branch</obj_property>
          <obj_property name="ObjectShortName">take_branch</obj_property>
@@ -481,10 +493,19 @@
    <wvobject type="group" fp_name="group56">
       <obj_property name="label">probe_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/tb_top/probe_if/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
       <wvobject type="array" fp_name="/tb_top/probe_if/int_registers">
          <obj_property name="DisplayName">FullPathName</obj_property>
          <obj_property name="ElementShortName">int_registers[0:31][31:0]</obj_property>
          <obj_property name="ObjectShortName">int_registers[0:31][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/probe_if/fe_halted">
+         <obj_property name="ElementShortName">fe_halted</obj_property>
+         <obj_property name="ObjectShortName">fe_halted</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/probe_if/wb_halted">
          <obj_property name="DisplayName">FullPathName</obj_property>

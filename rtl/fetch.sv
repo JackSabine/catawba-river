@@ -44,15 +44,14 @@ always_comb begin
         end
 
         STALL_ON_BRANCH: begin
-            if (pc_plus_4 == ex_if.branch_inst_next_pc) begin
+            if (ex_if.take_branch_valid) begin
                 next_fe_state = NORMAL_OPERATION;
-                next_pc = ex_if.take_branch ? ex_if.branch_target_pc : pc_plus_4;
+                next_pc = ex_if.take_branch ? ex_if.branch_target_pc : ex_if.branch_inst_next_pc;
             end else begin
                 next_fe_state = STALL_ON_BRANCH;
                 next_pc = pc;
+                local_stall_request = 1'b1;
             end
-
-            local_stall_request = 1'b1;
         end
 
         HALTED: begin
@@ -87,7 +86,7 @@ always_ff @(posedge clk) begin
 
     if (propagate_upstream_data) begin
         de_if.instruction <= instruction;
-        de_if.next_pc <= next_pc;
+        de_if.pc <= pc;
     end
 end
 

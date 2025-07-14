@@ -17,7 +17,7 @@ module execute import catawba_params::*; #(
 
     logic propagate_upstream_data;
 
-    assign alu_operand_a = de_if.a_use_pc ? de_if.next_pc : de_if.rs1_word;
+    assign alu_operand_a = de_if.a_use_pc ? de_if.pc : de_if.rs1_word;
     assign alu_operand_b = de_if.b_use_imm ? de_if.immediate : de_if.rs2_word;
 
     alu #(
@@ -38,9 +38,10 @@ module execute import catawba_params::*; #(
         .result(branch_alu_result)
     );
 
-    assign fe_if.take_branch = de_if.is_branch_insn & branch_alu_result;
-    assign fe_if.branch_target_pc = de_if.next_pc + de_if.immediate;
-    assign fe_if.branch_inst_next_pc = de_if.next_pc;
+    assign fe_if.take_branch_valid = de_if.valid & de_if.is_branch_insn;
+    assign fe_if.take_branch = branch_alu_result;
+    assign fe_if.branch_target_pc = de_if.pc + de_if.immediate;
+    assign fe_if.branch_inst_next_pc = de_if.pc + 'd4;
 
     advance_control advance_ctrl (
         .clk(clk),

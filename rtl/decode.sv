@@ -80,9 +80,6 @@ module decode import catawba_params::*; #(
     end
 
     always_comb begin
-        is_branch_insn = (instruction_kind == B_INST);
-        is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
-
         unique casez (fe_if.instruction.opcode)
         7'b01100??: begin
             instruction_kind = R_INST;
@@ -119,6 +116,9 @@ module decode import catawba_params::*; #(
         endcase
     end
 
+    assign is_branch_insn = (instruction_kind == B_INST);
+    assign is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
+
     advance_control advance_ctrl (
         .clk(clk),
         .rst_if(rst_if),
@@ -137,7 +137,7 @@ module decode import catawba_params::*; #(
         if (propagate_upstream_data) begin
             ex_if.rs1_word <= rs1_word;
             ex_if.rs2_word <= rs2_word;
-            ex_if.next_pc <= fe_if.next_pc;
+            ex_if.pc <= fe_if.pc;
             ex_if.instruction <= fe_if.instruction;
             ex_if.instruction_kind <= instruction_kind;
             ex_if.is_branch_insn <= is_branch_insn;
