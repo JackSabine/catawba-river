@@ -24,6 +24,7 @@ module tb_top;
 
     `include "catawba_probes.svh"
 
+    bind register_scoreboard register_scoreboard_assertions reg_scoreboard_asserts (.*);
 
     function tb_string_t read_stage_insn(logic valid, instruction_t insn);
         string s;

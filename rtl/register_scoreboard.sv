@@ -69,15 +69,4 @@ module register_scoreboard import catawba_params::*; #(
             end
         end
     end
-
-    CONFLICTING_WRITE_PORT_SELECTS: assert property (
-        @(posedge clk) disable iff (rst_if.reset)
-        (wb_write_vector != '0) & (~stall & de_instruction_has_rd) |-> wb_write_port_select != de_write_port_select
-    );
-
-    WRITE_VECTOR_IS_ONEHOT0_AND_VALID: assert property (
-        @(posedge clk) disable iff (rst_if.reset)
-        !$isunknown(wb_write_vector) && $onehot0(wb_write_vector) && (wb_write_vector[0] == 1'b0)
-    );
-
 endmodule
