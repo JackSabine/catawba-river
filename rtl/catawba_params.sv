@@ -4,14 +4,14 @@ package catawba_params;
     typedef enum logic[3:0] {
         ADD  = 4'b0_000,
         SUB  = 4'b1_000,
-        SLL  = 4'b?_001,
-        SLT  = 4'b?_010,
-        SLTU = 4'b?_011,
-        XOR  = 4'b?_100,
+        SLL  = 4'b0_001,
+        SLT  = 4'b0_010,
+        SLTU = 4'b0_011,
+        XOR  = 4'b0_100,
         SRL  = 4'b0_101,
         SRA  = 4'b1_101,
-        OR   = 4'b?_110,
-        AND  = 4'b?_111,
+        OR   = 4'b0_110,
+        AND  = 4'b0_111,
         ALU_OP_UNDEFINED = 'x
     } alu_operation_e;
 

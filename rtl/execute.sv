@@ -12,19 +12,15 @@ module execute import catawba_params::*; #(
 );
 
     logic [XLEN-1:0] alu_result;
-    logic [XLEN-1:0] alu_operand_a, alu_operand_b;
     logic branch_alu_result;
 
     logic propagate_upstream_data;
 
-    assign alu_operand_a = de_if.a_use_pc ? de_if.pc : de_if.rs1_word;
-    assign alu_operand_b = de_if.b_use_imm ? de_if.immediate : de_if.rs2_word;
-
     alu #(
         .XLEN(XLEN)
     ) alu (
-        .operand_a(alu_operand_a),
-        .operand_b(alu_operand_b),
+        .operand_a(de_if.operand_a),
+        .operand_b(de_if.operand_b),
         .operation(de_ex_if.alu_operation),
         .result(alu_result)
     );
@@ -40,7 +36,7 @@ module execute import catawba_params::*; #(
 
     assign fe_if.take_branch_valid = de_if.valid & de_if.is_branch_insn;
     assign fe_if.take_branch = branch_alu_result;
-    assign fe_if.branch_target_pc = de_if.pc + de_if.immediate;
+    assign fe_if.branch_target_pc = de_if.pc + de_if.operand_b;
     assign fe_if.branch_inst_next_pc = de_if.pc + 'd4;
 
     advance_control advance_ctrl (

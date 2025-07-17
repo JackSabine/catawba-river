@@ -15,9 +15,8 @@ interface decode_execute_if #(parameter XLEN = 32);
 
     alu_operation_e alu_operation;
     branch_alu_operation_e branch_alu_operation;
-    logic a_use_pc;
-    logic b_use_imm;
-    logic [XLEN-1:0] immediate;
+    logic [XLEN-1:0] operand_a;
+    logic [XLEN-1:0] operand_b;
 
     logic stall_upstream;
 
@@ -34,9 +33,8 @@ interface decode_execute_if #(parameter XLEN = 32);
             is_mem_insn,
             alu_operation,
             branch_alu_operation,
-            a_use_pc,
-            b_use_imm,
-            immediate,
+            operand_a,
+            operand_b,
         input
             stall_upstream
     );
@@ -54,9 +52,8 @@ interface decode_execute_if #(parameter XLEN = 32);
             is_mem_insn,
             alu_operation,
             branch_alu_operation,
-            a_use_pc,
-            b_use_imm,
-            immediate,
+            operand_a,
+            operand_b,
         output
             stall_upstream
     );

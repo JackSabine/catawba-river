@@ -12,11 +12,11 @@ module decode import catawba_params::*; #(
     logic [`REG_BITS-1:0] rs1_index, rs2_index, de_rd_index, wb_rd_index;
     logic [XLEN-1:0] rs1_word, rs2_word;
 
-    logic a_use_pc;
-
     logic [XLEN-1:0] composed_immediate;
+    logic a_use_pc;
     logic b_use_imm;
 
+    logic funct7_alu_control;
     alu_operation_e alu_operation;
 
     branch_alu_operation_e branch_alu_operation;
@@ -30,6 +30,7 @@ module decode import catawba_params::*; #(
     logic local_stall_request;
     logic propagate_upstream_data;
 
+    logic [XLEN-1:0] operand_a, operand_b;
 
     assign rs1_index = fe_if.instruction.rs1;
     assign rs2_index = fe_if.instruction.rs2;
@@ -72,12 +73,20 @@ module decode import catawba_params::*; #(
             5'b00101  // auipc
         };
         b_use_imm = (instruction_kind != R_INST);
+
+        funct7_alu_control = 1'b0;
+        casez (instruction_kind)
+            R_INST: funct7_alu_control = fe_if.instruction.funct7[5];
+            I_INST: funct7_alu_control = (alu_operation_e'(fe_if.instruction.funct3) == SRA) ? fe_if.instruction.funct7[5] : 1'b0;
+            default: funct7_alu_control = 1'b0;
+        endcase
     end
 
-    always_comb begin
-        alu_operation = alu_operation_e'({fe_if.instruction.funct7[6], fe_if.instruction.funct3});
-        branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
-    end
+    assign alu_operation = alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3});
+    assign branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
+
+    assign operand_a = a_use_pc ? fe_if.pc : rs1_word;
+    assign operand_b = b_use_imm ? composed_immediate : rs2_word;
 
     always_comb begin
         unique casez (fe_if.instruction.opcode)
@@ -142,11 +151,10 @@ module decode import catawba_params::*; #(
             ex_if.instruction_kind <= instruction_kind;
             ex_if.is_branch_insn <= is_branch_insn;
             ex_if.is_mem_insn <= is_mem_insn;
-            ex_if.immediate <= composed_immediate;
             ex_if.alu_operation <= alu_operation;
             ex_if.branch_alu_operation <= branch_alu_operation;
-            ex_if.a_use_pc <= a_use_pc;
-            ex_if.b_use_imm <= b_use_imm;
+            ex_if.operand_a <= operand_a;
+            ex_if.operand_b <= operand_b;
         end
     end
 
