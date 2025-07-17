@@ -2,3 +2,6 @@
 # test_name [optional arguments]
 # Check arguments of test runner script for remaining optional arguments
 
+asm_test --plusargs ASM_TEST=1-read-after-write
+asm_test --plusargs ASM_TEST=2-branch
+asm_test --plusargs ASM_TEST=3-loop
