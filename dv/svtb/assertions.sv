@@ -30,3 +30,5 @@ module register_scoreboard_assertions import uvm_pkg::*; (
         $sformatf("[%m]: wb_write_vector in an invalid state")
     )
 endmodule
+
+bind register_scoreboard register_scoreboard_assertions reg_scoreboard_asserts (.*);
