@@ -67,6 +67,7 @@ class scoreboard extends uvm_scoreboard;
     endfunction
 
     function void check_phase(uvm_phase phase);
+        uvm_report_server server;
         pipe_state_transaction expected_tx, observed_tx;
         string printout_str;
         bit other_reason_to_fail;
@@ -100,10 +101,10 @@ class scoreboard extends uvm_scoreboard;
 
             if (observed_tx.compare(expected_tx)) begin
                 vector_pass();
-                `uvm_info("PASS: ", printout_str, UVM_LOW)
+                `uvm_info("Proc State PASS: ", printout_str, UVM_HIGH)
             end else begin
                 vector_fail();
-                `uvm_error("FAIL: ", printout_str)
+                `uvm_error("Proc State FAIL: ", printout_str)
             end
         end
 
@@ -112,7 +113,9 @@ class scoreboard extends uvm_scoreboard;
             other_reason_to_fail = 1'b1;
         end
 
-        test_passed = (vector_count != 0) && (fail_count == 0) && (other_reason_to_fail == 1'b0);
+        server = uvm_report_server::get_server();
+
+        test_passed = (vector_count != 0) && (fail_count == 0) && (other_reason_to_fail == 1'b0) && (server.get_severity_count(UVM_ERROR) == 0);
     endfunction
 
     function void report_phase(uvm_phase phase);
