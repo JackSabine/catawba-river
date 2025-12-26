@@ -8,3 +8,5 @@ _start:
     addi x2, x0, 2
 around:
     addi x3, x0, 3
+
+1: j 1b

@@ -90,18 +90,25 @@ $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
 
 $(WORKDIR)/%.elf: ${WORKAREA}/dv/asm/%.S | $(WORKDIR)
-	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/asm/complex.ld $<
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/asm/complex.ld $< -march=rv32i -mabi=ilp32
+
+.PHONY: elf
+elf: $(ASM_OBJECTS)
+	@echo "----- Assembly compilation complete -----"
+
+$(WORKDIR)/memory_maps.sv: $(ASM_OBJECTS)
+	${WORKAREA}/scripts/disassemble_elf.py $(WORKDIR) $(WORKDIR)/memory_maps.sv
 
 $(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) | $(WORKDIR)
 	@echo "----- Compiling HDL -----"
 	cd $(WORKDIR) && xvlog $(UVM_XVLOG_FLAGS) $(COMPILE_LIST) $(XVLOG_FLAGS)
 
-$(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE)
+$(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE) $(WORKDIR)/memory_maps.sv
 	@echo "----- Elaborating HDL -----"
 	cd $(WORKDIR) && xelab -top $(TB_TOP) -snapshot $(TB_TOP)_snapshot -debug all $(UVM_XELAB_FLAGS) $(XELAB_FLAGS)
 
 .PHONY: all
-all: $(XSIM_BINARY) $(ASM_OBJECTS)
+all: $(XSIM_BINARY)
 	@echo "----- Compilation complete -----"
 
 $(WORKDIR):

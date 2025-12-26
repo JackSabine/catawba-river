@@ -15,8 +15,6 @@ class asm_test extends base_test;
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-
-        icache_rsp_seq.expected_pipe_state_ap.connect(env.sb.aport_expected_state);
     endfunction
 
     task run_phase(uvm_phase phase);

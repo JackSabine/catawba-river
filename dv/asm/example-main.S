@@ -30,6 +30,6 @@ tohost_exit:
         ori a0, a0, 1
 
         la t0, tohost
-        sd a0, 0(t0)
+        sw a0, 0(t0)
 
         1: j 1b # wait for termination

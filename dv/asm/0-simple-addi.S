@@ -4,3 +4,5 @@
 
 _start:
     addi x5, x0, 32
+
+1: j 1b
