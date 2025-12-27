@@ -73,7 +73,8 @@ COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/rtl.f
 COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/dv.f))
 
 HDL_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "*.sv" -o -name "*.svh" -o -name "*.mk" \))
-ASM_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "code.s" \))
+
+ASM_OBJECTS := $(addprefix ${WORKDIR}/,$(patsubst %.S, %.elf, $(shell find ${WORKAREA}/dv/asm -type f \( -name "*.S" \) -printf "%f\n")))
 
 ####################################################################
 # Vivado output/rule aliases
@@ -85,13 +86,11 @@ ASM_COMPILE_WORK_FILE = $(WORKDIR)/asm-complete
 ####################################################################
 # Rules
 
-$(ASM_COMPILE_WORK_FILE): $(ASM_SENSITIVITY_LIST) ${WORKAREA}/scripts/convert_asm_programs.py | $(WORKDIR)
-	@echo "----- Assembling code tests -----"
-	@${WORKAREA}/scripts/convert_asm_programs.py
-	@touch $(ASM_COMPILE_WORK_FILE)
-
 $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
+
+$(WORKDIR)/%.elf: ${WORKAREA}/dv/asm/%.S | $(WORKDIR)
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/asm/complex.ld $<
 
 $(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) | $(WORKDIR)
 	@echo "----- Compiling HDL -----"
@@ -102,11 +101,11 @@ $(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE)
 	cd $(WORKDIR) && xelab -top $(TB_TOP) -snapshot $(TB_TOP)_snapshot -debug all $(UVM_XELAB_FLAGS) $(XELAB_FLAGS)
 
 .PHONY: all
-all: $(XSIM_BINARY) $(ASM_COMPILE_WORK_FILE)
+all: $(XSIM_BINARY) $(ASM_OBJECTS)
 	@echo "----- Compilation complete -----"
 
 $(WORKDIR):
-	@mkdir $(WORKDIR)
+	@mkdir $@
 
 .PHONY: clean
 clean:

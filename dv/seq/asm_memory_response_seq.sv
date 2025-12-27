@@ -20,11 +20,14 @@ class asm_memory_response_seq extends base_memory_response_seq;
         uint32_t address;
         uint32_t data;
         memory_t memory;
+        string test_path;
 
-        fd = $fopen({get_environment_variable("WORKAREA"), "/dv/asm/", asm_test, "/assembled.txt"}, "r");
+        test_path = {asm_test, ".txt"};
+
+        fd = $fopen(test_path, "r");
 
         if (fd) begin
-            `uvm_info(get_full_name(), $sformatf("Opened %s successfully :)", asm_test), UVM_HIGH)
+            `uvm_info(get_full_name(), $sformatf("Opened %s successfully :)", test_path), UVM_HIGH)
             address = 0;
             while ($fscanf(fd, "%32b", data) == 1) begin
                 `uvm_info(get_full_name(), $sformatf("Placing %32b at address 0x%08h", data, address), UVM_HIGH)
@@ -32,7 +35,7 @@ class asm_memory_response_seq extends base_memory_response_seq;
                 address += 4; // instructions are 4 bytes wide, next insn falls 4 steps away
             end
         end else begin
-            `uvm_error(get_full_name(), $sformatf("Couldn't open assembled.txt for %s", asm_test))
+            `uvm_error(get_full_name(), $sformatf("Couldn't open %s", test_path))
         end
 
         $fclose(fd);
