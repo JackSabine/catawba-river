@@ -27,7 +27,7 @@ MAKEFLAGS += -j$(NPROCS)
 # Manual configure
 
 # DPI-C Modules/Filenames
-DPIC_SOURCES := get_environment_variable disassemble_rv32i
+DPIC_SOURCES := get_environment_variable disassemble_rv32i libspike_dpi
 
 # xsim random number generation
 RANDOM_NUMBER = $(shell shuf -i 0-4294967296 -n 1)
@@ -46,6 +46,10 @@ WORKDIR := $(WORKAREA)/$(WORK)
 
 ####################################################################
 # DPI-C compilation settings
+# Currently this is GCC 9.3.0 and modern linux OS contain GCC 13.3.0, which have incompatible GLIBC versions
+# We can use xsc to compile the DPI-C files to avoid GLIBC issues
+# If a modern GCC is required, you must statically link against libstdc++ and libgcc because xsim cannot dynamically link to versions it doesn't have
+
 CC := xsc
 
 SEARCH := -B/usr/lib/x86_64-linux-gnu
@@ -84,7 +88,30 @@ XSIM_BINARY = $(WORKDIR)/xsim.dir/$(TB_TOP)_snapshot/xsimk
 ASM_COMPILE_WORK_FILE = $(WORKDIR)/asm-complete
 
 ####################################################################
+# Spike
+SPIKE_SUBIP = ${WORKAREA}/subip/riscv-isa-sim-dpi
+SPIKE_BUILDDIR = $(SPIKE_SUBIP)/build
+SPIKE_DPIDIR = $(SPIKE_SUBIP)/dpi
+SPIKE_BIN = $(SPIKE_BUILDDIR)/spike
+
+####################################################################
 # Rules
+
+$(SPIKE_BUILDDIR):
+	@mkdir $@
+
+$(SPIKE_BIN): | $(SPIKE_BUILDDIR)
+	cd $(SPIKE_BUILDDIR) && ../configure --prefix=$(RISCV) && $(MAKE)
+
+$(SPIKE_DPIDIR)/libspike_dpi.so: $(SPIKE_BIN)
+	cd $(SPIKE_DPIDIR) && $(MAKE) all
+
+.PHONY: spike
+spike: $(SPIKE_DPIDIR)/libspike_dpi.so
+	@echo "----- Spike compilation complete -----"
+
+$(WORKDIR)/libspike_dpi.so: $(SPIKE_DPIDIR)/libspike_dpi.so | $(WORKDIR)
+	@ln -s $< $@
 
 $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
@@ -117,6 +144,11 @@ $(WORKDIR):
 .PHONY: clean
 clean:
 	@rm -rf $(WORKDIR)
+
+.PHONY: cleanspike
+cleanspike:
+	@rm -rf $(SPIKE_BUILDDIR)
+	@rm -f $(SPIKE_DPIDIR)/libspike_dpi.a $(SPIKE_DPIDIR)/libspike_dpi.so $(WORKDIR)/libspike_dpi.so
 
 .PHONY: help
 help:

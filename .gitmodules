@@ -4,3 +4,7 @@
 [submodule "subip/torrence-creek"]
 	path = subip/torrence-creek
 	url = git@github.com:JackSabine/torrence-creek.git
+[submodule "subip/riscv-isa-sim-dpi"]
+	path = subip/riscv-isa-sim-dpi
+	url = git@github.com:JackSabine/riscv-isa-sim-dpi.git
+	branch = vivado
