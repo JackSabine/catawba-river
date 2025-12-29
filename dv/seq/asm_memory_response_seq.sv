@@ -19,7 +19,10 @@ class asm_memory_response_seq extends base_memory_response_seq;
         spike_init_instructions = '{
               32'h00001000: 32'h00000297 // auipc   t0, 0x0
             , 32'h00001004: 32'h02028593 // addi    a1, t0, 32
-            , 32'h00001008: 32'hf1402573 // csrr    a0, mhartid
+            , 32'h00001008: (ZICSR_ENABLED ?
+                32'hf1402573 :  // csrr    a0, mhartid
+                32'h00000513    // addi    a0, x0, 0
+            )
             , 32'h0000100c: 32'h0182a283 // lw      t0, 24(t0)
             , 32'h00001010: 32'h00028067 // jr      t0
             , 32'h00001014: 32'h00000000 // reserved
