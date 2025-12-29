@@ -51,4 +51,6 @@ package catawba_params;
     } fetch_state_e;
 
     parameter XLEN = 32;
+
+    parameter RESET_PC = 32'h0000_1000; // Spike reset PC
 endpackage

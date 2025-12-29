@@ -77,7 +77,7 @@ advance_control advance_ctrl (
 
 always_ff @(posedge clk) begin
     if (rst_if.reset) begin
-        pc <= '0;
+        pc <= RESET_PC;
         fe_state <= NORMAL_OPERATION;
     end else if (propagate_upstream_data) begin
         pc <= next_pc;

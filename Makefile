@@ -117,7 +117,7 @@ $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
 
 $(WORKDIR)/%.elf: ${WORKAREA}/dv/asm/%.S | $(WORKDIR)
-	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/asm/complex.ld $< -march=rv32i -mabi=ilp32
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/asm/link.ld $< -march=rv32i -mabi=ilp32
 
 .PHONY: elf
 elf: $(ASM_OBJECTS)
