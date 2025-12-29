@@ -12,7 +12,7 @@ class main_memory extends uvm_object;
         uint32_t result;
 
         case (this.cache_type)
-            ICACHE: result = {'0, `HALT_OPC};
+            ICACHE: result = `NOP;
             DCACHE: begin
                 result = 0;
                 while (addr != 0) begin
