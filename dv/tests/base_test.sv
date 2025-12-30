@@ -2,8 +2,7 @@ class base_test extends uvm_test;
     `uvm_component_utils(base_test)
 
     environment env;
-    main_memory insn_memory;
-    main_memory data_memory;
+    main_memory dut_memory_model;
 
     virtual catawba_probe_if probe_if;
 
@@ -19,29 +18,13 @@ class base_test extends uvm_test;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         env = environment::type_id::create(.name("env"), .parent(this));
-        insn_memory = main_memory::type_id::create(.name("insn_memory"), .parent(this));
-        insn_memory.set_cache_type(ICACHE);
-        data_memory = main_memory::type_id::create(.name("data_memory"), .parent(this));
-        data_memory.set_cache_type(DCACHE);
+        dut_memory_model = main_memory::type_id::create(.name("dut_memory_model"), .parent(this));
 
         uvm_config_db #(main_memory)::set(
             .cntxt(this),
-            .inst_name("env.icache_rsp_agent.*"),
+            .inst_name("env.*"),
             .field_name("dut_memory_model"),
-            .value(insn_memory)
-        );
-
-        uvm_config_db #(main_memory)::set(
-            .cntxt(this),
-            .inst_name("env.dcache_rsp_agent.*"),
-            .field_name("dut_memory_model"),
-            .value(data_memory)
-        );
-        uvm_config_db #(main_memory)::set(
-            .cntxt(this),
-            .inst_name("env.sb.*"),
-            .field_name("data_memory"),
-            .value(data_memory)
+            .value(dut_memory_model)
         );
 
         assert(uvm_config_db #(virtual catawba_probe_if)::get(

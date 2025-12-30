@@ -14,7 +14,7 @@ class scoreboard extends uvm_scoreboard;
     uint32_t vector_count, pass_count, fail_count;
 
     virtual catawba_probe_if probe_if;
-    main_memory data_memory_model;
+    main_memory dut_memory_model;
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
@@ -34,9 +34,9 @@ class scoreboard extends uvm_scoreboard;
         assert(uvm_config_db #(main_memory)::get(
             .cntxt(this),
             .inst_name("*"),
-            .field_name("data_memory"),
-            .value(data_memory_model)
-        )) else `uvm_fatal(get_full_name(), "Couldn't get data_memory from uvm_config_db")
+            .field_name("dut_memory_model"),
+            .value(dut_memory_model)
+        )) else `uvm_fatal(get_full_name(), "Couldn't get dut_memory_model from uvm_config_db")
     endfunction
 
     function new (string name, uvm_component parent);
@@ -59,7 +59,7 @@ class scoreboard extends uvm_scoreboard;
             end
         end
 
-        observed_pipe_state_tx.data_memory = data_memory_model.tb_pull_memory();
+        observed_pipe_state_tx.data_memory = dut_memory_model.tb_pull_memory();
 
         `uvm_info(get_full_name(), {"Pushing observed tx\n:::", observed_pipe_state_tx.convert2string()}, UVM_DEBUG)
 
