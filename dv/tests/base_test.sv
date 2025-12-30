@@ -55,8 +55,14 @@ class base_test extends uvm_test;
         // Don't raise an objection, that way it doesn't hold up the end of simulation
         icache_rsp_seq = base_memory_response_seq::type_id::create(.name("icache_rsp_seq"));
         dcache_rsp_seq = base_memory_response_seq::type_id::create(.name("dcache_rsp_seq"));
-        icache_rsp_seq.start(env.icache_rsp_agent.mrsp_seqr); // Runs forever
-        dcache_rsp_seq.start(env.dcache_rsp_agent.mrsp_seqr); // Runs forever
+        fork
+            begin
+                icache_rsp_seq.start(env.icache_rsp_agent.mrsp_seqr); // Runs forever
+            end
+            begin
+                dcache_rsp_seq.start(env.dcache_rsp_agent.mrsp_seqr); // Runs forever
+            end
+        join_none
     endtask
 
     virtual task main_phase(uvm_phase phase);
