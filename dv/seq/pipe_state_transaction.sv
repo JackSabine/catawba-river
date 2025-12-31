@@ -13,12 +13,12 @@ class pipe_state_transaction extends uvm_sequence_item;
 
         s = "";
 
-        s = {s, "----- Registers -----\n"};
+        s = {s, "----- Int Registers -----\n"};
         foreach (int_regs[i]) begin
-            s = {s, $sformatf("x%0d: %08x/%d\n", i, int_regs[i], int_regs[i])};
+            s = {s, $sformatf("x%0d: %08x / %0d\n", i, int_regs[i], int_regs[i])};
         end
 
-        s = {s, "----- Data Memory -----\n"};
+        s = {s, "----- Memory -----\n"};
         foreach (data_memory[i]) begin
             s = {s, $sformatf("0x%08x: %08x\n", i, data_memory[i])};
         end
@@ -41,8 +41,7 @@ class pipe_state_transaction extends uvm_sequence_item;
 
         // https://verificationacademy.com/forums/t/compare-2-queues-2-associative-arrays-2-dynamic-arrays/36900
         return
-            int_regs    == _obj.int_regs; // FIXME: need to compare memory and int_regs
-            // int_regs    == _obj.int_regs    &
-            // data_memory == _obj.data_memory ;
+            int_regs    == _obj.int_regs    &
+            data_memory == _obj.data_memory ;
     endfunction
 endclass

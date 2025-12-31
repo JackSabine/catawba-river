@@ -5,6 +5,7 @@ package catawba_types;
     typedef byte unsigned uint8_t;
     typedef longint unsigned uint64_t;
     typedef int int32_t;
+    typedef byte int8_t;
 
     typedef uint32_t memory_t [uint32_t];
 

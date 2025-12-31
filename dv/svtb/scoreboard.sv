@@ -103,10 +103,13 @@ class scoreboard extends uvm_scoreboard;
             `uvm_info(get_full_name(), $sformatf("prev_pc = 0x%08x, curr_pc = 0x%08x", prev_pc, curr_pc), UVM_HIGH)
         end while (prev_pc != curr_pc);
 
-        if (!status) begin
-            status = spike_get_all_gprs(0, int_regs);
-            if (status == 32) foreach (int_regs[i]) expected_pipe_state_tx.int_regs[i] = uint32_t'(int_regs[i]);
-            else `uvm_error(get_full_name(), $sformatf("spike_get_all_gprs returned a non-32 code %0d", status))
+        status = spike_get_all_gprs(0, int_regs);
+        if (status == 32) foreach (int_regs[i]) expected_pipe_state_tx.int_regs[i] = uint32_t'(int_regs[i]);
+        else `uvm_error(get_full_name(), $sformatf("spike_get_all_gprs returned a non-32 code %0d", status))
+
+        foreach (observed_pipe_state_tx.data_memory[i]) begin
+            expected_pipe_state_tx.data_memory[i] = spike_read_mem_word(i);
+            `uvm_info(get_full_name(), $sformatf("spike_read_mem_word(0x%08x) returned %08x", i, expected_pipe_state_tx.data_memory[i]), UVM_HIGH)
         end
 
         spike_delete();
