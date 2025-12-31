@@ -78,7 +78,10 @@ COMPILE_LIST += $(addprefix ${WORKAREA}/,$(shell cat ${WORKAREA}/filelists/dv.f)
 
 HDL_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "*.sv" -o -name "*.svh" -o -name "*.mk" \))
 
-ASM_OBJECTS := $(addprefix ${WORKDIR}/,$(patsubst %.S, %.elf, $(shell find ${WORKAREA}/dv/asm -type f \( -name "*.S" \) -printf "%f\n")))
+ASM_OBJECTS := $(addprefix ${WORKDIR}/,$(patsubst %.S, %.elf, $(shell find ${WORKAREA}/dv/code_tests -type f \( -name "*.S" \) -printf "%f\n")))
+C_OBJECTS := $(addprefix ${WORKDIR}/,$(patsubst %.c, %.elf, $(shell find ${WORKAREA}/dv/code_tests -type f \( -name "*.c" \) -printf "%f\n")))
+TEST_OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS)
+
 
 ####################################################################
 # Vivado output/rule aliases
@@ -116,14 +119,17 @@ $(WORKDIR)/libspike_dpi.so: $(SPIKE_DPIDIR)/libspike_dpi.so | $(WORKDIR)
 $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
 
-$(WORKDIR)/%.elf: ${WORKAREA}/dv/asm/%.S | $(WORKDIR)
-	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/asm/link.ld $< -march=rv32i -mabi=ilp32
+$(WORKDIR)/%.elf: ${WORKAREA}/dv/code_tests/%.S | $(WORKDIR)
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/gcc/link.ld $< ${WORKAREA}/dv/gcc/bootloader.S -march=rv32i -mabi=ilp32 -O0
+
+$(WORKDIR)/%.elf: ${WORKAREA}/dv/code_tests/%.c | $(WORKDIR)
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/gcc/link.ld $< ${WORKAREA}/dv/gcc/bootloader.S -march=rv32i -mabi=ilp32 -O0
 
 .PHONY: elf
-elf: $(ASM_OBJECTS)
+elf: $(TEST_OBJECTS)
 	@echo "----- Assembly compilation complete -----"
 
-$(WORKDIR)/memory_maps.sv: $(ASM_OBJECTS)
+$(WORKDIR)/memory_maps.sv: $(TEST_OBJECTS)
 	${WORKAREA}/scripts/disassemble_elf.py $(WORKDIR) $(WORKDIR)/memory_maps.sv
 
 $(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) | $(WORKDIR)

@@ -1,8 +1,8 @@
 .section .text
 
-.globl _start
+.globl main
 
-_start:
+main:
     addi x1, x0, 7
     addi x2, x1, 5
 

@@ -1,8 +1,8 @@
 .section .text
 
-.globl _start
+.globl main
 
-_start:
+main:
     addi x1, x0, 1
     beq x0, x0, around
     addi x2, x0, 2

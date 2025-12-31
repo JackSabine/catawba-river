@@ -1,20 +1,14 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(_start)
+ENTRY(_bootloader)
 
 SECTIONS
 {
     . = 0x80000000;
-
-    .tohost : ALIGN(4K)
-    {
-        *(.tohost)
-    }
-
-    . += 4K;
-
     .text : ALIGN(4K)
     {
+        *(.bootloader)
+        . = ALIGN(4K);
         *(.text)
         *(.text.init)
     }
@@ -29,6 +23,11 @@ SECTIONS
         _estack = .;
         . += 128K;
         _sstack = .;
+    }
+
+    .fromhost : ALIGN(4K)
+    {
+        *(.fromhost)
     }
 
 }

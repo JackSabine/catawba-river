@@ -49,8 +49,18 @@ class scoreboard extends uvm_scoreboard;
 
     function void extract_phase(uvm_phase phase);
         pipe_state_transaction observed_pipe_state_tx;
+        pipe_state_transaction expected_pipe_state_tx;
+        string asm_test;
+        string elf_path;
+
+        int32_t status;
+
+        uint64_t int_regs[32];
+
+        uint32_t curr_pc, prev_pc;
 
         observed_pipe_state_tx = pipe_state_transaction::type_id::create(.name("observed_pipe_state_tx"), .contxt(get_full_name()));
+        expected_pipe_state_tx = pipe_state_transaction::type_id::create(.name("expected_pipe_state_tx"), .contxt(get_full_name()));
 
         for (uint32_t i = 0; i < `NUM_REGS; i++) begin
             if (!$isunknown(this.probe_if.int_registers[i])) begin
@@ -64,6 +74,44 @@ class scoreboard extends uvm_scoreboard;
         `uvm_info(get_full_name(), {"Pushing observed tx\n:::", observed_pipe_state_tx.convert2string()}, UVM_DEBUG)
 
         void'(observed_fifo.try_put(observed_pipe_state_tx));
+
+        if (!$value$plusargs("ASM_TEST=%s", asm_test)) begin
+            `uvm_fatal(get_full_name(), "ASM_TEST not specified for asm_memory_response_seq")
+        end
+
+        spike_set_isa("RV32I");
+
+        elf_path = {get_environment_variable("WORKDIR"), "/", asm_test, ".elf"};
+        `uvm_info(get_full_name(), $sformatf("spike is loading %s", elf_path), UVM_LOW)
+        spike_create(elf_path);
+
+        spike_set_pc(RESET_PC);
+        `uvm_info(get_full_name(), $sformatf("spike PC set to 0x%08x", RESET_PC), UVM_LOW)
+        curr_pc = uint32_t'(spike_get_pc(0));
+
+        do begin
+            `uvm_info(get_full_name(), $sformatf("PC for hart 0 is 0x%08x", curr_pc), UVM_MEDIUM)
+            prev_pc = curr_pc;
+
+            status = spike_step();
+            if (status) begin
+                `uvm_error(get_full_name(), $sformatf("spike_step returned a non-zero code %0d", status))
+                break;
+            end
+
+            curr_pc = uint32_t'(spike_get_pc(0));
+            `uvm_info(get_full_name(), $sformatf("prev_pc = 0x%08x, curr_pc = 0x%08x", prev_pc, curr_pc), UVM_HIGH)
+        end while (prev_pc != curr_pc);
+
+        if (!status) begin
+            status = spike_get_all_gprs(0, int_regs);
+            if (status == 32) foreach (int_regs[i]) expected_pipe_state_tx.int_regs[i] = uint32_t'(int_regs[i]);
+            else `uvm_error(get_full_name(), $sformatf("spike_get_all_gprs returned a non-32 code %0d", status))
+        end
+
+        spike_delete();
+
+        void'(expected_fifo.try_put(expected_pipe_state_tx));
     endfunction
 
     function void check_phase(uvm_phase phase);

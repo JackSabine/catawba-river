@@ -13,7 +13,7 @@ module decode import catawba_params::*; #(
     logic [XLEN-1:0] rs1_word, rs2_word;
 
     logic [XLEN-1:0] composed_immediate;
-    logic a_use_pc;
+    logic a_use_pc_or_zero;
     logic b_use_imm;
 
     logic funct7_alu_control;
@@ -22,9 +22,11 @@ module decode import catawba_params::*; #(
     branch_alu_operation_e branch_alu_operation;
 
     instruction_kind_t instruction_kind;
+    logic is_math_insn;
     logic is_branch_insn;
     logic is_jump_insn;
     logic is_mem_insn;
+    logic is_lui_insn;
 
     logic scoreboard_stall;
 
@@ -66,7 +68,7 @@ module decode import catawba_params::*; #(
     );
 
     always_comb begin
-        a_use_pc = fe_if.instruction.opcode[6:2] inside {
+        a_use_pc_or_zero = fe_if.instruction.opcode[6:2] inside {
             5'b11000, // branch
             5'b11011, // jal
             5'b01101, // lui
@@ -82,11 +84,19 @@ module decode import catawba_params::*; #(
         endcase
     end
 
-    assign alu_operation = (is_branch_insn | is_jump_insn | is_mem_insn) ? ADD : alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3});
+    assign alu_operation = is_math_insn ? alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3}) : ADD;
     assign branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
 
-    assign operand_a = a_use_pc ? fe_if.pc : rs1_word;
-    assign operand_b = b_use_imm ? composed_immediate : rs2_word;
+    always_comb begin
+        operand_a = a_use_pc_or_zero ? (is_lui_insn ? '0 : fe_if.pc) : rs1_word;
+        operand_b = b_use_imm ? composed_immediate : rs2_word;
+    end
+
+    assign is_math_insn = (fe_if.instruction.opcode =?= 7'b0?10011);
+    assign is_branch_insn = (instruction_kind == B_INST);
+    assign is_jump_insn = (fe_if.instruction.opcode =?= 7'b110z111);
+    assign is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
+    assign is_lui_insn = (fe_if.instruction.opcode == 7'b0110111);
 
     always_comb begin
         unique casez (fe_if.instruction.opcode)
@@ -124,10 +134,6 @@ module decode import catawba_params::*; #(
         end
         endcase
     end
-
-    assign is_branch_insn = (instruction_kind == B_INST);
-    assign is_jump_insn = (fe_if.instruction.opcode =?= 7'b110z111);
-    assign is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
 
     advance_control advance_ctrl (
         .clk(clk),

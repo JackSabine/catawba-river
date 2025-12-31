@@ -1,8 +1,8 @@
 .section .text
 
-.globl _start
+.globl main
 
-_start:
+main:
     addi x5, x0, 32
 
 1: j 1b

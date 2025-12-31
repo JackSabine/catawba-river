@@ -52,7 +52,7 @@ package catawba_params;
 
     parameter XLEN = 32;
 
-    parameter RESET_PC = 32'h0000_1000; // Spike reset PC
+    parameter RESET_PC = 32'h8000_0000; // Must agree with bootloader section dv/gcc/link.ld
 
     parameter ZICSR_ENABLED = 0;
 endpackage
