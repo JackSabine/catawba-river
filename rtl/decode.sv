@@ -82,7 +82,7 @@ module decode import catawba_params::*; #(
         endcase
     end
 
-    assign alu_operation = alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3});
+    assign alu_operation = is_mem_insn ? ADD : alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3});
     assign branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
 
     assign operand_a = a_use_pc ? fe_if.pc : rs1_word;

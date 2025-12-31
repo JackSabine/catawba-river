@@ -17,12 +17,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0 ns"></ZoomStartTime>
-      <ZoomEndTime time="36 ns"></ZoomEndTime>
-      <Cursor1Time time="18 ns"></Cursor1Time>
+      <ZoomEndTime time="42 ns"></ZoomEndTime>
+      <Cursor1Time time="27 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="413"></NameColumnWidth>
-      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+      <ValueColumnWidth column_width="103"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="26" />
    <wvobject type="logic" fp_name="/tb_top/clk">
@@ -85,6 +85,10 @@
       <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_branch">
          <obj_property name="ElementShortName">current_inst_is_branch</obj_property>
          <obj_property name="ObjectShortName">current_inst_is_branch</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_halt">
+         <obj_property name="ElementShortName">current_inst_is_halt</obj_property>
+         <obj_property name="ObjectShortName">current_inst_is_halt</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fe/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
@@ -187,6 +191,10 @@
          <obj_property name="ElementShortName">is_branch_insn</obj_property>
          <obj_property name="ObjectShortName">is_branch_insn</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
+      </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de/regscoreboard/de_write_vector">
          <obj_property name="ElementShortName">de_write_vector[31:0]</obj_property>
          <obj_property name="ObjectShortName">de_write_vector[31:0]</obj_property>
@@ -252,18 +260,6 @@
          <obj_property name="ElementShortName">branch_alu_operation[2:0]</obj_property>
          <obj_property name="ObjectShortName">branch_alu_operation[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/a_use_pc">
-         <obj_property name="ElementShortName">a_use_pc</obj_property>
-         <obj_property name="ObjectShortName">a_use_pc</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/b_use_imm">
-         <obj_property name="ElementShortName">b_use_imm</obj_property>
-         <obj_property name="ObjectShortName">b_use_imm</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/immediate">
-         <obj_property name="ElementShortName">immediate[31:0]</obj_property>
-         <obj_property name="ObjectShortName">immediate[31:0]</obj_property>
-      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/stall_upstream">
          <obj_property name="ElementShortName">stall_upstream</obj_property>
          <obj_property name="ObjectShortName">stall_upstream</obj_property>
@@ -287,14 +283,6 @@
       <wvobject type="array" fp_name="/tb_top/dut/ex/alu_result">
          <obj_property name="ElementShortName">alu_result[31:0]</obj_property>
          <obj_property name="ObjectShortName">alu_result[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex/alu_operand_a">
-         <obj_property name="ElementShortName">alu_operand_a[31:0]</obj_property>
-         <obj_property name="ObjectShortName">alu_operand_a[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex/alu_operand_b">
-         <obj_property name="ElementShortName">alu_operand_b[31:0]</obj_property>
-         <obj_property name="ObjectShortName">alu_operand_b[31:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/ex/branch_alu_result">
          <obj_property name="ElementShortName">branch_alu_result</obj_property>
@@ -395,6 +383,7 @@
       <wvobject type="group" fp_name="group205">
          <obj_property name="label">dcache_if</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject type="logic" fp_name="/tb_top/dut/dcache_if/clk">
             <obj_property name="ElementShortName">clk</obj_property>
             <obj_property name="ObjectShortName">clk</obj_property>
@@ -493,7 +482,6 @@
    <wvobject type="group" fp_name="group56">
       <obj_property name="label">probe_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb_top/probe_if/clk">
          <obj_property name="ElementShortName">clk</obj_property>
          <obj_property name="ObjectShortName">clk</obj_property>
