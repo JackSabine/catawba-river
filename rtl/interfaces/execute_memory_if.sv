@@ -5,7 +5,7 @@ interface execute_memory_if #(parameter XLEN = 32);
     logic valid;
     logic halt;
 
-    logic [XLEN-1:0] alu_result;
+    logic [XLEN-1:0] ex_result;
     logic [XLEN-1:0] rs2_word;
 
     instruction_t instruction;
@@ -18,7 +18,7 @@ interface execute_memory_if #(parameter XLEN = 32);
         output
             valid,
             halt,
-            alu_result,
+            ex_result,
             rs2_word,
             instruction,
             instruction_kind,
@@ -31,7 +31,7 @@ interface execute_memory_if #(parameter XLEN = 32);
         input
             valid,
             halt,
-            alu_result,
+            ex_result,
             rs2_word,
             instruction,
             instruction_kind,

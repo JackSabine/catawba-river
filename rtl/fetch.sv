@@ -19,9 +19,11 @@ logic propagate_upstream_data;
 
 fetch_state_e fe_state, next_fe_state;
 logic current_inst_is_branch;
+logic current_inst_is_jump;
 logic current_inst_is_halt;
 
 assign current_inst_is_branch = (instruction.opcode == 7'b1100011) & icache_if.req_fulfilled;
+assign current_inst_is_jump = (instruction.opcode  =?= 7'b110z111) & icache_if.req_fulfilled;
 assign current_inst_is_halt = (instruction == `J1b) & icache_if.req_fulfilled;
 
 assign pc_plus_4 = pc + 'd4;
@@ -34,8 +36,8 @@ always_comb begin
             if (current_inst_is_halt) begin
                 next_fe_state = HALTED;
                 next_pc = pc;
-            end else if (current_inst_is_branch) begin
-                next_fe_state = STALL_ON_BRANCH;
+            end else if (current_inst_is_branch | current_inst_is_jump) begin
+                next_fe_state = STALL_ON_JUMP_OR_BRANCH;
                 next_pc = pc;
             end else begin
                 next_fe_state = NORMAL_OPERATION;
@@ -43,12 +45,12 @@ always_comb begin
             end
         end
 
-        STALL_ON_BRANCH: begin
-            if (ex_if.take_branch_valid) begin
+        STALL_ON_JUMP_OR_BRANCH: begin
+            if (ex_if.jump_or_branch_valid) begin
                 next_fe_state = NORMAL_OPERATION;
-                next_pc = ex_if.take_branch ? ex_if.branch_target_pc : ex_if.branch_inst_next_pc;
+                next_pc = ex_if.jump_or_branch_next_pc;
             end else begin
-                next_fe_state = STALL_ON_BRANCH;
+                next_fe_state = STALL_ON_JUMP_OR_BRANCH;
                 next_pc = pc;
                 local_stall_request = 1'b1;
             end
@@ -87,6 +89,7 @@ always_ff @(posedge clk) begin
     if (propagate_upstream_data) begin
         de_if.instruction <= instruction;
         de_if.pc <= pc;
+        de_if.pc_plus_4 <= pc_plus_4;
     end
 end
 

@@ -6,11 +6,12 @@ interface decode_execute_if #(parameter XLEN = 32);
 
     logic [XLEN-1:0] rs1_word;
     logic [XLEN-1:0] rs2_word;
-    logic [XLEN-1:0] pc;
+    logic [XLEN-1:0] pc, pc_plus_4;
 
     instruction_t instruction;
     instruction_kind_t instruction_kind;
     logic is_branch_insn;
+    logic is_jump_insn;
     logic is_mem_insn;
 
     alu_operation_e alu_operation;
@@ -27,9 +28,11 @@ interface decode_execute_if #(parameter XLEN = 32);
             rs1_word,
             rs2_word,
             pc,
+            pc_plus_4,
             instruction,
             instruction_kind,
             is_branch_insn,
+            is_jump_insn,
             is_mem_insn,
             alu_operation,
             branch_alu_operation,
@@ -46,9 +49,11 @@ interface decode_execute_if #(parameter XLEN = 32);
             rs1_word,
             rs2_word,
             pc,
+            pc_plus_4,
             instruction,
             instruction_kind,
             is_branch_insn,
+            is_jump_insn,
             is_mem_insn,
             alu_operation,
             branch_alu_operation,

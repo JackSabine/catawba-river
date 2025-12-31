@@ -34,10 +34,8 @@ module execute import catawba_params::*; #(
         .result(branch_alu_result)
     );
 
-    assign fe_if.take_branch_valid = de_if.valid & de_if.is_branch_insn;
-    assign fe_if.take_branch = branch_alu_result;
-    assign fe_if.branch_target_pc = de_if.pc + de_if.operand_b;
-    assign fe_if.branch_inst_next_pc = de_if.pc + 'd4;
+    assign fe_if.jump_or_branch_valid = de_if.valid & (de_if.is_branch_insn | de_if.is_jump_insn);
+    assign fe_if.jump_or_branch_next_pc = (branch_alu_result | de_if.is_jump_insn) ? alu_result : de_if.pc_plus_4;
 
     advance_control advance_ctrl (
         .clk(clk),
@@ -56,7 +54,7 @@ module execute import catawba_params::*; #(
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin
             mem_if.rs2_word <= de_if.rs2_word;
-            mem_if.alu_result <= alu_result;
+            mem_if.ex_result <= de_if.is_jump_insn ? de_if.pc_plus_4 : alu_result;
 
             mem_if.instruction <= de_if.instruction;
             mem_if.instruction_kind <= de_if.instruction_kind;

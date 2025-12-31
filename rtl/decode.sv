@@ -23,6 +23,7 @@ module decode import catawba_params::*; #(
 
     instruction_kind_t instruction_kind;
     logic is_branch_insn;
+    logic is_jump_insn;
     logic is_mem_insn;
 
     logic scoreboard_stall;
@@ -68,7 +69,6 @@ module decode import catawba_params::*; #(
         a_use_pc = fe_if.instruction.opcode[6:2] inside {
             5'b11000, // branch
             5'b11011, // jal
-            5'b11001, // jalr
             5'b01101, // lui
             5'b00101  // auipc
         };
@@ -82,7 +82,7 @@ module decode import catawba_params::*; #(
         endcase
     end
 
-    assign alu_operation = is_mem_insn ? ADD : alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3});
+    assign alu_operation = (is_branch_insn | is_jump_insn | is_mem_insn) ? ADD : alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3});
     assign branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
 
     assign operand_a = a_use_pc ? fe_if.pc : rs1_word;
@@ -126,6 +126,7 @@ module decode import catawba_params::*; #(
     end
 
     assign is_branch_insn = (instruction_kind == B_INST);
+    assign is_jump_insn = (fe_if.instruction.opcode =?= 7'b110z111);
     assign is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
 
     advance_control advance_ctrl (
@@ -147,9 +148,11 @@ module decode import catawba_params::*; #(
             ex_if.rs1_word <= rs1_word;
             ex_if.rs2_word <= rs2_word;
             ex_if.pc <= fe_if.pc;
+            ex_if.pc_plus_4 <= fe_if.pc_plus_4;
             ex_if.instruction <= fe_if.instruction;
             ex_if.instruction_kind <= instruction_kind;
             ex_if.is_branch_insn <= is_branch_insn;
+            ex_if.is_jump_insn <= is_jump_insn;
             ex_if.is_mem_insn <= is_mem_insn;
             ex_if.alu_operation <= alu_operation;
             ex_if.branch_alu_operation <= branch_alu_operation;

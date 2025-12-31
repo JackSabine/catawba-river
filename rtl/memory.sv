@@ -22,7 +22,7 @@ module memory import catawba_params::*; import torrence_params::*; #(
     assign mem_req_valid = ex_if.valid & ex_if.is_mem_insn;
     assign mem_op_size = memory_operation_size_e'(ex_if.instruction.funct3[1:0]);
 
-    assign dcache_if.req_address = ex_if.alu_result;
+    assign dcache_if.req_address = ex_if.ex_result;
     assign dcache_if.req_operation = (ex_if.instruction_kind == S_INST) ? STORE : LOAD;
     assign dcache_if.req_size = mem_op_size;
     assign dcache_if.req_store_word = ex_if.rs2_word;
@@ -67,7 +67,7 @@ module memory import catawba_params::*; import torrence_params::*; #(
 
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin
-            wb_if.alu_result <= ex_if.alu_result;
+            wb_if.ex_result <= ex_if.ex_result;
             wb_if.load_result <= load_result;
             wb_if.instruction <= ex_if.instruction;
             wb_if.instruction_kind <= ex_if.instruction_kind;
@@ -76,5 +76,4 @@ module memory import catawba_params::*; import torrence_params::*; #(
     end
 
     assign local_stall_request = (ex_if.is_mem_insn & ~dcache_if.req_fulfilled);
-    assign ex_if.stall_upstream = local_stall_request;
 endmodule

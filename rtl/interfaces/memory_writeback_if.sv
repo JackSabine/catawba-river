@@ -4,7 +4,7 @@ interface memory_writeback_if #(parameter XLEN = 32);
     logic valid;
     logic halt;
 
-    logic [XLEN-1:0] alu_result;
+    logic [XLEN-1:0] ex_result;
     logic [XLEN-1:0] load_result;
 
     instruction_t instruction;
@@ -16,7 +16,7 @@ interface memory_writeback_if #(parameter XLEN = 32);
         output
             valid,
             halt,
-            alu_result,
+            ex_result,
             load_result,
             instruction,
             instruction_kind,
@@ -27,7 +27,7 @@ interface memory_writeback_if #(parameter XLEN = 32);
         input
             valid,
             halt,
-            alu_result,
+            ex_result,
             load_result,
             instruction,
             instruction_kind,
