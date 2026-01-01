@@ -7,8 +7,6 @@ SECTIONS
     . = 0x80000000;
     .text : ALIGN(4K)
     {
-        *(.bootloader)
-        . = ALIGN(4K);
         *(.text)
         *(.text.init)
     }

@@ -1,14 +1,12 @@
 .section .text
-
 .globl main
 
 main:
-    addi x1, x0, 3
-    addi x2, x0, 0
+    addi t0, x0, 3
+    addi t1, x0, 0
 
 loop:
-    addi x2, x2, 7
-    addi x1, x1, -1
-    bne x1, x0, loop
-
-1: j 1b
+    addi t1, t1, 7
+    addi t0, t0, -1
+    bne t0, x0, loop
+    ret

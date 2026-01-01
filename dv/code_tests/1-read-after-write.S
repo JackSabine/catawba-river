@@ -1,9 +1,7 @@
 .section .text
-
 .globl main
 
 main:
-    addi x1, x0, 7
-    addi x2, x1, 5
-
-1: j 1b
+    addi t0, x0, 7
+    addi t1, t0, 5
+    ret
