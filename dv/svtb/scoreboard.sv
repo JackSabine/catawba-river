@@ -141,14 +141,13 @@ class scoreboard extends uvm_scoreboard;
             void'(expected_fifo.try_get(expected_tx));
             void'(observed_fifo.try_get(observed_tx));
 
-            printout_str = $sformatf(
-                {
-                    "\n*OBSERVED*:\n%s",
-                    "\n*EXPECTED*:\n%s"
-                },
-                observed_tx.convert2string(),
-                expected_tx.convert2string()
-            );
+            printout_str = {
+                "\n\n#####################################\n",
+                    "  EXPECTED (BFM) vs. OBSERVED (RTL)\n",
+                    "#####################################\n",
+                expected_tx.print_comparison(observed_tx),
+                "\n"
+            };
 
             if (observed_tx.compare(expected_tx)) begin
                 vector_pass();

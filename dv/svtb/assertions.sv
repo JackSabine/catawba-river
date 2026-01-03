@@ -27,7 +27,7 @@ module register_scoreboard_assertions import uvm_pkg::*; (
         !$isunknown(wb_write_vector) && $onehot0(wb_write_vector) && (wb_write_vector[0] == 1'b0)
     ) else `uvm_error(
         "WRITE_VECTOR_IS_ONEHOT0_AND_VALID",
-        $sformatf("[%m]: wb_write_vector in an invalid state")
+        $sformatf("[%m]: wb_write_vector in an invalid state (%032b)", wb_write_vector)
     )
 endmodule
 
