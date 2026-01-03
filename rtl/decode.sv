@@ -9,6 +9,41 @@ module decode import catawba_params::*; #(
     writeback_decode_if.de wb_if
 );
 
+    function void r_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = R_INST;
+        composed_immediate = 'x;
+    endfunction
+
+    function void i_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = I_INST;
+        composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:20]};
+    endfunction
+
+    function void s_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = S_INST;
+        composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:25], fe_if.instruction[11:8], fe_if.instruction[7]};
+    endfunction
+
+    function void b_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = B_INST;
+        composed_immediate = {{20{fe_if.instruction[31]}}, fe_if.instruction[7], fe_if.instruction[30:25], fe_if.instruction[11:8], 1'b0};
+    endfunction
+
+    function void u_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = U_INST;
+        composed_immediate = {fe_if.instruction[31:12], 12'b0};
+    endfunction
+
+    function void j_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = J_INST;
+        composed_immediate = {{12{fe_if.instruction[31]}}, fe_if.instruction[19:12], fe_if.instruction[20], fe_if.instruction[30:21], 1'b0};
+    endfunction
+
+    function void invalid_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+        instruction_kind = INST_UNDEFINED;
+        composed_immediate = 'x;
+    endfunction
+
     logic [`REG_BITS-1:0] rs1_index, rs2_index, de_rd_index, wb_rd_index;
     logic [XLEN-1:0] rs1_word, rs2_word;
 
@@ -100,38 +135,17 @@ module decode import catawba_params::*; #(
 
     always_comb begin
         unique casez (fe_if.instruction.opcode)
-        7'b01100??: begin
-            instruction_kind = R_INST;
-            composed_immediate = 'x;
-        end
-        7'b00?00??: begin
-            instruction_kind = I_INST;
-            composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:20]};
-        end
-        7'b11?01??: begin
-            instruction_kind = I_INST;
-            composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:20]};
-        end
-        7'b01000??: begin
-            instruction_kind = S_INST;
-            composed_immediate = {{21{fe_if.instruction[31]}}, fe_if.instruction[30:25], fe_if.instruction[11:8], fe_if.instruction[7]};
-        end
-        7'b11000??: begin
-            instruction_kind = B_INST;
-            composed_immediate = {{20{fe_if.instruction[31]}}, fe_if.instruction[7], fe_if.instruction[30:25], fe_if.instruction[11:8], 1'b0};
-        end
-        7'b0?101??: begin
-            instruction_kind = U_INST;
-            composed_immediate = {fe_if.instruction[31:12], 12'b0};
-        end
-        7'b11011??: begin
-            instruction_kind = J_INST;
-            composed_immediate = {{12{fe_if.instruction[31]}}, fe_if.instruction[19:12], fe_if.instruction[20], fe_if.instruction[30:21], 1'b0};
-        end
-        default: begin
-            instruction_kind = INST_UNDEFINED;
-            composed_immediate = 'x;
-        end
+            7'b0110011: r_type_inst(instruction_kind, composed_immediate); // R-type
+            7'b0010011: i_type_inst(instruction_kind, composed_immediate); // I-type ALU
+            7'b0000011: i_type_inst(instruction_kind, composed_immediate); // I-type load
+            7'b1100111: i_type_inst(instruction_kind, composed_immediate); // I-type jalr
+            7'b0100011: s_type_inst(instruction_kind, composed_immediate); // S-type store
+            7'b1100011: b_type_inst(instruction_kind, composed_immediate); // B-type branch
+            7'b0110111: u_type_inst(instruction_kind, composed_immediate); // U-type lui
+            7'b0010111: u_type_inst(instruction_kind, composed_immediate); // U-type auipc
+            7'b1101111: j_type_inst(instruction_kind, composed_immediate); // J-type jal
+            7'b1110011: i_type_inst(instruction_kind, composed_immediate); // I-type system (CSR, ecall, ebreak)
+            default:    invalid_inst(instruction_kind, composed_immediate);
         endcase
     end
 
