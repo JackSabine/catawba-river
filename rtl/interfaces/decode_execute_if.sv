@@ -19,6 +19,10 @@ interface decode_execute_if #(parameter XLEN = 32);
     logic [XLEN-1:0] operand_a;
     logic [XLEN-1:0] operand_b;
 
+    logic rd_is_x0;
+    logic rs_is_x0;
+    logic is_csr_insn;
+
     logic stall_upstream;
 
     modport de (
@@ -38,6 +42,9 @@ interface decode_execute_if #(parameter XLEN = 32);
             branch_alu_operation,
             operand_a,
             operand_b,
+            rd_is_x0,
+            rs_is_x0,
+            is_csr_insn,
         input
             stall_upstream
     );
@@ -59,6 +66,9 @@ interface decode_execute_if #(parameter XLEN = 32);
             branch_alu_operation,
             operand_a,
             operand_b,
+            rd_is_x0,
+            rs_is_x0,
+            is_csr_insn,
         output
             stall_upstream
     );

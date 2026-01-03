@@ -8,6 +8,8 @@ rtl/interfaces/memory_writeback_if.sv
 rtl/interfaces/fetch_execute_if.sv
 rtl/interfaces/writeback_decode_if.sv
 
+rtl/csr.sv
+rtl/csr_wrapper.sv
 rtl/branch_alu.sv
 rtl/alu.sv
 rtl/register_file.sv

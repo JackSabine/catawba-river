@@ -50,9 +50,25 @@ package catawba_params;
         HALTED
     } fetch_state_e;
 
+    typedef enum logic [2:0] {
+        ECALL_EBREAK = 3'b000,
+        CSRRW = 3'b001,
+        CSRRS = 3'b010,
+        CSRRC = 3'b011,
+        SYSTEM_RESERVED = 3'b100,
+        CSRRWI = 3'b101,
+        CSRRSI = 3'b110,
+        CSRRCI = 3'b111
+    } system_op_e;
+
+    typedef enum logic [1:0] {
+        CSR_OP_INVALID = 2'b00,
+        RW = 2'b01,
+        RS = 2'b10,
+        RC = 2'b11
+    } system_csr_op_e;
+
     parameter XLEN = 32;
 
     parameter RESET_PC = 32'h8000_0000; // Must agree with bootloader section dv/gcc/link.ld
-
-    parameter ZICSR_ENABLED = 0;
 endpackage

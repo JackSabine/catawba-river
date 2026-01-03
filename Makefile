@@ -120,10 +120,10 @@ $(WORKDIR)/%.so: $(DV_DPI_C)/%.c | $(WORKDIR)
 	cd $(WORKDIR) && $(CC) $< -o $@ $(CFLAGS)
 
 $(WORKDIR)/%.elf: ${WORKAREA}/dv/code_tests/%.S | $(WORKDIR)
-	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/gcc/link.ld ${WORKAREA}/dv/gcc/bootloader.S $< -march=rv32i -mabi=ilp32 -O0
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/gcc/link.ld ${WORKAREA}/dv/gcc/bootloader.S $< -march=rv32i_zicsr -mabi=ilp32 -O0
 
 $(WORKDIR)/%.elf: ${WORKAREA}/dv/code_tests/%.c | $(WORKDIR)
-	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/gcc/link.ld ${WORKAREA}/dv/gcc/bootloader.S $< -march=rv32i -mabi=ilp32 -O0
+	${RISCV}/bin/riscv64-unknown-elf-gcc -nostdlib -o $@ -T ${WORKAREA}/dv/gcc/link.ld ${WORKAREA}/dv/gcc/bootloader.S $< -march=rv32i_zicsr -mabi=ilp32 -O0
 
 .PHONY: elf
 elf: $(TEST_OBJECTS)

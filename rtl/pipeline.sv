@@ -7,6 +7,10 @@ module pipeline (
     memory_if.requester dcache_if
 );
 
+logic [1:0] hart_curr_privilege;
+
+assign hart_curr_privilege = 2'b11; // Machine mode
+
 fetch_decode_if fe_de_if();
 fetch_execute_if fe_ex_if();
 decode_execute_if de_ex_if();
@@ -33,6 +37,7 @@ decode de (
 execute ex (
     .clk(clk),
     .rst_if(rst_if),
+    .hart_curr_privilege(hart_curr_privilege),
     .de_if(de_ex_if),
     .fe_if(fe_ex_if),
     .mem_if(ex_mem_if)

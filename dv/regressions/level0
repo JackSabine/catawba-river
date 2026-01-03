@@ -5,3 +5,5 @@
 asm_test --plusargs ASM_TEST=1-read-after-write
 asm_test --plusargs ASM_TEST=2-loop
 asm_test --plusargs ASM_TEST=3-branch
+asm_test --plusargs ASM_TEST=4-csr
+asm_test --plusargs ASM_TEST=test

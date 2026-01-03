@@ -16,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="25 ns"></ZoomStartTime>
-      <ZoomEndTime time="52 ns"></ZoomEndTime>
-      <Cursor1Time time="32 ns"></Cursor1Time>
+      <ZoomStartTime time="0 ns"></ZoomStartTime>
+      <ZoomEndTime time="140 ns"></ZoomEndTime>
+      <Cursor1Time time="111 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="301"></NameColumnWidth>
-      <ValueColumnWidth column_width="205"></ValueColumnWidth>
+      <ValueColumnWidth column_width="190"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="26" />
+   <WVObjectSize size="32" />
    <wvobject type="logic" fp_name="/tb_top/clk">
       <obj_property name="DisplayName">FullPathName</obj_property>
       <obj_property name="ElementShortName">clk</obj_property>
@@ -47,14 +47,57 @@
       <obj_property name="UseCustomSignalColor">true</obj_property>
       <obj_property name="Reversed">false</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group104">
-      <obj_property name="label">ex_fe inteface</obj_property>
+   <wvobject type="group" fp_name="group564">
+      <obj_property name="label">ex_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/ex_if/jump_or_branch_valid">
+         <obj_property name="ElementShortName">jump_or_branch_valid</obj_property>
+         <obj_property name="ObjectShortName">jump_or_branch_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/fe/ex_if/jump_or_branch_next_pc">
+         <obj_property name="ElementShortName">jump_or_branch_next_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">jump_or_branch_next_pc[31:0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group164">
-      <obj_property name="label">fe</obj_property>
+   <wvobject type="group" fp_name="group551">
+      <obj_property name="label">fetch_internals</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="group" fp_name="group552">
+         <obj_property name="label">icache_if</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="logic" fp_name="/tb_top/dut/fe/icache_if/clk">
+            <obj_property name="ElementShortName">clk</obj_property>
+            <obj_property name="ObjectShortName">clk</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/fe/icache_if/req_address">
+            <obj_property name="ElementShortName">req_address[31:0]</obj_property>
+            <obj_property name="ObjectShortName">req_address[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/fe/icache_if/req_operation">
+            <obj_property name="ElementShortName">req_operation[1:0]</obj_property>
+            <obj_property name="ObjectShortName">req_operation[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/fe/icache_if/req_size">
+            <obj_property name="ElementShortName">req_size[1:0]</obj_property>
+            <obj_property name="ObjectShortName">req_size[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/fe/icache_if/req_store_word">
+            <obj_property name="ElementShortName">req_store_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">req_store_word[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/dut/fe/icache_if/req_valid">
+            <obj_property name="ElementShortName">req_valid</obj_property>
+            <obj_property name="ObjectShortName">req_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/fe/icache_if/req_loaded_word">
+            <obj_property name="ElementShortName">req_loaded_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">req_loaded_word[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/dut/fe/icache_if/req_fulfilled">
+            <obj_property name="ElementShortName">req_fulfilled</obj_property>
+            <obj_property name="ObjectShortName">req_fulfilled</obj_property>
+         </wvobject>
+      </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fe/pc">
          <obj_property name="ElementShortName">pc[31:0]</obj_property>
          <obj_property name="ObjectShortName">pc[31:0]</obj_property>
@@ -63,75 +106,67 @@
          <obj_property name="ElementShortName">next_pc[31:0]</obj_property>
          <obj_property name="ObjectShortName">next_pc[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/fe/fe_state">
-         <obj_property name="ElementShortName">fe_state[1:0]</obj_property>
-         <obj_property name="ObjectShortName">fe_state[1:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_branch">
-         <obj_property name="ElementShortName">current_inst_is_branch</obj_property>
-         <obj_property name="ObjectShortName">current_inst_is_branch</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_halt">
-         <obj_property name="ElementShortName">current_inst_is_halt</obj_property>
-         <obj_property name="ObjectShortName">current_inst_is_halt</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/fe/pc_plus_4">
+         <obj_property name="ElementShortName">pc_plus_4[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc_plus_4[31:0]</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fe/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
       </wvobject>
-      <wvobject type="group" fp_name="group204">
-         <obj_property name="label">icache_if</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <wvobject type="logic" fp_name="/tb_top/dut/icache_if/clk">
-            <obj_property name="ElementShortName">clk</obj_property>
-            <obj_property name="ObjectShortName">clk</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/icache_if/req_address">
-            <obj_property name="ElementShortName">req_address[31:0]</obj_property>
-            <obj_property name="ObjectShortName">req_address[31:0]</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/icache_if/req_operation">
-            <obj_property name="ElementShortName">req_operation[1:0]</obj_property>
-            <obj_property name="ObjectShortName">req_operation[1:0]</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/icache_if/req_size">
-            <obj_property name="ElementShortName">req_size[1:0]</obj_property>
-            <obj_property name="ObjectShortName">req_size[1:0]</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/icache_if/req_store_word">
-            <obj_property name="ElementShortName">req_store_word[31:0]</obj_property>
-            <obj_property name="ObjectShortName">req_store_word[31:0]</obj_property>
-         </wvobject>
-         <wvobject type="logic" fp_name="/tb_top/dut/icache_if/req_valid">
-            <obj_property name="ElementShortName">req_valid</obj_property>
-            <obj_property name="ObjectShortName">req_valid</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/icache_if/req_loaded_word">
-            <obj_property name="ElementShortName">req_loaded_word[31:0]</obj_property>
-            <obj_property name="ObjectShortName">req_loaded_word[31:0]</obj_property>
-         </wvobject>
-         <wvobject type="logic" fp_name="/tb_top/dut/icache_if/req_fulfilled">
-            <obj_property name="ElementShortName">req_fulfilled</obj_property>
-            <obj_property name="ObjectShortName">req_fulfilled</obj_property>
-         </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/local_stall_request">
+         <obj_property name="ElementShortName">local_stall_request</obj_property>
+         <obj_property name="ObjectShortName">local_stall_request</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/propagate_upstream_data">
+         <obj_property name="ElementShortName">propagate_upstream_data</obj_property>
+         <obj_property name="ObjectShortName">propagate_upstream_data</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/fe/fe_state">
+         <obj_property name="ElementShortName">fe_state[1:0]</obj_property>
+         <obj_property name="ObjectShortName">fe_state[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/fe/next_fe_state">
+         <obj_property name="ElementShortName">next_fe_state[1:0]</obj_property>
+         <obj_property name="ObjectShortName">next_fe_state[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_branch">
+         <obj_property name="ElementShortName">current_inst_is_branch</obj_property>
+         <obj_property name="ObjectShortName">current_inst_is_branch</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_jump">
+         <obj_property name="ElementShortName">current_inst_is_jump</obj_property>
+         <obj_property name="ObjectShortName">current_inst_is_jump</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/current_inst_is_halt">
+         <obj_property name="ElementShortName">current_inst_is_halt</obj_property>
+         <obj_property name="ObjectShortName">current_inst_is_halt</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group92">
-      <obj_property name="label">fe_de interface</obj_property>
+   <wvobject type="group" fp_name="group560">
+      <obj_property name="label">de_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb_top/dut/fe_de_if/valid">
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/de_if/valid">
          <obj_property name="ElementShortName">valid</obj_property>
          <obj_property name="ObjectShortName">valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fe_de_if/halt">
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/de_if/halt">
          <obj_property name="ElementShortName">halt</obj_property>
          <obj_property name="ObjectShortName">halt</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/fe_de_if/instruction">
+      <wvobject type="array" fp_name="/tb_top/dut/fe/de_if/pc">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/fe/de_if/pc_plus_4">
+         <obj_property name="ElementShortName">pc_plus_4[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc_plus_4[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/fe/de_if/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fe_de_if/stall_upstream">
+      <wvobject type="logic" fp_name="/tb_top/dut/fe/de_if/stall_upstream">
          <obj_property name="ElementShortName">stall_upstream</obj_property>
          <obj_property name="ObjectShortName">stall_upstream</obj_property>
       </wvobject>
@@ -147,116 +182,233 @@
       <obj_property name="Radix">ASCIIRADIX</obj_property>
       <obj_property name="CustomSignalColor">#FFA500</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="Reversed">false</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group184">
-      <obj_property name="label">wb_de interface</obj_property>
+   <wvobject type="group" fp_name="group516">
+      <obj_property name="label">fe_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/wb_de_if/result">
+      <wvobject type="logic" fp_name="/tb_top/dut/de/fe_if/valid">
+         <obj_property name="ElementShortName">valid</obj_property>
+         <obj_property name="ObjectShortName">valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/fe_if/halt">
+         <obj_property name="ElementShortName">halt</obj_property>
+         <obj_property name="ObjectShortName">halt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/fe_if/pc">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/fe_if/pc_plus_4">
+         <obj_property name="ElementShortName">pc_plus_4[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc_plus_4[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/fe_if/instruction">
+         <obj_property name="ElementShortName">instruction</obj_property>
+         <obj_property name="ObjectShortName">instruction</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/fe_if/stall_upstream">
+         <obj_property name="ElementShortName">stall_upstream</obj_property>
+         <obj_property name="ObjectShortName">stall_upstream</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group541">
+      <obj_property name="label">wb_if</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/de/wb_if/result">
          <obj_property name="ElementShortName">result[31:0]</obj_property>
          <obj_property name="ObjectShortName">result[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/wb_de_if/rd">
+      <wvobject type="array" fp_name="/tb_top/dut/de/wb_if/rd">
          <obj_property name="ElementShortName">rd[4:0]</obj_property>
          <obj_property name="ObjectShortName">rd[4:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group170">
-      <obj_property name="label">de</obj_property>
+   <wvobject type="group" fp_name="group576">
+      <obj_property name="label">de_internals</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/de/rs1_index">
+         <obj_property name="ElementShortName">rs1_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rs1_index[4:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/rs2_index">
+         <obj_property name="ElementShortName">rs2_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_index[4:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/de_rd_index">
+         <obj_property name="ElementShortName">de_rd_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">de_rd_index[4:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/wb_rd_index">
+         <obj_property name="ElementShortName">wb_rd_index[4:0]</obj_property>
+         <obj_property name="ObjectShortName">wb_rd_index[4:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/rs1_word">
+         <obj_property name="ElementShortName">rs1_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs1_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/rs2_word">
+         <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/composed_immediate">
+         <obj_property name="ElementShortName">composed_immediate[31:0]</obj_property>
+         <obj_property name="ObjectShortName">composed_immediate[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/a_use_pc_or_zero">
+         <obj_property name="ElementShortName">a_use_pc_or_zero</obj_property>
+         <obj_property name="ObjectShortName">a_use_pc_or_zero</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/b_use_imm">
+         <obj_property name="ElementShortName">b_use_imm</obj_property>
+         <obj_property name="ObjectShortName">b_use_imm</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/funct7_alu_control">
+         <obj_property name="ElementShortName">funct7_alu_control</obj_property>
+         <obj_property name="ObjectShortName">funct7_alu_control</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/alu_operation">
+         <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_operation[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/branch_alu_operation">
+         <obj_property name="ElementShortName">branch_alu_operation[2:0]</obj_property>
+         <obj_property name="ObjectShortName">branch_alu_operation[2:0]</obj_property>
+      </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de/instruction_kind">
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de/scoreboard_stall">
-         <obj_property name="ElementShortName">scoreboard_stall</obj_property>
-         <obj_property name="ObjectShortName">scoreboard_stall</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/is_math_insn">
+         <obj_property name="ElementShortName">is_math_insn</obj_property>
+         <obj_property name="ObjectShortName">is_math_insn</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de/is_branch_insn">
          <obj_property name="ElementShortName">is_branch_insn</obj_property>
          <obj_property name="ObjectShortName">is_branch_insn</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/is_jump_insn">
+         <obj_property name="ElementShortName">is_jump_insn</obj_property>
+         <obj_property name="ObjectShortName">is_jump_insn</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de/is_mem_insn">
          <obj_property name="ElementShortName">is_mem_insn</obj_property>
          <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de/regscoreboard/de_write_vector">
-         <obj_property name="ElementShortName">de_write_vector[31:0]</obj_property>
-         <obj_property name="ObjectShortName">de_write_vector[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/is_lui_insn">
+         <obj_property name="ElementShortName">is_lui_insn</obj_property>
+         <obj_property name="ObjectShortName">is_lui_insn</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de/regscoreboard/wb_write_vector">
-         <obj_property name="ElementShortName">wb_write_vector[31:0]</obj_property>
-         <obj_property name="ObjectShortName">wb_write_vector[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/rd_is_x0">
+         <obj_property name="ElementShortName">rd_is_x0</obj_property>
+         <obj_property name="ObjectShortName">rd_is_x0</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de/regfile/register_file">
-         <obj_property name="ElementShortName">register_file[0:31][31:0]</obj_property>
-         <obj_property name="ObjectShortName">register_file[0:31][31:0]</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/rs_is_x0">
+         <obj_property name="ElementShortName">rs_is_x0</obj_property>
+         <obj_property name="ObjectShortName">rs_is_x0</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de/regscoreboard/ready_bits">
-         <obj_property name="ElementShortName">ready_bits[0:31]</obj_property>
-         <obj_property name="ObjectShortName">ready_bits[0:31]</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/is_csr_insn">
+         <obj_property name="ElementShortName">is_csr_insn</obj_property>
+         <obj_property name="ObjectShortName">is_csr_insn</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de/regscoreboard/stall">
-         <obj_property name="DisplayName">FullPathName</obj_property>
-         <obj_property name="ElementShortName">stall</obj_property>
-         <obj_property name="ObjectShortName">stall</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/scoreboard_stall">
+         <obj_property name="ElementShortName">scoreboard_stall</obj_property>
+         <obj_property name="ObjectShortName">scoreboard_stall</obj_property>
       </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group120">
-      <obj_property name="label">de_ex interface</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/valid">
-         <obj_property name="ElementShortName">valid</obj_property>
-         <obj_property name="ObjectShortName">valid</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/local_stall_request">
+         <obj_property name="ElementShortName">local_stall_request</obj_property>
+         <obj_property name="ObjectShortName">local_stall_request</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/halt">
-         <obj_property name="ElementShortName">halt</obj_property>
-         <obj_property name="ObjectShortName">halt</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/propagate_upstream_data">
+         <obj_property name="ElementShortName">propagate_upstream_data</obj_property>
+         <obj_property name="ObjectShortName">propagate_upstream_data</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/rs1_word">
-         <obj_property name="ElementShortName">rs1_word[31:0]</obj_property>
-         <obj_property name="ObjectShortName">rs1_word[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/rs2_word">
-         <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
-         <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/instruction">
-         <obj_property name="ElementShortName">instruction</obj_property>
-         <obj_property name="ObjectShortName">instruction</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/instruction_kind">
-         <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
-         <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_mem_insn">
-         <obj_property name="ElementShortName">is_mem_insn</obj_property>
-         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_branch_insn">
-         <obj_property name="ElementShortName">is_branch_insn</obj_property>
-         <obj_property name="ObjectShortName">is_branch_insn</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/alu_operation">
-         <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
-         <obj_property name="ObjectShortName">alu_operation[3:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/branch_alu_operation">
-         <obj_property name="ElementShortName">branch_alu_operation[2:0]</obj_property>
-         <obj_property name="ObjectShortName">branch_alu_operation[2:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/stall_upstream">
-         <obj_property name="ElementShortName">stall_upstream</obj_property>
-         <obj_property name="ObjectShortName">stall_upstream</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/operand_a">
+      <wvobject type="array" fp_name="/tb_top/dut/de/operand_a">
          <obj_property name="ElementShortName">operand_a[31:0]</obj_property>
          <obj_property name="ObjectShortName">operand_a[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/de_ex_if/operand_b">
+      <wvobject type="array" fp_name="/tb_top/dut/de/operand_b">
          <obj_property name="ElementShortName">operand_b[31:0]</obj_property>
          <obj_property name="ObjectShortName">operand_b[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group537">
+      <obj_property name="label">ex_if</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/valid">
+         <obj_property name="ElementShortName">valid</obj_property>
+         <obj_property name="ObjectShortName">valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/halt">
+         <obj_property name="ElementShortName">halt</obj_property>
+         <obj_property name="ObjectShortName">halt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/rs1_word">
+         <obj_property name="ElementShortName">rs1_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs1_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/rs2_word">
+         <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/pc">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/pc_plus_4">
+         <obj_property name="ElementShortName">pc_plus_4[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc_plus_4[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/instruction">
+         <obj_property name="ElementShortName">instruction</obj_property>
+         <obj_property name="ObjectShortName">instruction</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/instruction_kind">
+         <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
+         <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/is_branch_insn">
+         <obj_property name="ElementShortName">is_branch_insn</obj_property>
+         <obj_property name="ObjectShortName">is_branch_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/is_jump_insn">
+         <obj_property name="ElementShortName">is_jump_insn</obj_property>
+         <obj_property name="ObjectShortName">is_jump_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/alu_operation">
+         <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_operation[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/branch_alu_operation">
+         <obj_property name="ElementShortName">branch_alu_operation[2:0]</obj_property>
+         <obj_property name="ObjectShortName">branch_alu_operation[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/operand_a">
+         <obj_property name="ElementShortName">operand_a[31:0]</obj_property>
+         <obj_property name="ObjectShortName">operand_a[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/ex_if/operand_b">
+         <obj_property name="ElementShortName">operand_b[31:0]</obj_property>
+         <obj_property name="ObjectShortName">operand_b[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/rd_is_x0">
+         <obj_property name="ElementShortName">rd_is_x0</obj_property>
+         <obj_property name="ObjectShortName">rd_is_x0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/rs_is_x0">
+         <obj_property name="ElementShortName">rs_is_x0</obj_property>
+         <obj_property name="ObjectShortName">rs_is_x0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/is_csr_insn">
+         <obj_property name="ElementShortName">is_csr_insn</obj_property>
+         <obj_property name="ObjectShortName">is_csr_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/stall_upstream">
+         <obj_property name="ElementShortName">stall_upstream</obj_property>
+         <obj_property name="ObjectShortName">stall_upstream</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider70" type="divider">
@@ -271,13 +423,92 @@
       <obj_property name="CustomSignalColor">#FFD700</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group175">
-      <obj_property name="label">ex</obj_property>
+   <wvobject type="group" fp_name="group498">
+      <obj_property name="label">de_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb_top/dut/de_ex_if/is_jump_insn">
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/valid">
+         <obj_property name="ElementShortName">valid</obj_property>
+         <obj_property name="ObjectShortName">valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/halt">
+         <obj_property name="ElementShortName">halt</obj_property>
+         <obj_property name="ObjectShortName">halt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/rs1_word">
+         <obj_property name="ElementShortName">rs1_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs1_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/rs2_word">
+         <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/pc">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/pc_plus_4">
+         <obj_property name="ElementShortName">pc_plus_4[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc_plus_4[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/instruction">
+         <obj_property name="ElementShortName">instruction</obj_property>
+         <obj_property name="ObjectShortName">instruction</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/instruction_kind">
+         <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
+         <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/is_branch_insn">
+         <obj_property name="ElementShortName">is_branch_insn</obj_property>
+         <obj_property name="ObjectShortName">is_branch_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/is_jump_insn">
          <obj_property name="ElementShortName">is_jump_insn</obj_property>
          <obj_property name="ObjectShortName">is_jump_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/alu_operation">
+         <obj_property name="ElementShortName">alu_operation[3:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_operation[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/branch_alu_operation">
+         <obj_property name="ElementShortName">branch_alu_operation[2:0]</obj_property>
+         <obj_property name="ObjectShortName">branch_alu_operation[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/operand_a">
+         <obj_property name="ElementShortName">operand_a[31:0]</obj_property>
+         <obj_property name="ObjectShortName">operand_a[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/de_if/operand_b">
+         <obj_property name="ElementShortName">operand_b[31:0]</obj_property>
+         <obj_property name="ObjectShortName">operand_b[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/rd_is_x0">
+         <obj_property name="ElementShortName">rd_is_x0</obj_property>
+         <obj_property name="ObjectShortName">rd_is_x0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/rs_is_x0">
+         <obj_property name="ElementShortName">rs_is_x0</obj_property>
+         <obj_property name="ObjectShortName">rs_is_x0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/is_csr_insn">
+         <obj_property name="ElementShortName">is_csr_insn</obj_property>
+         <obj_property name="ObjectShortName">is_csr_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/stall_upstream">
+         <obj_property name="ElementShortName">stall_upstream</obj_property>
+         <obj_property name="ObjectShortName">stall_upstream</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group603">
+      <obj_property name="label">ex_internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/hart_curr_privilege">
+         <obj_property name="ElementShortName">hart_curr_privilege[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hart_curr_privilege[1:0]</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/ex/alu_result">
          <obj_property name="ElementShortName">alu_result[31:0]</obj_property>
@@ -287,49 +518,81 @@
          <obj_property name="ElementShortName">branch_alu_result</obj_property>
          <obj_property name="ObjectShortName">branch_alu_result</obj_property>
       </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group104">
-      <obj_property name="label">ex_fe interface</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb_top/dut/fe_ex_if/jump_or_branch_valid">
-         <obj_property name="ElementShortName">jump_or_branch_valid</obj_property>
-         <obj_property name="ObjectShortName">jump_or_branch_valid</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/propagate_upstream_data">
+         <obj_property name="ElementShortName">propagate_upstream_data</obj_property>
+         <obj_property name="ObjectShortName">propagate_upstream_data</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/fe_ex_if/jump_or_branch_next_pc">
-         <obj_property name="ElementShortName">jump_or_branch_next_pc[31:0]</obj_property>
-         <obj_property name="ObjectShortName">jump_or_branch_next_pc[31:0]</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/csr_address">
+         <obj_property name="ElementShortName">csr_address[11:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_address[11:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/csr_mscratch">
+         <obj_property name="ElementShortName">csr_mscratch[31:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_mscratch[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/csr_wrapper/csr/rst">
+         <obj_property name="ElementShortName">rst</obj_property>
+         <obj_property name="ObjectShortName">rst</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/csr_array[832]">
+         <obj_property name="ElementShortName">[832][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[832][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/read_value">
+         <obj_property name="ElementShortName">read_value[31:0]</obj_property>
+         <obj_property name="ObjectShortName">read_value[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr_read_value">
+         <obj_property name="ElementShortName">csr_read_value[31:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_read_value[31:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group151">
-      <obj_property name="label">ex_mem interface</obj_property>
+   <wvobject type="group" fp_name="group508">
+      <obj_property name="label">mem_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/valid">
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/mem_if/valid">
          <obj_property name="ElementShortName">valid</obj_property>
          <obj_property name="ObjectShortName">valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/halt">
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/mem_if/halt">
          <obj_property name="ElementShortName">halt</obj_property>
          <obj_property name="ObjectShortName">halt</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex_mem_if/rs2_word">
+      <wvobject type="array" fp_name="/tb_top/dut/ex/mem_if/ex_result">
+         <obj_property name="ElementShortName">ex_result[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ex_result[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/mem_if/rs2_word">
          <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
          <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex_mem_if/instruction">
+      <wvobject type="array" fp_name="/tb_top/dut/ex/mem_if/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex_mem_if/instruction_kind">
+      <wvobject type="array" fp_name="/tb_top/dut/ex/mem_if/instruction_kind">
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/is_mem_insn">
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/mem_if/is_mem_insn">
          <obj_property name="ElementShortName">is_mem_insn</obj_property>
          <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex_mem_if/stall_upstream">
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/mem_if/stall_upstream">
          <obj_property name="ElementShortName">stall_upstream</obj_property>
          <obj_property name="ObjectShortName">stall_upstream</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group477">
+      <obj_property name="label">fe_if</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/fe_if/jump_or_branch_valid">
+         <obj_property name="ElementShortName">jump_or_branch_valid</obj_property>
+         <obj_property name="ObjectShortName">jump_or_branch_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/fe_if/jump_or_branch_next_pc">
+         <obj_property name="ElementShortName">jump_or_branch_next_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">jump_or_branch_next_pc[31:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider77" type="divider">
@@ -344,10 +607,81 @@
       <obj_property name="CustomSignalColor">#008000</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group176">
-      <obj_property name="label">mem</obj_property>
+   <wvobject type="group" fp_name="group453">
+      <obj_property name="label">ex_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/ex_if/valid">
+         <obj_property name="ElementShortName">valid</obj_property>
+         <obj_property name="ObjectShortName">valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/ex_if/halt">
+         <obj_property name="ElementShortName">halt</obj_property>
+         <obj_property name="ObjectShortName">halt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/mem/ex_if/ex_result">
+         <obj_property name="ElementShortName">ex_result[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ex_result[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/mem/ex_if/rs2_word">
+         <obj_property name="ElementShortName">rs2_word[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_word[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/mem/ex_if/instruction">
+         <obj_property name="ElementShortName">instruction</obj_property>
+         <obj_property name="ObjectShortName">instruction</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/mem/ex_if/instruction_kind">
+         <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
+         <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/ex_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/ex_if/stall_upstream">
+         <obj_property name="ElementShortName">stall_upstream</obj_property>
+         <obj_property name="ObjectShortName">stall_upstream</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group472">
+      <obj_property name="label">mem_internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group473">
+         <obj_property name="label">dcache_if</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="logic" fp_name="/tb_top/dut/mem/dcache_if/clk">
+            <obj_property name="ElementShortName">clk</obj_property>
+            <obj_property name="ObjectShortName">clk</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/mem/dcache_if/req_address">
+            <obj_property name="ElementShortName">req_address[31:0]</obj_property>
+            <obj_property name="ObjectShortName">req_address[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/mem/dcache_if/req_operation">
+            <obj_property name="ElementShortName">req_operation[1:0]</obj_property>
+            <obj_property name="ObjectShortName">req_operation[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/mem/dcache_if/req_size">
+            <obj_property name="ElementShortName">req_size[1:0]</obj_property>
+            <obj_property name="ObjectShortName">req_size[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/mem/dcache_if/req_store_word">
+            <obj_property name="ElementShortName">req_store_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">req_store_word[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/dut/mem/dcache_if/req_valid">
+            <obj_property name="ElementShortName">req_valid</obj_property>
+            <obj_property name="ObjectShortName">req_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/tb_top/dut/mem/dcache_if/req_loaded_word">
+            <obj_property name="ElementShortName">req_loaded_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">req_loaded_word[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/dut/mem/dcache_if/req_fulfilled">
+            <obj_property name="ElementShortName">req_fulfilled</obj_property>
+            <obj_property name="ObjectShortName">req_fulfilled</obj_property>
+         </wvobject>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/mem/mem_req_valid">
          <obj_property name="ElementShortName">mem_req_valid</obj_property>
          <obj_property name="ObjectShortName">mem_req_valid</obj_property>
@@ -372,72 +706,39 @@
          <obj_property name="ElementShortName">local_stall_request</obj_property>
          <obj_property name="ObjectShortName">local_stall_request</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/mem/advance_ctrl/request_upstream_stall">
-         <obj_property name="ElementShortName">request_upstream_stall</obj_property>
-         <obj_property name="ObjectShortName">request_upstream_stall</obj_property>
-      </wvobject>
-      <wvobject type="group" fp_name="group205">
-         <obj_property name="label">dcache_if</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <wvobject type="logic" fp_name="/tb_top/dut/dcache_if/clk">
-            <obj_property name="ElementShortName">clk</obj_property>
-            <obj_property name="ObjectShortName">clk</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/dcache_if/req_address">
-            <obj_property name="ElementShortName">req_address[31:0]</obj_property>
-            <obj_property name="ObjectShortName">req_address[31:0]</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/dcache_if/req_operation">
-            <obj_property name="ElementShortName">req_operation[1:0]</obj_property>
-            <obj_property name="ObjectShortName">req_operation[1:0]</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/dcache_if/req_size">
-            <obj_property name="ElementShortName">req_size[1:0]</obj_property>
-            <obj_property name="ObjectShortName">req_size[1:0]</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/dcache_if/req_store_word">
-            <obj_property name="ElementShortName">req_store_word[31:0]</obj_property>
-            <obj_property name="ObjectShortName">req_store_word[31:0]</obj_property>
-         </wvobject>
-         <wvobject type="logic" fp_name="/tb_top/dut/dcache_if/req_valid">
-            <obj_property name="ElementShortName">req_valid</obj_property>
-            <obj_property name="ObjectShortName">req_valid</obj_property>
-         </wvobject>
-         <wvobject type="array" fp_name="/tb_top/dut/dcache_if/req_loaded_word">
-            <obj_property name="ElementShortName">req_loaded_word[31:0]</obj_property>
-            <obj_property name="ObjectShortName">req_loaded_word[31:0]</obj_property>
-         </wvobject>
-         <wvobject type="logic" fp_name="/tb_top/dut/dcache_if/req_fulfilled">
-            <obj_property name="ElementShortName">req_fulfilled</obj_property>
-            <obj_property name="ObjectShortName">req_fulfilled</obj_property>
-         </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/propagate_upstream_data">
+         <obj_property name="ElementShortName">propagate_upstream_data</obj_property>
+         <obj_property name="ObjectShortName">propagate_upstream_data</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group170">
-      <obj_property name="label">mem_wb interface</obj_property>
+   <wvobject type="group" fp_name="group462">
+      <obj_property name="label">wb_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/valid">
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/wb_if/valid">
          <obj_property name="ElementShortName">valid</obj_property>
          <obj_property name="ObjectShortName">valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/halt">
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/wb_if/halt">
          <obj_property name="ElementShortName">halt</obj_property>
          <obj_property name="ObjectShortName">halt</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/mem_wb_if/load_result">
+      <wvobject type="array" fp_name="/tb_top/dut/mem/wb_if/ex_result">
+         <obj_property name="ElementShortName">ex_result[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ex_result[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/mem/wb_if/load_result">
          <obj_property name="ElementShortName">load_result[31:0]</obj_property>
          <obj_property name="ObjectShortName">load_result[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/mem_wb_if/instruction">
+      <wvobject type="array" fp_name="/tb_top/dut/mem/wb_if/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/mem_wb_if/instruction_kind">
+      <wvobject type="array" fp_name="/tb_top/dut/mem/wb_if/instruction_kind">
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
          <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/mem_wb_if/is_mem_insn">
+      <wvobject type="logic" fp_name="/tb_top/dut/mem/wb_if/is_mem_insn">
          <obj_property name="ElementShortName">is_mem_insn</obj_property>
          <obj_property name="ObjectShortName">is_mem_insn</obj_property>
       </wvobject>
@@ -445,23 +746,63 @@
    <wvobject fp_name="divider84" type="divider">
       <obj_property name="label">wb</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="BkColor">#0000FF</obj_property>
+      <obj_property name="BkColor">#00FFFF</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb_top/wb_insn">
       <obj_property name="ElementShortName">wb_insn[255:0]</obj_property>
       <obj_property name="ObjectShortName">wb_insn[255:0]</obj_property>
       <obj_property name="Radix">ASCIIRADIX</obj_property>
-      <obj_property name="CustomSignalColor">#0000FF</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group184">
-      <obj_property name="label">wb_de interface</obj_property>
+   <wvobject type="group" fp_name="group429">
+      <obj_property name="label">mem_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/wb_de_if/result">
+      <wvobject type="logic" fp_name="/tb_top/dut/wb/mem_if/valid">
+         <obj_property name="ElementShortName">valid</obj_property>
+         <obj_property name="ObjectShortName">valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/wb/mem_if/halt">
+         <obj_property name="ElementShortName">halt</obj_property>
+         <obj_property name="ObjectShortName">halt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/wb/mem_if/ex_result">
+         <obj_property name="ElementShortName">ex_result[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ex_result[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/wb/mem_if/load_result">
+         <obj_property name="ElementShortName">load_result[31:0]</obj_property>
+         <obj_property name="ObjectShortName">load_result[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/wb/mem_if/instruction">
+         <obj_property name="ElementShortName">instruction</obj_property>
+         <obj_property name="ObjectShortName">instruction</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/wb/mem_if/instruction_kind">
+         <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>
+         <obj_property name="ObjectShortName">instruction_kind[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/wb/mem_if/is_mem_insn">
+         <obj_property name="ElementShortName">is_mem_insn</obj_property>
+         <obj_property name="ObjectShortName">is_mem_insn</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group616">
+      <obj_property name="label">wb_internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/tb_top/dut/wb/write_enable">
+         <obj_property name="ElementShortName">write_enable</obj_property>
+         <obj_property name="ObjectShortName">write_enable</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group440">
+      <obj_property name="label">de_if</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/wb/de_if/result">
          <obj_property name="ElementShortName">result[31:0]</obj_property>
          <obj_property name="ObjectShortName">result[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/wb_de_if/rd">
+      <wvobject type="array" fp_name="/tb_top/dut/wb/de_if/rd">
          <obj_property name="ElementShortName">rd[4:0]</obj_property>
          <obj_property name="ObjectShortName">rd[4:0]</obj_property>
       </wvobject>
@@ -471,13 +812,14 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">#800080</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/tb_top/clk">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
    <wvobject type="group" fp_name="group56">
       <obj_property name="label">probe_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/tb_top/probe_if/clk">
-         <obj_property name="ElementShortName">clk</obj_property>
-         <obj_property name="ObjectShortName">clk</obj_property>
-      </wvobject>
       <wvobject type="array" fp_name="/tb_top/probe_if/int_registers">
          <obj_property name="DisplayName">FullPathName</obj_property>
          <obj_property name="ElementShortName">int_registers[0:31][31:0]</obj_property>
