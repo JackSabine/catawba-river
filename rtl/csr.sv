@@ -41,6 +41,40 @@ logic [4095:0][XLEN-1:0] csr_array;
 `RW_CSR(mseccfg,    12'h747, clk, rst, 0, csr_address, value_to_write) // Not implemented
 `RW_CSR(mseccfgh,   12'h757, clk, rst, 0, csr_address, value_to_write)
 
+generate for (genvar i = 0; i < 16; i++) begin : PMPCFG_GEN
+    `RW_CSR(pmpcfg``i, 12'h3A0 + i, clk, rst, 0, csr_address, value_to_write)
+end endgenerate
+generate for (genvar i = 0; i < 64; i++) begin : PMPADDR_GEN
+    `RW_CSR(pmpaddr``i, 12'h3B0 + i, clk, rst, 0, csr_address, value_to_write)
+end endgenerate
+
+`RW_CSR(mnscratch, 12'h740, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(mnepc,     12'h741, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(mncause,   12'h742, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(mnnstatus, 12'h743, clk, rst, 0, csr_address, value_to_write) // Not implemented
+
+`RW_CSR(mcycle,    12'hB00, clk, rst, 0, csr_address, value_to_write) // No cycle counting yet
+`RW_CSR(minstret,  12'hB02, clk, rst, 0, csr_address, value_to_write) // No instruction counting yet
+generate for (genvar i = 3; i < 32; i++) begin : MHPMCOUNTER_GEN
+    `RW_CSR(mhpmcounter``i, 12'hB00 + i, clk, rst, 0, csr_address, value_to_write) // No counting yet
+end endgenerate
+`RW_CSR(mcycleh,   12'hB80, clk, rst, 0, csr_address, value_to_write) // No cycle counting yet
+`RW_CSR(minstreth, 12'hB82, clk, rst, 0, csr_address, value_to_write) // No instruction counting yet
+generate for (genvar i = 3; i < 32; i++) begin : MHPMCOUNTERH_GEN
+    `RW_CSR(mhpmcounterh``i, 12'hB80 + i, clk, rst, 0, csr_address, value_to_write) // No counting yet
+end endgenerate
+
+`RW_CSR(tselect,    12'h7A0, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(tdata1,     12'h7A1, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(tdata2,     12'h7A2, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(tdata3,     12'h7A3, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(mcontext,   12'h7A8, clk, rst, 0, csr_address, value_to_write) // Not implemented
+
+`RW_CSR(dcsr,       12'h7B0, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(dpc,        12'h7B1, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(dscratch0,  12'h7B2, clk, rst, 0, csr_address, value_to_write) // Not implemented
+`RW_CSR(dscratch1,  12'h7B3, clk, rst, 0, csr_address, value_to_write) // Not implemented
+
 assign csr_read_value = csr_array[csr_address];
 assign invalid_csr_index = 1'b0;
 
