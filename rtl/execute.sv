@@ -45,7 +45,7 @@ module execute import catawba_params::*; #(
         .XLEN(XLEN)
     ) csr_wrapper (
         .clk(clk),
-        .rst_if(rst_if),
+        .rst(rst_if.reset),
         .req_csr_address(de_if.operand_b[11:0]),
         .req_source_value(de_if.operand_a),
         .req_system_op(system_op_e'(de_if.instruction.funct3)),

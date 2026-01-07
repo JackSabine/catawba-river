@@ -34,18 +34,18 @@ def convert_port_list_to_inst_list(port_list: list[str]) -> list[str]:
 def main() -> None:
     csr_csv = Path(os.environ["WORKAREA"]) / "rtl" / "csr.csv"
     rtl_path = Path(os.environ["WORKDIR"]) / "csr_core.sv"
-    rtl_inst_path = Path(os.environ["WORKDIR"]) / "csr_core_inst.sv"
+    csr_wrapper_path = Path(os.environ["WORKAREA"]) / "rtl" / "csr_wrapper.sv"
 
     csrs: list[CSR] = []
 
     port_list: list[str] = [
         "    input logic clk",
         "    input logic rst",
-        "    input logic [11:0] csr_address",
-        "    input logic read",
-        "    input logic write",
+        "    input logic [11:0] req_csr_address",
+        "    input logic req_valid_read",
+        "    input logic req_valid_write",
         "    input logic [XLEN-1:0] value_to_write",
-        "    input logic trigger_read_side_effects",
+        "    input logic req_trigger_read_side_effects",
         "    output logic [XLEN-1:0] csr_read_value",
         "    output logic invalid_csr_index",
     ]
@@ -54,6 +54,9 @@ def main() -> None:
     always_ff_reset_statements: list[str] = []
     assign_statements: list[str] = []
     reading_statements: list[str] = []
+    inst_lines: list[str] = []
+    csr_wrapper_input_lines: list[str]
+    csr_wrapper_output_lines: list[str] = []
 
     internal_declares.append("logic [31:0] csr_read_value_precheck;")
 
@@ -87,9 +90,9 @@ def main() -> None:
                 assert not is_read_only(csr), f"CSR {csr.name} cannot be both volatile and read-only"
                 port_list.append(f"    input logic [{csr.width - 1}:0] csr_{csr.name}_hw_ovrd")
                 port_list.append(f"    input logic csr_{csr.name}_hw_ovrd_en")
-                always_ff_statements.append(f"        csr_{csr.name:20s} <= csr_{csr.name}_hw_ovrd_en ? csr_{csr.name}_hw_ovrd : (csr_address == 12'h{csr.address:03X} ? value_to_write : csr_{csr.name});")
+                always_ff_statements.append(f"        csr_{csr.name:20s} <= csr_{csr.name}_hw_ovrd_en ? csr_{csr.name}_hw_ovrd : (req_valid_write && (req_csr_address == 12'h{csr.address:03X}) ? value_to_write : csr_{csr.name});")
             else:
-                always_ff_statements.append(f"        csr_{csr.name:20s} <= (csr_address == 12'h{csr.address:03X} ? value_to_write : csr_{csr.name});")
+                always_ff_statements.append(f"        csr_{csr.name:20s} <= (req_valid_write && (req_csr_address == 12'h{csr.address:03X}) ? value_to_write : csr_{csr.name});")
 
             if csr.reset == 0:
                 always_ff_reset_statements.append(f"        csr_{csr.name} <= '0;")
@@ -108,7 +111,7 @@ def main() -> None:
     reading_statements.append("            invalid_csr_index = 1'b1;")
     reading_statements.append("        end")
 
-    assign_statements.append("assign csr_read_value = read ? csr_read_value_precheck : '0;")
+    assign_statements.append("assign csr_read_value = req_valid_read ? csr_read_value_precheck : '0;")
 
     with open(rtl_path, 'w') as f:
         f.write("// This file is auto-generated. Do not edit directly.\n\n")
@@ -127,20 +130,37 @@ def main() -> None:
         f.write("\n".join(assign_statements))
         f.write("\n\nalways_comb begin\n")
         f.write("    invalid_csr_index = 1'b0;\n")
-        f.write("    csr_read_value = '0;\n\n")
-        f.write("    unique casez (csr_address)\n")
+        f.write("    unique casez (req_csr_address)\n")
         f.write("\n".join(reading_statements))
         f.write("\n    endcase\n")
         f.write("end\n\n")
         f.write("\n\nendmodule\n")
 
-    with open(rtl_inst_path, 'w') as f:
-        f.write("// This file is auto-generated. Do not edit directly.\n\n")
-        f.write("csr_core #(\n")
-        f.write("    .XLEN(XLEN)\n")
-        f.write(") csr_core_inst (\n")
-        f.write(",\n".join(convert_port_list_to_inst_list(port_list)))
-        f.write("\n);\n")
+    inst_lines.append("csr_core #(\n")
+    inst_lines.append("    .XLEN(XLEN)\n")
+    inst_lines.append(") csr_core_inst (\n")
+    inst_lines.append(",\n".join(convert_port_list_to_inst_list(port_list)))
+    inst_lines.append("\n);\n")
+
+    with open(csr_wrapper_path, 'r') as f:
+        csr_wrapper_input_lines = f.readlines()
+
+    skipping_lines = False
+
+    for l in csr_wrapper_input_lines:
+        if skipping_lines:
+            if re.search(r'^\s*//\s*gen_csr\.py end\s*$', l):
+                skipping_lines = False
+                csr_wrapper_output_lines.append(l)
+            continue
+
+        csr_wrapper_output_lines.append(l)
+        if re.search(r'^\s*//\s*gen_csr\.py begin\s*$', l):
+            csr_wrapper_output_lines.extend(inst_lines)
+            skipping_lines = True
+
+    with open(csr_wrapper_path, 'w') as f:
+        f.writelines(csr_wrapper_output_lines)
 
     return
 

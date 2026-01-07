@@ -2,7 +2,7 @@ module csr_wrapper import catawba_params::*; #(
     parameter XLEN = 32
 ) (
     input  logic            clk,
-           reset_if         rst_if,
+    input  logic            rst,
     input  logic [11:0]     req_csr_address,
     input  logic [XLEN-1:0] req_source_value,
     input  system_op_e      req_system_op,
@@ -73,18 +73,31 @@ always_comb begin
     endcase
 end
 
+logic invalid_csr_index;
+logic [31:0] csr_mepc;
+logic [31:0] csr_mepc_hw_ovrd;
+logic        csr_mepc_hw_ovrd_en;
 
-csr csr (
-    .clk(clk),
-    .rst(rst_if.reset),
-    .csr_address(req_csr_address),
-    .read(req_valid_read),
-    .write(req_valid_write),
-    .value_to_write(value_to_write),
-    .trigger_read_side_effects(req_trigger_read_side_effects),
-    .csr_read_value(csr_read_value),
-    .invalid_csr_index()
+assign csr_mepc_hw_ovrd_en = '0;
+
+// gen_csr.py begin
+csr_core #(
+    .XLEN(XLEN)
+) csr_core_inst (
+    .clk,
+    .rst,
+    .req_csr_address,
+    .req_valid_read,
+    .req_valid_write,
+    .value_to_write,
+    .req_trigger_read_side_effects,
+    .csr_read_value,
+    .invalid_csr_index,
+    .csr_mepc,
+    .csr_mepc_hw_ovrd,
+    .csr_mepc_hw_ovrd_en
 );
+// gen_csr.py end
 
 assign rsp_csr_value = req_valid_read ? csr_read_value : '0;
 

@@ -132,7 +132,10 @@ elf: $(TEST_OBJECTS)
 $(WORKDIR)/memory_maps.sv: $(TEST_OBJECTS)
 	${WORKAREA}/scripts/disassemble_elf.py $(WORKDIR) $(WORKDIR)/memory_maps.sv
 
-$(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) | $(WORKDIR)
+$(WORKDIR)/csr_core.sv: ${WORKAREA}/rtl/csr.csv ${WORKAREA}/scripts/gen_csr.py | $(WORKDIR)
+	${WORKAREA}/scripts/gen_csr.py
+
+$(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) $(WORKDIR)/csr_core.sv | $(WORKDIR)
 	@echo "----- Compiling HDL -----"
 	cd $(WORKDIR) && xvlog $(UVM_XVLOG_FLAGS) $(COMPILE_LIST) $(XVLOG_FLAGS)
 
