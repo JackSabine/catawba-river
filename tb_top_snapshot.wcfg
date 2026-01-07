@@ -16,13 +16,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0 ns"></ZoomStartTime>
-      <ZoomEndTime time="140 ns"></ZoomEndTime>
-      <Cursor1Time time="111 ns"></Cursor1Time>
+      <ZoomStartTime time="68 ns"></ZoomStartTime>
+      <ZoomEndTime time="250 ns"></ZoomEndTime>
+      <Cursor1Time time="99 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="301"></NameColumnWidth>
-      <ValueColumnWidth column_width="190"></ValueColumnWidth>
+      <ValueColumnWidth column_width="185"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="32" />
    <wvobject type="logic" fp_name="/tb_top/clk">
@@ -310,6 +310,22 @@
          <obj_property name="ElementShortName">is_csr_insn</obj_property>
          <obj_property name="ObjectShortName">is_csr_insn</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/regscoreboard/de_instruction_has_rd">
+         <obj_property name="ElementShortName">de_instruction_has_rd</obj_property>
+         <obj_property name="ObjectShortName">de_instruction_has_rd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/regscoreboard/de_instruction_reads_rs1">
+         <obj_property name="ElementShortName">de_instruction_reads_rs1</obj_property>
+         <obj_property name="ObjectShortName">de_instruction_reads_rs1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/regscoreboard/de_instruction_reads_rs2">
+         <obj_property name="ElementShortName">de_instruction_reads_rs2</obj_property>
+         <obj_property name="ObjectShortName">de_instruction_reads_rs2</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/de/regscoreboard/ready_bits">
+         <obj_property name="ElementShortName">ready_bits[0:31]</obj_property>
+         <obj_property name="ObjectShortName">ready_bits[0:31]</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de/scoreboard_stall">
          <obj_property name="ElementShortName">scoreboard_stall</obj_property>
          <obj_property name="ObjectShortName">scoreboard_stall</obj_property>
@@ -521,26 +537,6 @@
       <wvobject type="logic" fp_name="/tb_top/dut/ex/propagate_upstream_data">
          <obj_property name="ElementShortName">propagate_upstream_data</obj_property>
          <obj_property name="ObjectShortName">propagate_upstream_data</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/csr_address">
-         <obj_property name="ElementShortName">csr_address[11:0]</obj_property>
-         <obj_property name="ObjectShortName">csr_address[11:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/csr_mscratch">
-         <obj_property name="ElementShortName">csr_mscratch[31:0]</obj_property>
-         <obj_property name="ObjectShortName">csr_mscratch[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/ex/csr_wrapper/csr/rst">
-         <obj_property name="ElementShortName">rst</obj_property>
-         <obj_property name="ObjectShortName">rst</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/csr_array[832]">
-         <obj_property name="ElementShortName">[832][31:0]</obj_property>
-         <obj_property name="ObjectShortName">[832][31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr/read_value">
-         <obj_property name="ElementShortName">read_value[31:0]</obj_property>
-         <obj_property name="ObjectShortName">read_value[31:0]</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/ex/csr_wrapper/csr_read_value">
          <obj_property name="ElementShortName">csr_read_value[31:0]</obj_property>

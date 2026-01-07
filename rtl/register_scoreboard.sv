@@ -33,13 +33,10 @@ module register_scoreboard import catawba_params::*; #(
     assign wb_write_vector[0] = 1'b0;
     always_comb begin
         for (int r = 1; r < NUM_REGISTERS; r++) begin
-            de_write_vector[r] = (de_write_port_select == r);
+            de_write_vector[r] = de_valid & (de_write_port_select == r);
             wb_write_vector[r] = (wb_write_port_select == r);
         end
     end
-
-    // stall on non-ready rd to prevent younger instructions from advancing
-    // when the older writer of rd finishes
 
     // use_rsx | ready[rsx] || stall
     // --------+------------++------
@@ -47,8 +44,7 @@ module register_scoreboard import catawba_params::*; #(
     //   1     |     1      ||   0
     //   1     |     0      ||   1
     assign stall = (de_instruction_reads_rs1 & ~ready_bits[de_read_port_select_1]) |
-                   (de_instruction_reads_rs2 & ~ready_bits[de_read_port_select_2]) |
-                   (de_instruction_has_rd    & ~ready_bits[de_write_port_select]);
+                   (de_instruction_reads_rs2 & ~ready_bits[de_read_port_select_2]);
 
     assign ready_bits[0] = 1'b1;
 
@@ -61,10 +57,10 @@ module register_scoreboard import catawba_params::*; #(
             // When wb_write_enable and de_instruction_has_rd are active while stall isn't active,
             // wb_write_port_select will not equal de_write_port_select
             for (int r = 1; r < NUM_REGISTERS; r++) begin
-                unique0 if (wb_write_vector[r]) begin
-                    ready_bits[r] <= 1'b1;
-                end else if (de_valid & ~stall & de_instruction_has_rd & de_write_vector[r]) begin
+                if (de_valid & ~stall & de_instruction_has_rd & de_write_vector[r]) begin
                     ready_bits[r] <= 1'b0;
+                end else if (wb_write_vector[r]) begin
+                    ready_bits[r] <= 1'b1;
                 end
             end
         end

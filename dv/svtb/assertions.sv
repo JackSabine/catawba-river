@@ -14,19 +14,19 @@ module register_scoreboard_assertions import uvm_pkg::*; (
     input logic stall
 );
 
-    CONFLICTING_WRITE_PORT_SELECTS: assert property (
+    DE_WRITE_VECTOR_IS_ONEHOT0_AND_VALID: assert property (
         @(posedge clk) disable iff (rst_if.reset)
-        (wb_write_vector != '0) & (~stall & de_instruction_has_rd) |-> wb_write_port_select != de_write_port_select
-    ) else `uvm_error (
-        "CONFLICTING_WRITE_PORT_SELECTS",
-        $sformatf("[%m]: DE instruction is not stalling even though wb_write_port_select and de_write_port_select are equal")
+        !$isunknown(de_write_vector) && $onehot0(de_write_vector) && (de_write_vector[0] == 1'b0)
+    ) else `uvm_error(
+        "DE_WRITE_VECTOR_IS_ONEHOT0_AND_VALID",
+        $sformatf("[%m]: de_write_vector in an invalid state (%032b)", de_write_vector)
     )
 
-    WRITE_VECTOR_IS_ONEHOT0_AND_VALID: assert property (
+   WB_WRITE_VECTOR_IS_ONEHOT0_AND_VALID: assert property (
         @(posedge clk) disable iff (rst_if.reset)
         !$isunknown(wb_write_vector) && $onehot0(wb_write_vector) && (wb_write_vector[0] == 1'b0)
     ) else `uvm_error(
-        "WRITE_VECTOR_IS_ONEHOT0_AND_VALID",
+        "WB_WRITE_VECTOR_IS_ONEHOT0_AND_VALID",
         $sformatf("[%m]: wb_write_vector in an invalid state (%032b)", wb_write_vector)
     )
 endmodule
