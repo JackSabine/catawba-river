@@ -115,6 +115,8 @@ class scoreboard extends uvm_scoreboard;
         spike_delete();
 
         void'(expected_fifo.try_put(expected_pipe_state_tx));
+
+        `uvm_info(get_full_name(), $sformatf("Simulation ending at time %0t ns", $time()), UVM_LOW)
     endfunction
 
     function void check_phase(uvm_phase phase);

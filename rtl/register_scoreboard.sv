@@ -16,6 +16,8 @@ module register_scoreboard import catawba_params::*; #(
 
     input logic [`REG_BITS-1:0] wb_write_port_select,
 
+    input logic block_ready_bit_clear,
+
     output logic stall
 );
 
@@ -58,7 +60,9 @@ module register_scoreboard import catawba_params::*; #(
             // wb_write_port_select will not equal de_write_port_select
             for (int r = 1; r < NUM_REGISTERS; r++) begin
                 if (de_valid & ~stall & de_instruction_has_rd & de_write_vector[r]) begin
-                    ready_bits[r] <= 1'b0;
+                    if (~block_ready_bit_clear) begin
+                        ready_bits[r] <= 1'b0;
+                    end
                 end else if (wb_write_vector[r]) begin
                     ready_bits[r] <= 1'b1;
                 end

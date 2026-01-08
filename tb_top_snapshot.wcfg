@@ -16,13 +16,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="68 ns"></ZoomStartTime>
-      <ZoomEndTime time="250 ns"></ZoomEndTime>
-      <Cursor1Time time="99 ns"></Cursor1Time>
+      <ZoomStartTime time="0 ns"></ZoomStartTime>
+      <ZoomEndTime time="254 ns"></ZoomEndTime>
+      <Cursor1Time time="80 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="301"></NameColumnWidth>
-      <ValueColumnWidth column_width="185"></ValueColumnWidth>
+      <ValueColumnWidth column_width="180"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="32" />
    <wvobject type="logic" fp_name="/tb_top/clk">
@@ -226,6 +226,7 @@
    <wvobject type="group" fp_name="group576">
       <obj_property name="label">de_internals</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/de/rs1_index">
          <obj_property name="ElementShortName">rs1_index[4:0]</obj_property>
          <obj_property name="ObjectShortName">rs1_index[4:0]</obj_property>
@@ -326,6 +327,10 @@
          <obj_property name="ElementShortName">ready_bits[0:31]</obj_property>
          <obj_property name="ObjectShortName">ready_bits[0:31]</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/de/regscoreboard/block_ready_bit_clear">
+         <obj_property name="ElementShortName">block_ready_bit_clear</obj_property>
+         <obj_property name="ObjectShortName">block_ready_bit_clear</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de/scoreboard_stall">
          <obj_property name="ElementShortName">scoreboard_stall</obj_property>
          <obj_property name="ObjectShortName">scoreboard_stall</obj_property>
@@ -341,6 +346,10 @@
       <wvobject type="array" fp_name="/tb_top/dut/de/operand_a">
          <obj_property name="ElementShortName">operand_a[31:0]</obj_property>
          <obj_property name="ObjectShortName">operand_a[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/ex/alu/operation">
+         <obj_property name="ElementShortName">operation[3:0]</obj_property>
+         <obj_property name="ObjectShortName">operation[3:0]</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/de/operand_b">
          <obj_property name="ElementShortName">operand_b[31:0]</obj_property>
@@ -442,6 +451,7 @@
    <wvobject type="group" fp_name="group498">
       <obj_property name="label">de_if</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb_top/dut/ex/de_if/valid">
          <obj_property name="ElementShortName">valid</obj_property>
          <obj_property name="ObjectShortName">valid</obj_property>

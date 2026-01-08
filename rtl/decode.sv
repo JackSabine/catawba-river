@@ -104,6 +104,8 @@ module decode import catawba_params::*; #(
 
         .wb_write_port_select(wb_rd_index),
 
+        .block_ready_bit_clear(ex_if.stall_upstream),
+
         .stall(scoreboard_stall)
     );
 

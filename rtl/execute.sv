@@ -25,7 +25,7 @@ module execute import catawba_params::*; #(
     ) alu (
         .operand_a(de_if.operand_a),
         .operand_b(de_if.operand_b),
-        .operation(de_ex_if.alu_operation),
+        .operation(de_if.alu_operation),
         .result(alu_result)
     );
 
