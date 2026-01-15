@@ -38,6 +38,8 @@ execute ex (
     .clk(clk),
     .rst_if(rst_if),
     .hart_curr_privilege(hart_curr_privilege),
+    .mem_has_valid_instruction(ex_mem_if.valid),
+    .wb_has_valid_instruction(mem_wb_if.valid),
     .de_if(de_ex_if),
     .fe_if(fe_ex_if),
     .mem_if(ex_mem_if)

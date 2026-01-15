@@ -8,6 +8,9 @@ module execute import catawba_params::*; #(
 
     input logic [1:0] hart_curr_privilege,
 
+    input logic mem_has_valid_instruction,
+    input logic wb_has_valid_instruction,
+
     fetch_execute_if.ex fe_if,
     decode_execute_if.ex de_if,
     execute_memory_if.ex mem_if
@@ -19,6 +22,11 @@ module execute import catawba_params::*; #(
     logic propagate_upstream_data;
 
     logic [XLEN-1:0] csr_read_value;
+
+    logic stall_to_make_csr_op_atomic;
+    assign stall_to_make_csr_op_atomic =
+        de_if.is_csr_insn &
+        (mem_has_valid_instruction | wb_has_valid_instruction);
 
     alu #(
         .XLEN(XLEN)
@@ -51,7 +59,7 @@ module execute import catawba_params::*; #(
         .req_system_op(system_op_e'(de_if.instruction.funct3)),
         .req_rd_is_x0(de_if.rd_is_x0),
         .req_rs_is_x0(de_if.rs_is_x0),
-        .req_valid(de_if.valid & de_if.is_csr_insn),
+        .req_valid(de_if.valid & de_if.is_csr_insn & ~stall_to_make_csr_op_atomic),
 
         .hart_curr_privilege(hart_curr_privilege),
         .rsp_csr_value(csr_read_value)
@@ -61,7 +69,7 @@ module execute import catawba_params::*; #(
         .clk(clk),
         .rst_if(rst_if),
         .upstream_valid(de_if.valid),
-        .local_stall_request(1'b0),
+        .local_stall_request(stall_to_make_csr_op_atomic),
         .downstream_stall_request(mem_if.stall_upstream),
         .upstream_halt(de_if.halt),
 
