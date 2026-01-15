@@ -16,10 +16,22 @@ module csr_wrapper import catawba_params::*; #(
 
 logic [1:0] req_csr_address_rw;
 logic [1:0] req_csr_address_privilege_required;
+logic csr_is_ro;
+logic underprivileged_hart;
+logic req_valid_write;
+logic req_valid_read;
+logic req_trigger_read_side_effects;
+logic [XLEN-1:0] csr_read_value;
+logic [XLEN-1:0] value_to_write;
+system_csr_op_e csr_op;
+logic invalid_csr_index;
+logic [31:0] csr_mepc;
+logic [31:0] csr_mepc_hw_ovrd;
+logic        csr_mepc_hw_ovrd_en;
+
 assign req_csr_address_rw = req_csr_address[11:10];
 assign req_csr_address_privilege_required = req_csr_address[9:8];
 
-logic underprivileged_hart;
 always_comb begin : privilege_check
     casez (hart_curr_privilege)
         2'b11: underprivileged_hart = 1'b0;
@@ -30,11 +42,9 @@ always_comb begin : privilege_check
     endcase
 end
 
-logic csr_is_ro;
 assign csr_is_ro = (req_csr_address_rw == 2'b11);
 
 // valid write unless:
-logic req_valid_write;
 assign req_valid_write =
     req_valid &
     ~underprivileged_hart &
@@ -45,20 +55,14 @@ assign req_valid_write =
     ));
 
 // valid read unless: csrrw op AND rd is x0
-logic req_valid_read;
 assign req_valid_read =
     req_valid &
     ~underprivileged_hart;
 
-logic req_trigger_read_side_effects;
 assign req_trigger_read_side_effects =
     req_valid_read &
     ~(req_system_op[1:0] == 2'b01 & req_rd_is_x0);
 
-logic [XLEN-1:0] csr_read_value;
-logic [XLEN-1:0] value_to_write;
-
-system_csr_op_e csr_op;
 assign csr_op = system_csr_op_e'(req_system_op[1:0]);
 
 always_comb begin
@@ -73,10 +77,6 @@ always_comb begin
     endcase
 end
 
-logic invalid_csr_index;
-logic [31:0] csr_mepc;
-logic [31:0] csr_mepc_hw_ovrd;
-logic        csr_mepc_hw_ovrd_en;
 
 assign csr_mepc_hw_ovrd_en = '0;
 
