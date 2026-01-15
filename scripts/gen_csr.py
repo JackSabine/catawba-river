@@ -41,12 +41,11 @@ def main() -> None:
     port_list: list[str] = [
         "    input logic clk",
         "    input logic rst",
-        "    input logic [11:0] req_csr_address",
-        "    input logic req_valid_read",
+        "    input logic [11:0] read_csr_address",
+        "    input logic [11:0] queue_head_entry_csr_address",
         "    input logic req_valid_write",
         "    input logic [XLEN-1:0] value_to_write",
-        "    input logic req_trigger_read_side_effects",
-        "    output logic [XLEN-1:0] csr_read_value",
+        "    output logic [XLEN-1:0] core_csr_read_value",
         "    output logic invalid_csr_index",
     ]
     internal_declares: list[str] = []
@@ -58,7 +57,7 @@ def main() -> None:
     csr_wrapper_input_lines: list[str]
     csr_wrapper_output_lines: list[str] = []
 
-    internal_declares.append("logic [31:0] csr_read_value_precheck;")
+    internal_declares.append("logic [31:0] core_csr_read_value;")
 
 
     with open(csr_csv, newline='') as f:
@@ -90,9 +89,9 @@ def main() -> None:
                 assert not is_read_only(csr), f"CSR {csr.name} cannot be both volatile and read-only"
                 port_list.append(f"    input logic [{csr.width - 1}:0] csr_{csr.name}_hw_ovrd")
                 port_list.append(f"    input logic csr_{csr.name}_hw_ovrd_en")
-                always_ff_statements.append(f"        csr_{csr.name:20s} <= csr_{csr.name}_hw_ovrd_en ? csr_{csr.name}_hw_ovrd : (req_valid_write && (req_csr_address == 12'h{csr.address:03X}) ? value_to_write : csr_{csr.name});")
+                always_ff_statements.append(f"        csr_{csr.name:20s} <= csr_{csr.name}_hw_ovrd_en ? csr_{csr.name}_hw_ovrd : (req_valid_write && (queue_head_entry_csr_address == 12'h{csr.address:03X}) ? value_to_write : csr_{csr.name});")
             else:
-                always_ff_statements.append(f"        csr_{csr.name:20s} <= (req_valid_write && (req_csr_address == 12'h{csr.address:03X}) ? value_to_write : csr_{csr.name});")
+                always_ff_statements.append(f"        csr_{csr.name:20s} <= (req_valid_write && (queue_head_entry_csr_address == 12'h{csr.address:03X}) ? value_to_write : csr_{csr.name});")
 
             if csr.reset == 0:
                 always_ff_reset_statements.append(f"        csr_{csr.name} <= '0;")
@@ -104,14 +103,12 @@ def main() -> None:
             else:
                 assign_statements.append(f"assign csr_{csr.name:20s} = {csr.width}'h{csr.reset:0{(csr.width + 3) // 4}X};")
 
-        reading_statements.append(f"        12'h{csr.address:03X}: csr_read_value_precheck = {{ {{(XLEN - {csr.width}){{1'b0}}}}, csr_{csr.name} }};")
+        reading_statements.append(f"        12'h{csr.address:03X}: core_csr_read_value = {{ {{(XLEN - {csr.width}){{1'b0}}}}, csr_{csr.name} }};")
 
     reading_statements.append("        default: begin")
-    reading_statements.append("            csr_read_value_precheck = '0;")
+    reading_statements.append("            core_csr_read_value = '0;")
     reading_statements.append("            invalid_csr_index = 1'b1;")
     reading_statements.append("        end")
-
-    assign_statements.append("assign csr_read_value = req_valid_read ? csr_read_value_precheck : '0;")
 
     with open(rtl_path, 'w') as f:
         f.write("// This file is auto-generated. Do not edit directly.\n\n")
@@ -130,7 +127,7 @@ def main() -> None:
         f.write("\n".join(assign_statements))
         f.write("\n\nalways_comb begin\n")
         f.write("    invalid_csr_index = 1'b0;\n")
-        f.write("    unique casez (req_csr_address)\n")
+        f.write("    unique casez (queue_head_entry_csr_address)\n")
         f.write("\n".join(reading_statements))
         f.write("\n    endcase\n")
         f.write("end\n\n")

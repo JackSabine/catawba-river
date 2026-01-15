@@ -10,8 +10,11 @@ module csr_wrapper import catawba_params::*; #(
     input  logic            req_rs_is_x0,
     input  logic            req_valid,
 
+    input  logic            retire_csr_instruction,
+
     input  logic [1:0]      hart_curr_privilege,
-    output logic [XLEN-1:0] rsp_csr_value
+    output logic [XLEN-1:0] rsp_csr_value,
+    output logic            stall_incoming_csr_req
 );
 
 logic [1:0] req_csr_address_rw;
@@ -56,29 +59,52 @@ assign req_trigger_read_side_effects =
     ~(req_system_op[1:0] == 2'b01 & req_rd_is_x0);
 
 logic [XLEN-1:0] csr_read_value;
-logic [XLEN-1:0] value_to_write;
+logic [XLEN-1:0] computed_value_to_write;
 
 system_csr_op_e csr_op;
 assign csr_op = system_csr_op_e'(req_system_op[1:0]);
 
 always_comb begin
     casez (csr_op)
-        RW: value_to_write = req_source_value;
-        RS: value_to_write = req_source_value | csr_read_value;
-        RC: value_to_write = ~req_source_value & csr_read_value;
+        RW: computed_value_to_write = req_source_value;
+        RS: computed_value_to_write = req_source_value | csr_read_value;
+        RC: computed_value_to_write = ~req_source_value & csr_read_value;
         default: begin
             // Illegal
-            value_to_write = '0;
+            computed_value_to_write = '0;
         end
     endcase
 end
 
-logic invalid_csr_index;
-logic [31:0] csr_mepc;
-logic [31:0] csr_mepc_hw_ovrd;
-logic        csr_mepc_hw_ovrd_en;
+logic [XLEN-1:0] queue_csr_read_value;
+logic            queue_read_fulfilled;
 
-assign csr_mepc_hw_ovrd_en = '0;
+logic [11:0] queue_head_entry_csr_address;
+logic [XLEN-1:0] queue_head_entry_value;
+logic queue_head_entry_valid;
+
+csr_queue csr_queue (
+    .clk(clk),
+    .rst(rst),
+    .req_csr_address(req_csr_address),
+    .req_value_to_write(computed_value_to_write),
+    .push(req_valid_write),
+    .pop(retire_csr_instruction),
+    .search_read_value(queue_csr_read_value),
+    .search_read_fulfilled(queue_read_fulfilled),
+    .stall_incoming_write_req(stall_incoming_csr_req),
+    .head_entry_csr_address(queue_head_entry_csr_address),
+    .head_entry_value(queue_head_entry_value),
+    .head_entry_valid(queue_head_entry_valid)
+);
+
+logic invalid_csr_index;
+logic [XLEN-1:0] core_csr_read_value;
+
+logic [11:0] read_csr_address;
+assign read_csr_address = req_csr_address;
+
+assign csr_read_value = queue_read_fulfilled ? queue_csr_read_value : core_csr_read_value;
 
 // gen_csr.py begin
 csr_core #(
@@ -86,16 +112,12 @@ csr_core #(
 ) csr_core_inst (
     .clk,
     .rst,
-    .req_csr_address,
-    .req_valid_read,
-    .req_valid_write,
-    .value_to_write,
-    .req_trigger_read_side_effects,
-    .csr_read_value,
-    .invalid_csr_index,
-    .csr_mepc,
-    .csr_mepc_hw_ovrd,
-    .csr_mepc_hw_ovrd_en
+    .read_csr_address,
+    .queue_head_entry_csr_address,
+    .queue_head_entry_value,
+    .queue_head_entry_valid,
+    .core_csr_read_value,
+    .invalid_csr_index
 );
 // gen_csr.py end
 

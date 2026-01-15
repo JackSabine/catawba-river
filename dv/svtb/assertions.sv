@@ -32,3 +32,47 @@ module register_scoreboard_assertions import uvm_pkg::*; (
 endmodule
 
 bind register_scoreboard register_scoreboard_assertions reg_scoreboard_asserts (.*);
+
+module csr_queue_assertions import uvm_pkg::*; #(
+    parameter DEPTH = 2
+) (
+    input logic clk,
+    input logic rst,
+    input logic [DEPTH-1:0] search_valid_match,
+    input logic push,
+    input logic pop,
+    input logic full,
+    input logic empty,
+    input logic search_read_fulfilled,
+    input logic stall_incoming_write_req
+);
+
+    // assert no pop with empty
+    NO_POP_WHEN_EMPTY: assert property (
+        @(posedge clk) disable iff (rst)
+        !(pop && empty)
+    ) else `uvm_error(
+        "NO_POP_WHEN_EMPTY",
+        $sformatf("[%m]: pop asserted when queue is empty")
+    )
+
+    // assert search_valid_match is onehot0
+    SEARCH_IS_ONEHOT0: assert property (
+        @(posedge clk) disable iff (rst)
+        !$isunknown(search_valid_match) && $onehot0(search_valid_match)
+    ) else `uvm_error(
+        "SEARCH_IS_ONEHOT0",
+        $sformatf("[%m]: search_valid_match in an invalid state (%012b)", search_valid_match)
+    )
+
+    // no write when full
+    NO_WRITE_WHEN_FULL: assert property (
+        @(posedge clk) disable iff (rst)
+        !(push && full)
+    ) else `uvm_error(
+        "NO_WRITE_WHEN_FULL",
+        $sformatf("[%m]: write request when queue is full")
+    )
+endmodule
+
+bind csr_queue csr_queue_assertions #(.DEPTH(DEPTH)) csr_queue_asserts (.*);

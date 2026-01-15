@@ -13,7 +13,7 @@ mie,304,32,0,N,N
 mtvec,305,32,0,N,N
 medelegh,312,32,0,N,N
 mscratch,340,32,0,N,N
-mepc,341,32,0,Y,Y
+mepc,341,32,0,N,N
 mcause,342,32,0,N,N
 mtval,343,32,0,N,N
 mip,344,32,0,N,N

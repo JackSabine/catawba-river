@@ -20,6 +20,8 @@ module execute import catawba_params::*; #(
 
     logic [XLEN-1:0] csr_read_value;
 
+    logic local_stall_request;
+
     alu #(
         .XLEN(XLEN)
     ) alu (
@@ -52,6 +54,8 @@ module execute import catawba_params::*; #(
         .req_rd_is_x0(de_if.rd_is_x0),
         .req_rs_is_x0(de_if.rs_is_x0),
         .req_valid(de_if.valid & de_if.is_csr_insn),
+        .retire_csr_instruction(1'b0),
+        .stall_incoming_csr_req(local_stall_request),
 
         .hart_curr_privilege(hart_curr_privilege),
         .rsp_csr_value(csr_read_value)
@@ -61,7 +65,7 @@ module execute import catawba_params::*; #(
         .clk(clk),
         .rst_if(rst_if),
         .upstream_valid(de_if.valid),
-        .local_stall_request(1'b0),
+        .local_stall_request(local_stall_request),
         .downstream_stall_request(mem_if.stall_upstream),
         .upstream_halt(de_if.halt),
 
