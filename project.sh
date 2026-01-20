@@ -19,3 +19,6 @@ alias waves="xsim -autoloadwcfg --gui *_snapshot.wdb &"
 source .venv/bin/activate
 
 export RISCV="/opt/riscv"
+alias rvobjdump="${RISCV}/bin/riscv64-unknown-elf-objdump"
+alias rvgcc="${RISCV}/bin/riscv64-unknown-elf-gcc"
+alias rvreadelf="${RISCV}/bin/riscv64-unknown-elf-readelf"
