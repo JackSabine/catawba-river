@@ -155,6 +155,57 @@ all: $(XSIM_BINARY) $(TEST_TXTS)
 $(WORKDIR):
 	@mkdir $@
 
+####################################################################
+# Standalone unit tests (dv/unit_tests/*_tb.sv): small assert-based
+# self-checks compiled/run directly with xvlog/xelab/xsim, independent of
+# the full-chip COMPILE_LIST above.
+
+UNIT_TEST_WORKDIR := $(WORKDIR)/unit_tests
+
+.PHONY: test-store_queue
+test-store_queue: | $(UNIT_TEST_WORKDIR)
+	cd $(UNIT_TEST_WORKDIR) && xvlog --sv \
+		${WORKAREA}/subip/torrence-creek/rtl/torrence_params.sv \
+		${WORKAREA}/rtl/store_queue.sv \
+		${WORKAREA}/dv/unit_tests/store_queue_tb.sv
+	cd $(UNIT_TEST_WORKDIR) && xelab store_queue_tb -s store_queue_tb_snapshot
+	cd $(UNIT_TEST_WORKDIR) && xsim store_queue_tb_snapshot -R
+
+.PHONY: test-searchable_fifo
+test-searchable_fifo: | $(UNIT_TEST_WORKDIR)
+	cd $(UNIT_TEST_WORKDIR) && xvlog --sv \
+		${WORKAREA}/rtl/common/fifo_ptrs.sv \
+		${WORKAREA}/rtl/common/searchable_fifo.sv \
+		${WORKAREA}/dv/unit_tests/searchable_fifo_tb.sv
+	cd $(UNIT_TEST_WORKDIR) && xelab searchable_fifo_tb -s searchable_fifo_tb_snapshot
+	cd $(UNIT_TEST_WORKDIR) && xsim searchable_fifo_tb_snapshot -R
+
+$(UNIT_TEST_WORKDIR):
+	@mkdir -p $@
+
+####################################################################
+# Synthesis area comparison: searchable_fifo (configured to match
+# store_queue's geometry) vs. the hand-written store_queue. Scripts live
+# in synth/ (gitignored, not checked in) so this can be re-run later.
+
+SYNTH_PART := xc7a100tcsg324-1
+
+.PHONY: synth-compare
+synth-compare:
+	vivado -mode batch -nolog -nojournal -source ${WORKAREA}/synth/synth_module.tcl -tclargs \
+		generic_fifo_synth_top $(SYNTH_PART) \
+		${WORKAREA}/subip/torrence-creek/rtl/torrence_params.sv \
+		${WORKAREA}/rtl/common/searchable_fifo.sv \
+		${WORKAREA}/synth/generic_fifo_synth_top.sv
+	vivado -mode batch -nolog -nojournal -source ${WORKAREA}/synth/synth_module.tcl -tclargs \
+		store_queue $(SYNTH_PART) \
+		${WORKAREA}/subip/torrence-creek/rtl/torrence_params.sv \
+		${WORKAREA}/rtl/store_queue.sv
+	@echo "----- searchable_fifo (DEPTH=2, 32b) -----"
+	@grep -A20 "Slice Logic$$" $(WORKAREA)/synth/reports/generic_fifo_synth_top.util.rpt
+	@echo "----- store_queue -----"
+	@grep -A20 "Slice Logic$$" $(WORKAREA)/synth/reports/store_queue.util.rpt
+
 .PHONY: clean
 clean:
 	@rm -rf $(WORKDIR)
@@ -168,3 +219,6 @@ cleanspike:
 help:
 	@echo "#### RULES ####"
 	@echo "* all - compile with xvlog and xelab"
+	@echo "* test-store_queue - compile and run dv/unit_tests/store_queue_tb.sv"
+	@echo "* test-searchable_fifo - compile and run dv/unit_tests/searchable_fifo_tb.sv"
+	@echo "* synth-compare - synthesize searchable_fifo vs store_queue and diff utilization (synth/, gitignored)"
