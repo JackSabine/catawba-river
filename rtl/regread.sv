@@ -1,21 +1,16 @@
-`include "catawba_macros.svh"
-
-module register_file #(
-    parameter XLEN = 32,
-    parameter NUM_REGISTERS = `NUM_REGS
-) (
+module regread import catawba_params::*; (
     input logic clk,
 
-    input logic [`REG_BITS-1:0] read_port_select_1,
-    input logic [`REG_BITS-1:0] read_port_select_2,
-    input logic [`REG_BITS-1:0] write_port_select,
+    input logic [PRF_PTR_WIDTH-1:0] read_port_select_1,
+    input logic [PRF_PTR_WIDTH-1:0] read_port_select_2,
+    input logic [PRF_PTR_WIDTH-1:0] write_port_select,
     input logic [XLEN-1:0] write_port_data,
 
     output logic [XLEN-1:0] read_port_data_1,
     output logic [XLEN-1:0] read_port_data_2
 );
 
-    logic [XLEN-1:0] register_file [0:NUM_REGISTERS-1];
+    logic [XLEN-1:0] register_file [0:PRF_DEPTH-1];
 
     assign register_file[0] = '0;
 
