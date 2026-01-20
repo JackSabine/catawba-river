@@ -1,6 +1,7 @@
 work
 runs
-synth/*
+synth/reports
+synth/*.sv
 __pycache__
 .vscode/settings.json
 .venv

@@ -155,6 +155,36 @@ all: $(XSIM_BINARY) $(TEST_TXTS)
 $(WORKDIR):
 	@mkdir $@
 
+####################################################################
+# Standalone unit tests (dv/unit_tests/*_tb.sv): small assert-based
+# self-checks compiled/run directly with xvlog/xelab/xsim, independent of
+# the full-chip COMPILE_LIST above.
+
+UNIT_TEST_WORKDIR := $(WORKDIR)/unit_tests
+
+.PHONY: test-searchable_fifo
+test-searchable_fifo: | $(UNIT_TEST_WORKDIR)
+	cd $(UNIT_TEST_WORKDIR) && xvlog --sv \
+		${WORKAREA}/rtl/common/fifo_ptrs.sv \
+		${WORKAREA}/rtl/common/searchable_fifo.sv \
+		${WORKAREA}/dv/unit_tests/searchable_fifo_tb.sv
+	cd $(UNIT_TEST_WORKDIR) && xelab searchable_fifo_tb -s searchable_fifo_tb_snapshot
+	cd $(UNIT_TEST_WORKDIR) && xsim searchable_fifo_tb_snapshot -R
+
+$(UNIT_TEST_WORKDIR):
+	@mkdir -p $@
+
+SYNTH_PART := xc7a100tcsg324-1
+
+.PHONY: synth-dummy
+synth-dummy: | $(WORKDIR)
+	vivado -mode batch -nolog -nojournal -source ${WORKAREA}/synth/synth_module.tcl -tclargs \
+		searchable_fifo $(SYNTH_PART) \
+		${WORKAREA}/rtl/common/fifo_ptrs.sv \
+		${WORKAREA}/rtl/common/searchable_fifo.sv
+	@echo "----- searchable_fifo (DEPTH=8, 32b data, 32b key) -----"
+	@grep -A20 "Slice Logic$$" $(WORKAREA)/synth/reports/searchable_fifo.util.rpt
+
 .PHONY: clean
 clean:
 	@rm -rf $(WORKDIR)
@@ -168,3 +198,5 @@ cleanspike:
 help:
 	@echo "#### RULES ####"
 	@echo "* all - compile with xvlog and xelab"
+	@echo "* test-searchable_fifo - compile and run dv/unit_tests/searchable_fifo_tb.sv"
+	@echo "* synth-dummy - synthesize searchable_fifo

@@ -4,7 +4,6 @@ interface retire_rob_if #(parameter XLEN = 32);
     logic pop;
 
     logic empty;
-    logic full;
 
     logic head_ready;
     logic [XLEN-1:0] head_pc;
@@ -17,7 +16,6 @@ interface retire_rob_if #(parameter XLEN = 32);
     modport rob (
         output
             empty,
-            full,
             head_ready,
             head_pc,
             head_instruction,
@@ -32,7 +30,6 @@ interface retire_rob_if #(parameter XLEN = 32);
     modport rt (
         input
             empty,
-            full,
             head_ready,
             head_pc,
             head_instruction,
