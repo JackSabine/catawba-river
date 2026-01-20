@@ -50,4 +50,23 @@ writeback wb (
     .de_if(wb_de_if)
 );
 
+reorder_buffer rob (
+    .clk(clk),
+    .rst(rst_if.reset),
+    .dispatch_pc(de_ex_if.pc),
+    .dispatch_instruction(de_ex_if.instruction),
+    .dispatch_dest_reg(de_ex_if.instruction.rd),
+    .push(de_ex_if.valid),
+    .pop(wb_de_if.valid),
+    .full(),
+    .empty(),
+    .head_ready(),
+    .head_pc(),
+    .head_instruction(),
+    .head_dest_reg(),
+    .head_result(),
+    .head_exception()
+);
+
+
 endmodule
