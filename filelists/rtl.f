@@ -3,8 +3,7 @@ rtl/catawba_params.sv
 rtl/interfaces/reset_if.sv
 rtl/interfaces/fetch_decode_if.sv
 rtl/interfaces/decode_execute_if.sv
-rtl/interfaces/execute_memory_if.sv
-rtl/interfaces/memory_writeback_if.sv
+rtl/interfaces/execute_writeback_if.sv
 rtl/interfaces/fetch_execute_if.sv
 rtl/interfaces/writeback_decode_if.sv
 

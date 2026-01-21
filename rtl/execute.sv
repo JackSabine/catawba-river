@@ -8,25 +8,35 @@ module execute import catawba_params::*; #(
 
     input logic [1:0] hart_curr_privilege,
 
-    input logic mem_has_valid_instruction,
     input logic wb_has_valid_instruction,
 
     fetch_execute_if.ex fe_if,
     decode_execute_if.ex de_if,
-    execute_memory_if.ex mem_if
+    execute_writeback_if.ex wb_if,
+    memory_if.requester dcache_if
 );
+    logic propagate_upstream_data;
 
-    logic [XLEN-1:0] alu_result;
     logic branch_alu_result;
 
-    logic propagate_upstream_data;
+
+    logic [XLEN-1:0] alu_result;
 
     logic [XLEN-1:0] csr_read_value;
 
+    logic [XLEN-1:0] memory_loaded_word;
+    logic memory_req_fulfilled;
+
+    logic [XLEN-1:0] ex_result;
+
+
+    logic local_stall_request;
+    logic memory_busy;
     logic stall_to_make_csr_op_atomic;
-    assign stall_to_make_csr_op_atomic =
-        de_if.is_csr_insn &
-        (mem_has_valid_instruction | wb_has_valid_instruction);
+
+    assign stall_to_make_csr_op_atomic = de_if.is_csr_insn & wb_has_valid_instruction;
+
+    assign local_stall_request = stall_to_make_csr_op_atomic | memory_busy;
 
     alu #(
         .XLEN(XLEN)
@@ -46,9 +56,6 @@ module execute import catawba_params::*; #(
         .result(branch_alu_result)
     );
 
-    assign fe_if.jump_or_branch_valid = de_if.valid & (de_if.is_branch_insn | de_if.is_jump_insn);
-    assign fe_if.jump_or_branch_next_pc = (branch_alu_result | de_if.is_jump_insn) ? alu_result : de_if.pc_plus_4;
-
     csr_wrapper #(
         .XLEN(XLEN)
     ) csr_wrapper (
@@ -65,39 +72,59 @@ module execute import catawba_params::*; #(
         .rsp_csr_value(csr_read_value)
     );
 
+    memory memory (
+        .clk(clk),
+        .rst_if(rst_if),
+
+        .req_valid(de_if.valid & de_if.is_mem_insn),
+        .req_base_address(de_if.operand_a),
+        .req_offset(de_if.operand_b),
+        .req_store_word(de_if.rs2_word),
+        .instruction(de_if.instruction),
+        .instruction_kind(de_if.instruction_kind),
+
+        .req_loaded_word(memory_loaded_word),
+        .req_fulfilled(memory_req_fulfilled),
+        .busy(memory_busy),
+
+        .dcache_if(dcache_if)
+    );
+
     advance_control advance_ctrl (
         .clk(clk),
         .rst_if(rst_if),
         .upstream_valid(de_if.valid),
-        .local_stall_request(stall_to_make_csr_op_atomic),
-        .downstream_stall_request(mem_if.stall_upstream),
+        .local_stall_request(local_stall_request),
+        .downstream_stall_request(1'b0),
         .upstream_halt(de_if.halt),
 
         .propagate_upstream_data(propagate_upstream_data),
-        .downstream_valid(mem_if.valid),
-        .downstream_halt(mem_if.halt),
+        .downstream_valid(wb_if.valid),
+        .downstream_halt(wb_if.halt),
         .request_upstream_stall(de_if.stall_upstream)
     );
 
-    logic [XLEN-1:0] ex_result;
     always_comb begin
         unique if (de_if.is_jump_insn) begin
             ex_result = de_if.pc_plus_4;
         end else if (de_if.is_csr_insn) begin
             ex_result = csr_read_value;
+        end else if (de_if.is_mem_insn & memory_req_fulfilled) begin
+            ex_result = memory_loaded_word;
         end else begin
             ex_result = alu_result;
         end
     end
 
+    assign fe_if.jump_or_branch_valid = de_if.valid & (de_if.is_branch_insn | de_if.is_jump_insn);
+    assign fe_if.jump_or_branch_next_pc = (branch_alu_result | de_if.is_jump_insn) ? alu_result : de_if.pc_plus_4;
+
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin
-            mem_if.rs2_word <= de_if.rs2_word;
-            mem_if.ex_result <= ex_result;
+            wb_if.ex_result <= ex_result;
 
-            mem_if.instruction <= de_if.instruction;
-            mem_if.instruction_kind <= de_if.instruction_kind;
-            mem_if.is_mem_insn <= de_if.is_mem_insn;
+            wb_if.instruction <= de_if.instruction;
+            wb_if.instruction_kind <= de_if.instruction_kind;
         end
     end
 endmodule

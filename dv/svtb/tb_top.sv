@@ -47,13 +47,12 @@ module tb_top;
         return reversed_tbs;
     endfunction
 
-    tb_string_t fe_insn, de_insn, ex_insn, mem_insn, wb_insn;
+    tb_string_t fe_insn, de_insn, ex_insn, wb_insn;
 
     always_comb fe_insn  = read_stage_insn(dut.fe.icache_if.req_fulfilled, dut.fe.instruction);
     always_comb de_insn  = read_stage_insn(dut.de.fe_if.valid,             dut.de.fe_if.instruction);
     always_comb ex_insn  = read_stage_insn(dut.ex.de_if.valid,             dut.ex.de_if.instruction);
-    always_comb mem_insn = read_stage_insn(dut.mem.ex_if.valid,            dut.mem.ex_if.instruction);
-    always_comb wb_insn  = read_stage_insn(dut.wb.mem_if.valid,            dut.wb.mem_if.instruction);
+    always_comb wb_insn  = read_stage_insn(dut.wb.ex_if.valid,             dut.wb.ex_if.instruction);
 
     initial begin
         @(posedge clk_enabled);
