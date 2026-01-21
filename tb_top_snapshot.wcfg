@@ -16,13 +16,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="49 ns"></ZoomStartTime>
-      <ZoomEndTime time="151 ns"></ZoomEndTime>
-      <Cursor1Time time="107 ns"></Cursor1Time>
+      <ZoomStartTime time="4 ns"></ZoomStartTime>
+      <ZoomEndTime time="30 ns"></ZoomEndTime>
+      <Cursor1Time time="9 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="301"></NameColumnWidth>
-      <ValueColumnWidth column_width="170"></ValueColumnWidth>
+      <ValueColumnWidth column_width="155"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="27" />
    <wvobject type="logic" fp_name="/tb_top/clk">
@@ -69,6 +69,10 @@
             <obj_property name="ElementShortName">clk</obj_property>
             <obj_property name="ObjectShortName">clk</obj_property>
          </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/icache_bfm/rst">
+            <obj_property name="ElementShortName">rst</obj_property>
+            <obj_property name="ObjectShortName">rst</obj_property>
+         </wvobject>
          <wvobject type="array" fp_name="/tb_top/dut/fe/icache_if/req_address">
             <obj_property name="ElementShortName">req_address[31:0]</obj_property>
             <obj_property name="ObjectShortName">req_address[31:0]</obj_property>
@@ -96,6 +100,14 @@
          <wvobject type="logic" fp_name="/tb_top/dut/fe/icache_if/req_fulfilled">
             <obj_property name="ElementShortName">req_fulfilled</obj_property>
             <obj_property name="ObjectShortName">req_fulfilled</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/icache_bfm/initialized">
+            <obj_property name="ElementShortName">initialized</obj_property>
+            <obj_property name="ObjectShortName">initialized</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/tb_top/icache_bfm/rng_allow_fulfilled">
+            <obj_property name="ElementShortName">rng_allow_fulfilled</obj_property>
+            <obj_property name="ObjectShortName">rng_allow_fulfilled</obj_property>
          </wvobject>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fe/pc">
@@ -419,6 +431,14 @@
          <obj_property name="ElementShortName">operand_b[31:0]</obj_property>
          <obj_property name="ObjectShortName">operand_b[31:0]</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/local_stall_request">
+         <obj_property name="ElementShortName">local_stall_request</obj_property>
+         <obj_property name="ObjectShortName">local_stall_request</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/ex/propagate_upstream_data">
+         <obj_property name="ElementShortName">propagate_upstream_data</obj_property>
+         <obj_property name="ObjectShortName">propagate_upstream_data</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/de/ex_if/rd_is_x0">
          <obj_property name="ElementShortName">rd_is_x0</obj_property>
          <obj_property name="ObjectShortName">rd_is_x0</obj_property>
@@ -737,6 +757,10 @@
          <obj_property name="ElementShortName">halt</obj_property>
          <obj_property name="ObjectShortName">halt</obj_property>
       </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/wb/ex_if/pc">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/wb/ex_if/ex_result">
          <obj_property name="ElementShortName">ex_result[31:0]</obj_property>
          <obj_property name="ObjectShortName">ex_result[31:0]</obj_property>
@@ -744,7 +768,6 @@
       <wvobject type="array" fp_name="/tb_top/dut/wb/ex_if/instruction">
          <obj_property name="ElementShortName">instruction</obj_property>
          <obj_property name="ObjectShortName">instruction</obj_property>
-         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/wb/ex_if/instruction_kind">
          <obj_property name="ElementShortName">instruction_kind[2:0]</obj_property>

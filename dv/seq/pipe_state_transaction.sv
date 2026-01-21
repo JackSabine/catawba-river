@@ -1,6 +1,7 @@
 class pipe_state_transaction extends uvm_sequence_item;
     `uvm_object_utils(pipe_state_transaction)
 
+    bit [catawba_params::XLEN-1:0] pc;
     bit [catawba_params::XLEN-1:0] int_regs [0:`NUM_REGS-1];
     memory_t data_memory;
 
@@ -20,6 +21,8 @@ class pipe_state_transaction extends uvm_sequence_item;
 
         s = "";
 
+        s = {s, $sformatf("PC: %08x\n", pc)};
+
         s = {s, "----- Int Registers -----\n"};
         foreach (int_regs[i]) begin
             s = {s, $sformatf("%-3s (x%-2d): %08x\n", register2abinames[i], i, int_regs[i])};
@@ -37,6 +40,8 @@ class pipe_state_transaction extends uvm_sequence_item;
         string s;
 
         s = "";
+
+        s = {s, $sformatf("PC: %08x %1s %08x\n", pc, (pc == other_tx.pc) ? "" : "|", other_tx.pc)};
 
         s = {s, "----- Integer Registers -----\n"};
         foreach (int_regs[i]) begin
@@ -85,6 +90,7 @@ class pipe_state_transaction extends uvm_sequence_item;
         // https://verificationacademy.com/forums/t/compare-2-queues-2-associative-arrays-2-dynamic-arrays/36900
         return
             int_regs    == _obj.int_regs    &
+            pc          == _obj.pc          &
             data_memory == _obj.data_memory ;
     endfunction
 endclass

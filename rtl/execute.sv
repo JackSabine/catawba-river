@@ -125,6 +125,8 @@ module execute import catawba_params::*; #(
 
             wb_if.instruction <= de_if.instruction;
             wb_if.instruction_kind <= de_if.instruction_kind;
+
+            wb_if.pc <= de_if.pc;
         end
     end
 endmodule

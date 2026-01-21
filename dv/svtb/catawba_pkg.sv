@@ -30,6 +30,9 @@ package catawba_pkg;
     `include "../agents/reset_agent/reset_driver.sv"
     `include "../agents/reset_agent/reset_agent.sv"
 
+    `include "../agents/commit_agent/commit_monitor.sv"
+    `include "../agents/commit_agent/commit_agent.sv"
+
     `include "scoreboard.sv"
     `include "environment.sv"
 

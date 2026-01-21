@@ -3,6 +3,7 @@ interface execute_writeback_if #(parameter XLEN = 32);
 
     logic valid;
     logic halt;
+    logic [XLEN-1:0] pc;
 
     logic [XLEN-1:0] ex_result;
 
@@ -13,6 +14,7 @@ interface execute_writeback_if #(parameter XLEN = 32);
         output
             valid,
             halt,
+            pc,
             ex_result,
             instruction,
             instruction_kind
@@ -22,6 +24,7 @@ interface execute_writeback_if #(parameter XLEN = 32);
         input
             valid,
             halt,
+            pc,
             ex_result,
             instruction,
             instruction_kind
