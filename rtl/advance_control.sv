@@ -5,6 +5,7 @@ module advance_control (
     input logic local_stall_request,
     input logic downstream_stall_request,
     input logic upstream_halt,
+    input logic force_downstream_valid_and_halt_low,
 
     output logic propagate_upstream_data,
     output logic downstream_valid,
@@ -31,20 +32,24 @@ module advance_control (
     //                                                    or no stall requests if the hazards clear up in time
 
     always_comb begin
-        casez ({valid_local_stall_request, downstream_stall_request})
-            2'b00: begin
-                next_downstream_valid = upstream_valid & ~upstream_halt;
-                next_downstream_halt = upstream_halt;
-            end
-            2'b01: begin
-                next_downstream_valid = downstream_valid;
-                next_downstream_halt = downstream_halt;
-            end
-            2'b10: begin
+        casez ({force_downstream_valid_and_halt_low, valid_local_stall_request, downstream_stall_request})
+            3'b1??: begin
                 next_downstream_valid = 1'b0;
                 next_downstream_halt = 1'b0;
             end
-            2'b11: begin
+            3'b000: begin
+                next_downstream_valid = upstream_valid & ~upstream_halt;
+                next_downstream_halt = upstream_halt;
+            end
+            3'b001: begin
+                next_downstream_valid = downstream_valid;
+                next_downstream_halt = downstream_halt;
+            end
+            3'b010: begin
+                next_downstream_valid = 1'b0;
+                next_downstream_halt = 1'b0;
+            end
+            3'b011: begin
                 next_downstream_valid = downstream_valid;
                 next_downstream_halt = downstream_halt;
             end

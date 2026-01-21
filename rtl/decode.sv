@@ -182,6 +182,7 @@ module decode import catawba_params::*; #(
         .local_stall_request(local_stall_request),
         .downstream_stall_request(ex_if.stall_upstream),
         .upstream_halt(fe_if.halt),
+        .force_downstream_valid_and_halt_low(1'b0),
 
         .propagate_upstream_data(propagate_upstream_data),
         .downstream_valid(ex_if.valid),

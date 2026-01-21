@@ -97,6 +97,7 @@ module execute import catawba_params::*; #(
         .local_stall_request(local_stall_request),
         .downstream_stall_request(1'b0),
         .upstream_halt(de_if.halt),
+        .force_downstream_valid_and_halt_low(1'b0),
 
         .propagate_upstream_data(propagate_upstream_data),
         .downstream_valid(wb_if.valid),

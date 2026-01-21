@@ -16,6 +16,7 @@ instruction_t instruction;
 
 logic local_stall_request;
 logic propagate_upstream_data;
+logic force_downstream_valid_low;
 
 fetch_state_e fe_state, next_fe_state;
 logic current_inst_is_branch;
@@ -30,6 +31,7 @@ assign pc_plus_4 = pc + 'd4;
 
 always_comb begin
     local_stall_request = 1'b0;
+    force_downstream_valid_low = 1'b0;
 
     casez (fe_state)
         NORMAL_OPERATION: begin
@@ -49,6 +51,7 @@ always_comb begin
             if (ex_if.jump_or_branch_valid) begin
                 next_fe_state = NORMAL_OPERATION;
                 next_pc = ex_if.jump_or_branch_next_pc;
+                force_downstream_valid_low = 1'b1;
             end else begin
                 next_fe_state = STALL_ON_JUMP_OR_BRANCH;
                 next_pc = pc;
@@ -70,6 +73,7 @@ advance_control advance_ctrl (
     .local_stall_request(local_stall_request),
     .downstream_stall_request(de_if.stall_upstream),
     .upstream_halt(current_inst_is_halt),
+    .force_downstream_valid_and_halt_low(force_downstream_valid_low),
 
     .propagate_upstream_data(propagate_upstream_data),
     .downstream_valid(de_if.valid),
