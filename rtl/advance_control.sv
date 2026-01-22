@@ -66,7 +66,10 @@ module advance_control (
             downstream_halt <= next_downstream_halt;
         end
     end
-    //                           don't stall if current stage invalid (catch-up)
+    // Stall upstream if it has valid data and this stage or any downstream has a stall request
+    // If upstream is not valid, don't propagate downstream requests and don't listen to local stall requests (allow upstream stages to operate)
     assign request_upstream_stall = (upstream_valid & downstream_stall_request) | valid_local_stall_request;
-    assign propagate_upstream_data = ~request_upstream_stall;
+
+    // Only propagate if downstream is ready to accept data and nothing is stalling locally
+    assign propagate_upstream_data = ~downstream_stall_request & ~valid_local_stall_request;
 endmodule
