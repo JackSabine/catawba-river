@@ -27,6 +27,12 @@ class main_memory extends uvm_object;
         resp = this.read(addr, op_size);
         memory[addr] = data;
 
+        `uvm_info(
+            get_full_name(),
+            $sformatf("Received write to address 0x%08h with data 0x%08h", addr, data),
+            UVM_MEDIUM
+        )
+
         return resp;
     endfunction
 

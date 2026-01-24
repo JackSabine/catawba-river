@@ -14,8 +14,7 @@ assign hart_curr_privilege = 2'b11; // Machine mode
 fetch_decode_if fe_de_if();
 fetch_execute_if fe_ex_if();
 decode_execute_if de_ex_if();
-execute_memory_if ex_mem_if();
-memory_writeback_if mem_wb_if();
+execute_writeback_if ex_wb_if();
 writeback_decode_if wb_de_if();
 
 fetch fe (
@@ -38,24 +37,16 @@ execute ex (
     .clk(clk),
     .rst_if(rst_if),
     .hart_curr_privilege(hart_curr_privilege),
-    .mem_has_valid_instruction(ex_mem_if.valid),
-    .wb_has_valid_instruction(mem_wb_if.valid),
+    .wb_has_valid_instruction(ex_wb_if.valid),
     .de_if(de_ex_if),
     .fe_if(fe_ex_if),
-    .mem_if(ex_mem_if)
-);
-
-memory mem (
-    .clk(clk),
-    .rst_if(rst_if),
-    .ex_if(ex_mem_if),
-    .wb_if(mem_wb_if),
+    .wb_if(ex_wb_if),
     .dcache_if(dcache_if)
 );
 
 writeback wb (
     .clk(clk),
-    .mem_if(mem_wb_if),
+    .ex_if(ex_wb_if),
     .de_if(wb_de_if)
 );
 
