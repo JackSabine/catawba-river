@@ -13,20 +13,33 @@ class asm_test extends base_test;
         super.connect_phase(phase);
     endfunction
 
-    task run_phase(uvm_phase phase);
-        asm_memory_response_seq icache_rsp_seq;
-        base_memory_response_seq dcache_rsp_seq;
+    function void seed_memory(uint32_t defaults [uint32_t]);
+        uint32_t addr;
+        foreach (defaults[addr]) begin
+            dut_memory_model.tb_write(addr, defaults[addr]);
+        end
+    endfunction
 
-        // Don't raise an objection, that way it doesn't hold up the end of simulation
-        icache_rsp_seq = asm_memory_response_seq::type_id::create(.name("icache_rsp_seq"));
-        dcache_rsp_seq = base_memory_response_seq::type_id::create(.name("dcache_rsp_seq"));
-        fork
-            begin
-                icache_rsp_seq.start(env.icache_rsp_agent.mrsp_seqr); // Runs forever
-            end
-            begin
-                dcache_rsp_seq.start(env.dcache_rsp_agent.mrsp_seqr); // Runs forever
-            end
-        join_none
-    endtask
+    function void start_of_simulation_phase(uvm_phase phase);
+        string asm_test;
+        `include "memory_maps.sv"
+
+        super.start_of_simulation_phase(phase);
+
+        if (!$value$plusargs("ASM_TEST=%s", asm_test)) begin
+            `uvm_fatal(get_full_name(), "ASM_TEST not specified for asm_memory_response_seq")
+        end
+
+
+        if (!asm_files.exists(asm_test)) begin
+            `uvm_fatal(get_full_name(), $sformatf("No memory map found for ASM_TEST='%s'", asm_test))
+        end
+
+        seed_memory(asm_files[asm_test]);
+        `uvm_info(
+            get_full_name(),
+            $sformatf("Seeded memory for ASM_TEST='%s'", asm_test),
+            UVM_LOW
+        )
+    endfunction
 endclass

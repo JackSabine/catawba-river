@@ -3,7 +3,6 @@ module tb_top;
     import catawba_pkg::*;
     import catawba_types::*;
     import catawba_params::*;
-    import torrence_params::*;
 
     clock_config clk_config;
 
@@ -20,6 +19,24 @@ module tb_top;
         .rst_if(rst_if),
         .icache_if(icache_if),
         .dcache_if(dcache_if)
+    );
+
+    cache_bfm #(
+        .XLEN(XLEN),
+        .NAME("icache_bfm")
+    ) icache_bfm (
+        .clk(clk),
+        .rst(rst_if.reset),
+        .hmem_if(icache_if)
+    );
+
+    cache_bfm #(
+        .XLEN(XLEN),
+        .NAME("dcache_bfm")
+    ) dcache_bfm (
+        .clk(clk),
+        .rst(rst_if.reset),
+        .hmem_if(dcache_if)
     );
 
     `include "catawba_probes.svh"
@@ -70,21 +87,6 @@ module tb_top;
             .inst_name("uvm_test_top.*"),
             .field_name("reset_if"),
             .value(rst_if)
-        );
-
-        // icache interface
-        uvm_config_db #(virtual memory_if)::set(
-            .cntxt(null),
-            .inst_name("uvm_test_top.env.icache_rsp_agent.*"),
-            .field_name("memory_responder_if"),
-            .value(icache_if)
-        );
-        // dcache interface
-        uvm_config_db #(virtual memory_if)::set(
-            .cntxt(null),
-            .inst_name("uvm_test_top.env.dcache_rsp_agent.*"),
-            .field_name("memory_responder_if"),
-            .value(dcache_if)
         );
 
         // Clock configuration

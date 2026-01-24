@@ -21,8 +21,8 @@ class base_test extends uvm_test;
         dut_memory_model = main_memory::type_id::create(.name("dut_memory_model"), .parent(this));
 
         uvm_config_db #(main_memory)::set(
-            .cntxt(this),
-            .inst_name("env.*"),
+            .cntxt(uvm_root::get()),
+            .inst_name("*"),
             .field_name("dut_memory_model"),
             .value(dut_memory_model)
         );
@@ -46,23 +46,6 @@ class base_test extends uvm_test;
         rst_seq.start(env.rst_agent.rst_seqr);
 
         phase.drop_objection(this);
-    endtask
-
-    virtual task run_phase(uvm_phase phase);
-        base_memory_response_seq icache_rsp_seq;
-        base_memory_response_seq dcache_rsp_seq;
-
-        // Don't raise an objection, that way it doesn't hold up the end of simulation
-        icache_rsp_seq = base_memory_response_seq::type_id::create(.name("icache_rsp_seq"));
-        dcache_rsp_seq = base_memory_response_seq::type_id::create(.name("dcache_rsp_seq"));
-        fork
-            begin
-                icache_rsp_seq.start(env.icache_rsp_agent.mrsp_seqr); // Runs forever
-            end
-            begin
-                dcache_rsp_seq.start(env.dcache_rsp_agent.mrsp_seqr); // Runs forever
-            end
-        join_none
     endtask
 
     virtual task main_phase(uvm_phase phase);
