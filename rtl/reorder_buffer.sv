@@ -2,8 +2,8 @@ module reorder_buffer import catawba_params::*; (
     input logic clk,
     input logic rst,
 
-    input logic [31:0] dispatch_pc,
-    input logic [31:0] dispatch_instruction,
+    input logic [XLEN-1:0] dispatch_pc,
+    input logic [XLEN-1:0] dispatch_instruction,
     input logic [`REG_BITS-1:0] dispatch_dest_reg,
 
     input logic push,
@@ -13,16 +13,16 @@ module reorder_buffer import catawba_params::*; (
     output logic empty,
 
     output logic head_ready,
-    output logic [31:0] head_pc,
-    output logic [31:0] head_instruction,
+    output logic [XLEN-1:0] head_pc,
+    output logic [XLEN-1:0] head_instruction,
     output logic [`REG_BITS-1:0] head_dest_reg,
     output logic [XLEN-1:0] head_result,
     output logic head_exception
 );
 
 typedef struct packed {
-    logic [31:0] pc;
-    logic [31:0] instruction;
+    logic [XLEN-1:0] pc;
+    logic [XLEN-1:0] instruction;
     logic [XLEN-1:0] result;
     logic exception;
     // logic mispredicted;
@@ -61,10 +61,7 @@ always_ff @(posedge clk) begin
             rob[tail].dest_reg = dispatch_dest_reg;
             rob[tail].ready = 1'b0; // Initially not ready
             rob[tail].exception = 1'b0; // No exception initially
-<<<<<<< HEAD
-=======
             // rob[tail].mispredicted = 1'b0; // No misprediction initially
->>>>>>> ef329ff (Rob fix)
 
             {tail_phase, tail} <= {tail_phase, tail} + 'd1;
         end
