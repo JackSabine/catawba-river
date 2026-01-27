@@ -7,6 +7,7 @@ module store_queue #(
 
     input logic [XLEN-1:0] req_address,
     input logic [XLEN-1:0] req_store_value,
+    input memory_operation_size_e req_op_size,
 
     output logic stall_incoming_write_req,
     output logic [XLEN-1:0] search_read_value,
@@ -17,6 +18,7 @@ module store_queue #(
 
     output logic [XLEN-1:0] head_entry_req_address,
     output logic [XLEN-1:0] head_entry_store_value,
+    output memory_operation_size_e head_entry_req_size,
     output logic head_entry_valid
 );
 
@@ -24,6 +26,7 @@ localparam PTR_WIDTH = $clog2(DEPTH);
 
 logic [DEPTH-1:0][XLEN-1:0] write_addresses;
 logic [DEPTH-1:0][XLEN-1:0] write_values;
+memory_operation_size_e write_sizes [DEPTH-1:0];
 logic [DEPTH-1:0] valids;
 
 // tail points to the next free entry, store points to the entry to be written
@@ -44,6 +47,7 @@ always_ff @(posedge clk) begin
                     // Take new data
                     write_addresses[i] <= req_address;
                     write_values[i] <= req_store_value;
+                    write_sizes[i] <= req_op_size;
                     valids[i] <= 1'b1;
                 end else if (!push & pop) begin
                     // Invalidate
@@ -54,11 +58,13 @@ always_ff @(posedge clk) begin
                     // Take i+1 data
                     write_addresses[i] <= write_addresses[i+1];
                     write_values[i] <= write_values[i+1];
+                    write_sizes[i] <= write_sizes[i+1];
                     valids[i] <= valids[i+1];
                 end else if (push & (i == store_ptr)) begin
                     // Take new data
                     write_addresses[i] <= req_address;
                     write_values[i] <= req_store_value;
+                    write_sizes[i] <= req_op_size;
                     valids[i] <= 1'b1;
                 end
             end
@@ -66,14 +72,9 @@ always_ff @(posedge clk) begin
     end
 end
 
+assign store_ptr = (push & pop) ? tail_ptr - 1 : tail_ptr;
 
 always_comb begin
-    store_ptr = tail_ptr;
-
-    if (push & pop) begin
-        store_ptr = tail_ptr - 1;
-    end
-
     casez ({push, pop})
         2'b11: next_tail_ptr = tail_ptr;
         2'b10: next_tail_ptr = tail_ptr + 1;
