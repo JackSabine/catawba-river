@@ -81,6 +81,7 @@ HDL_SENSITIVITY_LIST := $(shell find ${WORKAREA}/ -type f \( -name "*.sv" -o -na
 ASM_OBJECTS := $(addprefix ${WORKDIR}/,$(patsubst %.S, %.elf, $(shell find ${WORKAREA}/dv/code_tests -type f \( -name "*.S" \) -printf "%f\n")))
 C_OBJECTS := $(addprefix ${WORKDIR}/,$(patsubst %.c, %.elf, $(shell find ${WORKAREA}/dv/code_tests -type f \( -name "*.c" \) -printf "%f\n")))
 TEST_OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS)
+TEST_TXTS := $(patsubst %.elf, %.txt, $(TEST_OBJECTS))
 
 
 ####################################################################
@@ -129,8 +130,12 @@ $(WORKDIR)/%.elf: ${WORKAREA}/dv/code_tests/%.c | $(WORKDIR)
 elf: $(TEST_OBJECTS)
 	@echo "----- Assembly compilation complete -----"
 
-$(WORKDIR)/memory_maps.sv: $(TEST_OBJECTS)
-	${WORKAREA}/scripts/disassemble_elf.py $(WORKDIR) $(WORKDIR)/memory_maps.sv
+$(WORKDIR)/%.txt: $(WORKDIR)/%.elf | $(WORKDIR)
+	@${WORKAREA}/scripts/disassemble_elf.py $< $@
+
+.PHONY: memory_maps
+memory_maps: $(TEST_TXTS)
+	@echo "----- Memory map generation complete -----"
 
 $(WORKDIR)/csr_core.sv: ${WORKAREA}/rtl/csr.csv ${WORKAREA}/scripts/gen_csr.py | $(WORKDIR)
 	${WORKAREA}/scripts/gen_csr.py
@@ -139,12 +144,12 @@ $(XVLOG_WORK_FILE): $(HDL_SENSITIVITY_LIST) $(WORKDIR)/csr_core.sv | $(WORKDIR)
 	@echo "----- Compiling HDL -----"
 	cd $(WORKDIR) && xvlog $(UVM_XVLOG_FLAGS) $(COMPILE_LIST) $(XVLOG_FLAGS)
 
-$(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE) $(WORKDIR)/memory_maps.sv
+$(XSIM_BINARY): $(DPIC_SHARED_OBJECTS) $(XVLOG_WORK_FILE)
 	@echo "----- Elaborating HDL -----"
 	cd $(WORKDIR) && xelab -top $(TB_TOP) -snapshot $(TB_TOP)_snapshot -debug all $(UVM_XELAB_FLAGS) $(XELAB_FLAGS)
 
 .PHONY: all
-all: $(XSIM_BINARY)
+all: $(XSIM_BINARY) $(TEST_TXTS)
 	@echo "----- Compilation complete -----"
 
 $(WORKDIR):

@@ -10,13 +10,13 @@ from collections import defaultdict
 
 
 class DisassemblerArguments:
-    elf_path: str
-    output_file: str
+    elf: str
+    txt: str
 
 
 parser = argparse.ArgumentParser(description="Disassemble ELF files")
-parser.add_argument("elf_path", type=str, help="Path to the dir containing ELF files")
-parser.add_argument("output_file", type=str, help="Path to the output file")
+parser.add_argument("elf", type=str, help="Path to the input ELF")
+parser.add_argument("txt", type=str, help="Path to the output txt")
 
 
 
@@ -30,37 +30,32 @@ def main():
     if RISCV is None:
         raise EnvironmentError("RISCV environment variable not set")
 
-    memory_cells: dict[str, dict[int, int]] = defaultdict(dict)
+    memory_cells: dict[int, int] = {}
     output_lines: list[str] = []
 
-    for elf_path in get_elf_paths(Path(args.elf_path)):
-        disassemble_command = [
-            f"{RISCV}/bin/riscv64-unknown-elf-objdump",
-            "-d",
-            elf_path
-        ]
-
-        objdump_output = subprocess.check_output(disassemble_command, text=True)
+    elf_path: Path = Path(args.elf)
+    txt_path: Path = Path(args.txt)
 
 
-        for line in objdump_output.splitlines():
-            if m := re.search(r"^\s*([0-9a-fA-F]+):\s+([0-9a-fA-F]+)", line):
-                address = m.group(1)
-                instruction = m.group(2)
-                memory_cells[elf_path.stem][int(address, 16)] = int(instruction, 16)
+    disassemble_command = [
+        f"{RISCV}/bin/riscv64-unknown-elf-objdump",
+        "-d",
+        elf_path
+    ]
 
-        if not memory_cells:
-            raise RuntimeError("No instructions found in ELF file " + str(elf_path))
+    objdump_output = subprocess.check_output(disassemble_command, text=True)
 
-    output_lines.append("// Auto-generated memory map from ELF files - disassemble_elf.py\n\n")
-    output_lines.append("memory_t asm_files [string];\n\n")
-    for elf_name, cells in memory_cells.items():
-        output_lines.append(f"asm_files[\"{elf_name}\"] = '{{\n")
-        for i, address in enumerate(sorted(cells.keys())):
-            output_lines.append(f"  {', ' if i != 0 else '  '}32'h{address:08x}: 32'h{cells[address]:08x}\n")
-        output_lines.append("};\n\n")
 
-    with open(args.output_file, "w") as f:
+    for line in objdump_output.splitlines():
+        if m := re.search(r"^\s*([0-9a-fA-F]+):\s+([0-9a-fA-F]+)", line):
+            address = m.group(1)
+            instruction = m.group(2)
+            memory_cells[int(address, 16)] = int(instruction, 16)
+
+    for address in sorted(memory_cells.keys()):
+        output_lines.append(f"{address:08x}: {memory_cells[address]:08x}\n")
+
+    with open(txt_path, "w") as f:
         f.writelines(output_lines)
 
     return 0
