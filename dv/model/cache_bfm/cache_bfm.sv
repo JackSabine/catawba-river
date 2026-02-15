@@ -16,6 +16,7 @@ import uvm_pkg::*;
 
 main_memory dut_memory_model;
 bit initialized = 1'b0;
+bit store_trigger;
 
 initial begin
     uvm_config_db #(main_memory)::wait_modified(
@@ -40,7 +41,7 @@ initial begin
     initialized = 1'b1;
 end
 
-always @(rst or initialized or hmem_if.req_valid or hmem_if.req_address or hmem_if.req_size) begin
+always @(rst or initialized or hmem_if.req_valid or hmem_if.req_address or hmem_if.req_size or store_trigger) begin
     if (rst) begin
         hmem_if.req_loaded_word = '0;
     end else if (initialized && hmem_if.req_valid) begin
@@ -53,7 +54,10 @@ always @(posedge clk) begin
         if (hmem_if.req_fulfilled) begin
             case (hmem_if.req_operation)
                 LOAD:  void'(dut_memory_model.read(hmem_if.req_address, hmem_if.req_size));
-                STORE: void'(dut_memory_model.write(hmem_if.req_address, hmem_if.req_size, hmem_if.req_store_word));
+                STORE: begin
+                    void'(dut_memory_model.write(hmem_if.req_address, hmem_if.req_size, hmem_if.req_store_word));
+                    store_trigger = ~store_trigger;
+                end
                 default: begin end
             endcase
         end
