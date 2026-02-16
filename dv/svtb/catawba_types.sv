@@ -3,6 +3,7 @@
 package catawba_types;
     typedef int unsigned uint32_t;
     typedef byte unsigned uint8_t;
+    typedef shortint unsigned uint16_t;
     typedef longint unsigned uint64_t;
     typedef int int32_t;
     typedef byte int8_t;

@@ -45,7 +45,7 @@ always @(rst or initialized or hmem_if.req_valid or hmem_if.req_address or hmem_
     if (rst) begin
         hmem_if.req_loaded_word = '0;
     end else if (initialized && hmem_if.req_valid) begin
-        hmem_if.req_loaded_word = dut_memory_model.read(hmem_if.req_address, hmem_if.req_size).req_word;
+        hmem_if.req_loaded_word = dut_memory_model.read(hmem_if.req_address, hmem_if.req_size);
     end
 end
 
@@ -55,7 +55,7 @@ always @(posedge clk) begin
             case (hmem_if.req_operation)
                 LOAD:  void'(dut_memory_model.read(hmem_if.req_address, hmem_if.req_size));
                 STORE: begin
-                    void'(dut_memory_model.write(hmem_if.req_address, hmem_if.req_size, hmem_if.req_store_word));
+                    dut_memory_model.write(hmem_if.req_address, hmem_if.req_size, hmem_if.req_store_word);
                     store_trigger = ~store_trigger;
                 end
                 default: begin end

@@ -13,3 +13,4 @@ asm_test --plusargs ASM_TEST=pointer
 asm_test --plusargs ASM_TEST=vector_add
 asm_test --plusargs ASM_TEST=sum
 asm_test --plusargs ASM_TEST=dot_product
+asm_test --plusargs ASM_TEST=bytes
