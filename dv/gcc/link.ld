@@ -16,6 +16,11 @@ SECTIONS
         *(.data)
     }
 
+    .bss : ALIGN(4K)
+    {
+        *(.bss)
+    }
+
     .stack : ALIGN(4K)
     {
         _estack = .;
