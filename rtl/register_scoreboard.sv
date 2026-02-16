@@ -40,12 +40,18 @@ module register_scoreboard import catawba_params::*; #(
         end
     end
 
-    // use_rsx | ready[rsx] || stall
-    // --------+------------++------
-    //   0     |     x      ||   0
-    //   1     |     1      ||   0
-    //   1     |     0      ||   1
-    assign stall = (de_instruction_reads_rs1 & ~ready_bits[de_read_port_select_1]) |
+    // use_rx | ready[rx] || stall
+    // -------+-----------++------
+    //   0    |     x     ||   0
+    //   1    |     1     ||   0
+    //   1    |     0     ||   1
+
+    // Stall on unready rd to prevent failures where de, ex, and wb have inst's writing to same rd.
+    // In that case, the wb inst will ready rd while ex has a younger value to write for the inst in de.
+    // This would cause the younger instruction to read wb's value instead of ex's value
+
+    assign stall = (de_instruction_has_rd    & ~ready_bits[de_write_port_select] ) |
+                   (de_instruction_reads_rs1 & ~ready_bits[de_read_port_select_1]) |
                    (de_instruction_reads_rs2 & ~ready_bits[de_read_port_select_2]);
 
     assign ready_bits[0] = 1'b1;
