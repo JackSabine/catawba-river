@@ -10,3 +10,6 @@ asm_test --plusargs ASM_TEST=5-waw
 asm_test --plusargs ASM_TEST=6-b2b-store-load-same-address
 asm_test --plusargs ASM_TEST=test
 asm_test --plusargs ASM_TEST=pointer
+asm_test --plusargs ASM_TEST=vector_add
+asm_test --plusargs ASM_TEST=sum
+asm_test --plusargs ASM_TEST=dot_product
