@@ -10,7 +10,6 @@ package catawba_pkg;
     `include "dpi-c.sv"
     `include "../common/randomizable_2d_array.sv"
 
-    `include "../seq/memory_transaction.sv"
     `include "../seq/reset_transaction.sv"
     `include "../seq/pipe_state_transaction.sv"
 
@@ -18,11 +17,6 @@ package catawba_pkg;
     `include "../configs/clock_config.sv"
 
     `include "../seq/reset_seq.sv"
-
-    `include "../agents/memory_rsp_agent/memory_rsp_sequencer.sv"
-    `include "../agents/memory_rsp_agent/memory_rsp_driver.sv"
-    `include "../agents/memory_rsp_agent/memory_rsp_monitor.sv"
-    `include "../agents/memory_rsp_agent/memory_rsp_agent.sv"
 
     `include "../agents/reset_agent/reset_sequencer.sv"
     `include "../agents/reset_agent/reset_driver.sv"
