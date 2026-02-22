@@ -33,6 +33,16 @@ decode de (
     .wb_if(wb_de_if)
 );
 
+register_read rr (
+    .clk(clk),
+    .read_port_select_1(),
+    .read_port_select_2(),
+    .write_port_select(),
+    .write_port_data(),
+    .read_port_data_1(de_ex_if.rs1_word),
+    .read_port_data_2(de_ex_if.rs2_word)
+);
+
 execute ex (
     .clk(clk),
     .rst_if(rst_if),
