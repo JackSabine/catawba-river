@@ -170,7 +170,7 @@ class scoreboard extends uvm_scoreboard;
                 pass_fail_str
             };
 
-            `uvm_info("PASSED", report_str, UVM_LOW)
+            `uvm_info("PASSED", report_str, UVM_NONE)
         end else begin
             pass_fail_str = {
                 "\n\n",

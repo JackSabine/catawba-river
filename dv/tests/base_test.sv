@@ -42,7 +42,7 @@ class base_test extends uvm_test;
 
         rst_seq = reset_seq::type_id::create(.name("rst_seq"));
         assert(rst_seq.randomize()) else `uvm_fatal(get_full_name(), "Couldn't randomize rst_seq");
-        rst_seq.print();
+        `uvm_info(get_full_name(), rst_seq.convert2string(), UVM_LOW)
         rst_seq.start(env.rst_agent.rst_seqr);
 
         phase.drop_objection(this);
