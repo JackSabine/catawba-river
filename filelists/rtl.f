@@ -6,6 +6,9 @@ rtl/interfaces/decode_execute_if.sv
 rtl/interfaces/execute_writeback_if.sv
 rtl/interfaces/fetch_execute_if.sv
 rtl/interfaces/writeback_decode_if.sv
+rtl/interfaces/rename_rob_if.sv
+rtl/interfaces/retire_rob_if.sv
+rtl/interfaces/writeback_rob_if.sv
 
 work/csr_core.sv
 rtl/csr_wrapper.sv
