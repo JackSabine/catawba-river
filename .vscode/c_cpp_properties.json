@@ -11,6 +11,17 @@
             "cStandard": "gnu17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "RISCV",
+            "includePath": [
+                "/opt/riscv/riscv64-unknown-elf/include"
+            ],
+            "defines": [],
+            "compilerPath": "/opt/riscv/bin/riscv64-unknown-elf-gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4
