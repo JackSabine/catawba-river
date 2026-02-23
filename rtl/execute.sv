@@ -34,7 +34,7 @@ module execute import catawba_params::*; #(
     logic memory_busy;
     logic stall_to_make_csr_op_atomic;
 
-    assign stall_to_make_csr_op_atomic = de_if.is_csr_insn & wb_has_valid_instruction;
+    assign stall_to_make_csr_op_atomic = `IS_CSR_INSN(de_if.instruction) & wb_has_valid_instruction;
 
     assign local_stall_request = stall_to_make_csr_op_atomic | memory_busy;
 
@@ -64,9 +64,9 @@ module execute import catawba_params::*; #(
         .req_csr_address(de_if.operand_b[11:0]),
         .req_source_value(de_if.operand_a),
         .req_system_op(system_op_e'(de_if.instruction.funct3)),
-        .req_rd_is_x0(de_if.rd_is_x0),
-        .req_rs_is_x0(de_if.rs_is_x0),
-        .req_valid(de_if.valid & de_if.is_csr_insn & ~stall_to_make_csr_op_atomic),
+        .req_rd_is_x0(`IS_RD_X0(de_if.instruction)),
+        .req_rs_is_x0(`IS_RS_X0(de_if.instruction)),
+        .req_valid(de_if.valid & `IS_CSR_INSN(de_if.instruction) & ~stall_to_make_csr_op_atomic),
 
         .hart_curr_privilege(hart_curr_privilege),
         .rsp_csr_value(csr_read_value)
@@ -76,7 +76,7 @@ module execute import catawba_params::*; #(
         .clk(clk),
         .rst_if(rst_if),
 
-        .req_valid(de_if.valid & de_if.is_mem_insn),
+        .req_valid(de_if.valid & `IS_MEM_INSN(de_if.instruction)),
         .req_base_address(de_if.operand_a),
         .req_offset(de_if.operand_b),
         .req_store_word(de_if.rs2_word),
@@ -96,29 +96,27 @@ module execute import catawba_params::*; #(
         .upstream_valid(de_if.valid),
         .local_stall_request(local_stall_request),
         .downstream_stall_request(1'b0),
-        .upstream_halt(de_if.halt),
-        .force_downstream_valid_and_halt_low(1'b0),
+        .force_downstream_valid_low(1'b0),
 
         .propagate_upstream_data(propagate_upstream_data),
         .downstream_valid(wb_if.valid),
-        .downstream_halt(wb_if.halt),
         .request_upstream_stall(de_if.stall_upstream)
     );
 
     always_comb begin
-        unique if (de_if.is_jump_insn) begin
+        unique if (`IS_JUMP_INSN(de_if.instruction)) begin
             ex_result = de_if.pc_plus_4;
-        end else if (de_if.is_csr_insn) begin
+        end else if (`IS_CSR_INSN(de_if.instruction)) begin
             ex_result = csr_read_value;
-        end else if (de_if.is_mem_insn & memory_req_fulfilled) begin
+        end else if (`IS_MEM_INSN(de_if.instruction) & memory_req_fulfilled) begin
             ex_result = memory_loaded_word;
         end else begin
             ex_result = alu_result;
         end
     end
 
-    assign fe_if.jump_or_branch_valid = de_if.valid & (de_if.is_branch_insn | de_if.is_jump_insn);
-    assign fe_if.jump_or_branch_next_pc = (branch_alu_result | de_if.is_jump_insn) ? alu_result : de_if.pc_plus_4;
+    assign fe_if.jump_or_branch_valid = de_if.valid & (`IS_BRANCH_INSN(de_if.instruction) | `IS_JUMP_INSN(de_if.instruction));
+    assign fe_if.jump_or_branch_next_pc = (branch_alu_result | `IS_JUMP_INSN(de_if.instruction)) ? alu_result : de_if.pc_plus_4;
 
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin

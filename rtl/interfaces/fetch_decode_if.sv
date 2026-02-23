@@ -2,7 +2,6 @@ interface fetch_decode_if #(parameter XLEN = 32);
     import catawba_params::*;
 
     logic valid;
-    logic halt;
 
     logic [XLEN-1:0] pc, pc_plus_4;
     instruction_t instruction;
@@ -12,7 +11,6 @@ interface fetch_decode_if #(parameter XLEN = 32);
     modport fe (
         output
             valid,
-            halt,
             pc,
             pc_plus_4,
             instruction,
@@ -23,7 +21,6 @@ interface fetch_decode_if #(parameter XLEN = 32);
     modport de (
         input
             valid,
-            halt,
             pc,
             pc_plus_4,
             instruction,

@@ -57,16 +57,7 @@ module decode import catawba_params::*; #(
     branch_alu_operation_e branch_alu_operation;
 
     instruction_kind_t instruction_kind;
-    logic is_math_insn;
-    logic is_branch_insn;
-    logic is_jump_insn;
-    logic is_mem_insn;
     logic is_lui_insn;
-
-    logic is_csr_insn;
-    logic is_csr_insn_with_uimm;
-    logic rd_is_x0;
-    logic rs_is_x0;
 
     logic scoreboard_stall;
 
@@ -126,18 +117,18 @@ module decode import catawba_params::*; #(
         endcase
     end
 
-    assign alu_operation = is_math_insn ? alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3}) : ADD;
+    assign alu_operation = `IS_MATH_INSN(fe_if.instruction) ? alu_operation_e'({funct7_alu_control, fe_if.instruction.funct3}) : ADD;
     assign branch_alu_operation = branch_alu_operation_e'(fe_if.instruction.funct3);
 
     always_comb begin
         if (a_use_pc_or_zero) begin
-            if (is_lui_insn) begin
+            if (`IS_LUI_INSN(fe_if.instruction)) begin
                 operand_a = '0;
             end else begin
                 operand_a = fe_if.pc;
             end
         end else begin
-            if (is_csr_insn_with_uimm) begin
+            if (`IS_CSR_INSN_WITH_UIMM(fe_if.instruction)) begin
                 // For CSR instructions with immediate, operand A is zext(rs1)
                 operand_a = {27'b0, fe_if.instruction.rs1};
             end else begin
@@ -147,17 +138,6 @@ module decode import catawba_params::*; #(
         operand_b = b_use_imm ? composed_immediate : rs2_word;
     end
 
-
-    assign is_math_insn = (fe_if.instruction.opcode =?= 7'b0?10011);
-    assign is_branch_insn = (instruction_kind == B_INST);
-    assign is_jump_insn = (fe_if.instruction.opcode =?= 7'b110z111);
-    assign is_mem_insn = (fe_if.instruction.opcode =?= 7'b0z00011);
-    assign is_lui_insn = (fe_if.instruction.opcode == 7'b0110111);
-    assign is_csr_insn = (fe_if.instruction.opcode == 7'b1110011) &
-                         (fe_if.instruction.funct3 != 3'b000); // Exclude ecall/ebreak
-    assign is_csr_insn_with_uimm = is_csr_insn & (fe_if.instruction.funct3[2] == 1'b1); // CSRxI instructions
-    assign rd_is_x0 = (fe_if.instruction.rd  == '0);
-    assign rs_is_x0 = (fe_if.instruction.rs1 == '0);
 
     always_comb begin
         unique casez (fe_if.instruction.opcode)
@@ -181,12 +161,10 @@ module decode import catawba_params::*; #(
         .upstream_valid(fe_if.valid),
         .local_stall_request(local_stall_request),
         .downstream_stall_request(ex_if.stall_upstream),
-        .upstream_halt(fe_if.halt),
-        .force_downstream_valid_and_halt_low(1'b0),
+        .force_downstream_valid_low(1'b0),
 
         .propagate_upstream_data(propagate_upstream_data),
         .downstream_valid(ex_if.valid),
-        .downstream_halt(ex_if.halt),
         .request_upstream_stall(fe_if.stall_upstream)
     );
 
@@ -198,16 +176,10 @@ module decode import catawba_params::*; #(
             ex_if.pc_plus_4 <= fe_if.pc_plus_4;
             ex_if.instruction <= fe_if.instruction;
             ex_if.instruction_kind <= instruction_kind;
-            ex_if.is_branch_insn <= is_branch_insn;
-            ex_if.is_jump_insn <= is_jump_insn;
-            ex_if.is_mem_insn <= is_mem_insn;
             ex_if.alu_operation <= alu_operation;
             ex_if.branch_alu_operation <= branch_alu_operation;
             ex_if.operand_a <= operand_a;
             ex_if.operand_b <= operand_b;
-            ex_if.rd_is_x0 <= rd_is_x0;
-            ex_if.rs_is_x0 <= rs_is_x0;
-            ex_if.is_csr_insn <= is_csr_insn;
         end
     end
 

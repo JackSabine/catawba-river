@@ -19,13 +19,6 @@ logic propagate_upstream_data;
 logic force_downstream_valid_low;
 
 fetch_state_e fe_state, next_fe_state;
-logic current_inst_is_branch;
-logic current_inst_is_jump;
-logic current_inst_is_halt;
-
-assign current_inst_is_branch = (instruction.opcode == 7'b1100011) & icache_if.req_fulfilled;
-assign current_inst_is_jump = (instruction.opcode  =?= 7'b110z111) & icache_if.req_fulfilled;
-assign current_inst_is_halt = (instruction == `J1b) & icache_if.req_fulfilled;
 
 assign pc_plus_4 = pc + 'd4;
 
@@ -35,10 +28,10 @@ always_comb begin
 
     casez (fe_state)
         NORMAL_OPERATION: begin
-            if (current_inst_is_halt) begin
+            if (`IS_HALT_INSN(instruction)) begin
                 next_fe_state = HALTED;
                 next_pc = pc;
-            end else if (current_inst_is_branch | current_inst_is_jump) begin
+            end else if (`IS_BRANCH_INSN(instruction) | `IS_JUMP_INSN(instruction)) begin
                 next_fe_state = STALL_ON_JUMP_OR_BRANCH;
                 next_pc = pc;
             end else begin
@@ -72,12 +65,10 @@ advance_control advance_ctrl (
     .upstream_valid(icache_if.req_fulfilled),
     .local_stall_request(local_stall_request),
     .downstream_stall_request(de_if.stall_upstream),
-    .upstream_halt(current_inst_is_halt),
-    .force_downstream_valid_and_halt_low(force_downstream_valid_low),
+    .force_downstream_valid_low(force_downstream_valid_low),
 
     .propagate_upstream_data(propagate_upstream_data),
     .downstream_valid(de_if.valid),
-    .downstream_halt(de_if.halt),
     .request_upstream_stall()
 );
 
@@ -103,6 +94,6 @@ assign icache_if.req_size = WORD;
 assign icache_if.req_store_word = 'x;
 assign icache_if.req_valid = 1'b1;
 
-assign instruction = icache_if.req_loaded_word;
+assign instruction = icache_if.req_fulfilled ? icache_if.req_loaded_word : '0;
 
 endmodule

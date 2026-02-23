@@ -14,6 +14,17 @@
 `define TB_STRING_MAX_CHARS (31)
 `define TB_STRING_NUM_BITS ( (`TB_STRING_MAX_CHARS + 1) * 8)
 
+`define IS_HALT_INSN(insn)          (insn == `J1b)
+`define IS_MATH_INSN(insn)          (insn.opcode =?= 7'b0?10011)
+`define IS_BRANCH_INSN(insn)        (insn.opcode  == 7'b1100011)
+`define IS_JUMP_INSN(insn)          (insn.opcode =?= 7'b110z111)
+`define IS_MEM_INSN(insn)           (insn.opcode =?= 7'b0z00011)
+`define IS_LUI_INSN(insn)           (insn.opcode  == 7'b0110111)
+`define IS_CSR_INSN(insn)           ((insn.opcode == 7'b1110011) & (insn.funct3 != 3'b000))
+`define IS_CSR_INSN_WITH_UIMM(insn) (`IS_CSR_INSN(insn) & (insn.funct3[2] == 1'b1))
+`define IS_RD_X0(insn)              (insn.rd  == '0)
+`define IS_RS_X0(insn)              (insn.rs1 == '0)
+
 
 `define RO_CSR(CSR_NAME, ADDRESS, CONST_VALUE) \
     logic [XLEN-1:0] csr_``CSR_NAME; \

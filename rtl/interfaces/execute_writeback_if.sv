@@ -2,7 +2,6 @@ interface execute_writeback_if #(parameter XLEN = 32);
     import catawba_params::*;
 
     logic valid;
-    logic halt;
     logic [XLEN-1:0] pc;
 
     logic [XLEN-1:0] ex_result;
@@ -13,7 +12,6 @@ interface execute_writeback_if #(parameter XLEN = 32);
     modport ex (
         output
             valid,
-            halt,
             pc,
             ex_result,
             instruction,
@@ -23,7 +21,6 @@ interface execute_writeback_if #(parameter XLEN = 32);
     modport wb (
         input
             valid,
-            halt,
             pc,
             ex_result,
             instruction,

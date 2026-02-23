@@ -2,7 +2,6 @@ interface decode_execute_if #(parameter XLEN = 32);
     import catawba_params::*;
 
     logic valid;
-    logic halt;
 
     logic [XLEN-1:0] rs1_word;
     logic [XLEN-1:0] rs2_word;
@@ -10,41 +9,27 @@ interface decode_execute_if #(parameter XLEN = 32);
 
     instruction_t instruction;
     instruction_kind_t instruction_kind;
-    logic is_branch_insn;
-    logic is_jump_insn;
-    logic is_mem_insn;
 
     alu_operation_e alu_operation;
     branch_alu_operation_e branch_alu_operation;
     logic [XLEN-1:0] operand_a;
     logic [XLEN-1:0] operand_b;
 
-    logic rd_is_x0;
-    logic rs_is_x0;
-    logic is_csr_insn;
-
     logic stall_upstream;
 
     modport de (
         output
             valid,
-            halt,
             rs1_word,
             rs2_word,
             pc,
             pc_plus_4,
             instruction,
             instruction_kind,
-            is_branch_insn,
-            is_jump_insn,
-            is_mem_insn,
             alu_operation,
             branch_alu_operation,
             operand_a,
             operand_b,
-            rd_is_x0,
-            rs_is_x0,
-            is_csr_insn,
         input
             stall_upstream
     );
@@ -52,23 +37,16 @@ interface decode_execute_if #(parameter XLEN = 32);
     modport ex (
         input
             valid,
-            halt,
             rs1_word,
             rs2_word,
             pc,
             pc_plus_4,
             instruction,
             instruction_kind,
-            is_branch_insn,
-            is_jump_insn,
-            is_mem_insn,
             alu_operation,
             branch_alu_operation,
             operand_a,
             operand_b,
-            rd_is_x0,
-            rs_is_x0,
-            is_csr_insn,
         output
             stall_upstream
     );
