@@ -44,7 +44,6 @@ module decode import catawba_params::*; #(
         composed_immediate = 'x;
     endfunction
 
-    logic [`REG_BITS-1:0] rs1_index, rs2_index, de_rd_index, wb_rd_index;
     logic [XLEN-1:0] rs1_word, rs2_word;
 
     logic [XLEN-1:0] composed_immediate;
@@ -57,25 +56,17 @@ module decode import catawba_params::*; #(
     branch_alu_operation_e branch_alu_operation;
 
     instruction_kind_t instruction_kind;
-    logic is_lui_insn;
-
-    logic scoreboard_stall;
 
     logic local_stall_request;
     logic propagate_upstream_data;
 
     logic [XLEN-1:0] operand_a, operand_b;
 
-    assign rs1_index = fe_if.instruction.rs1;
-    assign rs2_index = fe_if.instruction.rs2;
-    assign de_rd_index = fe_if.instruction.rd;
-    assign wb_rd_index = wb_if.rd;
-
     register_file regfile (
         .clk(clk),
-        .read_port_select_1(rs1_index),
-        .read_port_select_2(rs2_index),
-        .write_port_select(wb_rd_index),
+        .read_port_select_1(fe_if.instruction.rs1),
+        .read_port_select_2(fe_if.instruction.rs2),
+        .write_port_select(wb_if.rd),
         .write_port_data(wb_if.result),
 
         .read_port_data_1(rs1_word),
@@ -89,15 +80,15 @@ module decode import catawba_params::*; #(
         .de_valid(fe_if.valid),
 
         .de_instruction_kind(instruction_kind),
-        .de_read_port_select_1(rs1_index),
-        .de_read_port_select_2(rs2_index),
-        .de_write_port_select(de_rd_index),
+        .de_read_port_select_1(fe_if.instruction.rs1),
+        .de_read_port_select_2(fe_if.instruction.rs2),
+        .de_write_port_select(fe_if.instruction.rd),
 
-        .wb_write_port_select(wb_rd_index),
+        .wb_write_port_select(wb_if.rd),
 
         .block_ready_bit_clear(ex_if.stall_upstream),
 
-        .stall(scoreboard_stall)
+        .stall(local_stall_request)
     );
 
     always_comb begin
@@ -182,6 +173,4 @@ module decode import catawba_params::*; #(
             ex_if.operand_b <= operand_b;
         end
     end
-
-    assign local_stall_request = scoreboard_stall;
 endmodule
