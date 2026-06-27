@@ -37,6 +37,7 @@ module execute import catawba_params::*; #(
     // Trap detection
     logic take_trap;
     logic [XLEN-1:0] trap_mcause;
+    logic [XLEN-1:0] trap_mtval;
     logic [XLEN-1:0] csr_mtvec;
 
     // MRET detection
@@ -67,6 +68,8 @@ module execute import catawba_params::*; #(
 
     assign take_trap   = de_if.valid & propagate_upstream_data & `IS_TRAP_INSN(de_if.instruction);
     assign trap_mcause = `IS_EBREAK_INSN(de_if.instruction) ? 32'd3 : 32'd11;
+    // EBREAK: mtval = faulting PC (spec §3.1.17); ECALL: mtval = 0
+    assign trap_mtval  = `IS_EBREAK_INSN(de_if.instruction) ? de_if.pc : '0;
 
     // do_mret fires for exactly one cycle: when a valid mret commits from execute
     assign do_mret = de_if.valid & propagate_upstream_data & `IS_MRET_INSN(de_if.instruction);
@@ -88,6 +91,7 @@ module execute import catawba_params::*; #(
         .take_trap(take_trap),
         .trap_pc(de_if.pc),
         .trap_mcause_val(trap_mcause),
+        .trap_mtval_val(trap_mtval),
         .do_mret(do_mret),
         .csr_mtvec(csr_mtvec),
         .csr_mepc(csr_mepc),

@@ -16,6 +16,7 @@ module csr_wrapper import catawba_params::*; #(
     input  logic            take_trap,
     input  logic [XLEN-1:0] trap_pc,
     input  logic [XLEN-1:0] trap_mcause_val,
+    input  logic [XLEN-1:0] trap_mtval_val,
 
     // MRET input (driven by execute on mret)
     input  logic            do_mret,
@@ -112,8 +113,8 @@ assign csr_mepc_hw_ovrd_en = take_trap;
 assign csr_mcause_hw_ovrd    = trap_mcause_val;
 assign csr_mcause_hw_ovrd_en = take_trap;
 
-// Trap entry: mtval = 0 for ecall/ebreak
-assign csr_mtval_hw_ovrd    = '0;
+// mtval hw override: PC of faulting instruction (ebreak), or 0 (ecall)
+assign csr_mtval_hw_ovrd    = trap_mtval_val;
 assign csr_mtval_hw_ovrd_en = take_trap;
 
 // mstatus hw override: trap entry and MRET are mutually exclusive; take_trap has priority
