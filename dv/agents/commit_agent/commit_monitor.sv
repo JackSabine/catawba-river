@@ -56,6 +56,13 @@ class commit_monitor extends uvm_monitor;
 
                 state_tx.data_memory = dut_memory_model.tb_pull_memory();
 
+                // Capture tracked CSR values at commit time
+                state_tx.csrs[32'h300] = this.probe_if.csr_mstatus;
+                state_tx.csrs[32'h305] = this.probe_if.csr_mtvec;
+                state_tx.csrs[32'h341] = this.probe_if.csr_mepc;
+                state_tx.csrs[32'h342] = this.probe_if.csr_mcause;
+                state_tx.csrs[32'h343] = this.probe_if.csr_mtval;
+
                 `uvm_info(get_full_name(), $sformatf("dut PC: 0x%08X -- insn: %s", state_tx.pc, disassemble_rv32i(1'b1, uint32_t'(this.probe_if.wb_instruction))), UVM_LOW)
 
                 `uvm_info(get_full_name(), $sformatf("Committing state %s", state_tx.convert2string()), UVM_HIGH)

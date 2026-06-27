@@ -7,3 +7,8 @@ logic [`REG_BITS-1:0] wb_rd;
 logic [XLEN-1:0] wb_rd_value;
 logic [XLEN-1:0] wb_pc;
 instruction_t wb_instruction;
+logic [31:0] csr_mstatus;
+logic [31:0] csr_mtvec;
+logic [31:0] csr_mepc;
+logic [31:0] csr_mcause;
+logic [31:0] csr_mtval;

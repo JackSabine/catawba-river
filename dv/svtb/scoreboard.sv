@@ -82,6 +82,13 @@ class scoreboard extends uvm_scoreboard;
         if (status == 32) foreach (int_regs[i]) expected_pipe_state_tx.int_regs[i] = uint32_t'(int_regs[i]);
         else `uvm_error(get_full_name(), $sformatf("spike_get_all_gprs returned a non-32 code %0d", status))
 
+        // Read tracked CSRs from Spike
+        expected_pipe_state_tx.csrs[32'h300] = uint32_t'(spike_get_csr(0, 32'h300)); // mstatus
+        expected_pipe_state_tx.csrs[32'h305] = uint32_t'(spike_get_csr(0, 32'h305)); // mtvec
+        expected_pipe_state_tx.csrs[32'h341] = uint32_t'(spike_get_csr(0, 32'h341)); // mepc
+        expected_pipe_state_tx.csrs[32'h342] = uint32_t'(spike_get_csr(0, 32'h342)); // mcause
+        expected_pipe_state_tx.csrs[32'h343] = uint32_t'(spike_get_csr(0, 32'h343)); // mtval
+
         dut_data_memory = dut_memory_model.tb_pull_memory();
         foreach (dut_data_memory[i]) begin
             expected_pipe_state_tx.data_memory[i] = spike_read_mem_word(i);

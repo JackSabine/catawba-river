@@ -4,6 +4,7 @@ class pipe_state_transaction extends uvm_sequence_item;
     bit [catawba_params::XLEN-1:0] pc;
     bit [catawba_params::XLEN-1:0] int_regs [0:`NUM_REGS-1];
     memory_t data_memory;
+    uint32_t csrs[uint32_t]; // CSR address -> value (M-mode trap-related CSRs)
 
     const static string register2abinames [0:`NUM_REGS-1] = '{
         "x0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -31,6 +32,11 @@ class pipe_state_transaction extends uvm_sequence_item;
         s = {s, "----- Memory -----\n"};
         foreach (data_memory[i]) begin
             s = {s, $sformatf("0x%08x: %08x\n", i, data_memory[i])};
+        end
+
+        s = {s, "----- CSRs -----\n"};
+        foreach (csrs[i]) begin
+            s = {s, $sformatf("CSR 0x%03x: %08x\n", i, csrs[i])};
         end
 
         return s;
@@ -71,6 +77,20 @@ class pipe_state_transaction extends uvm_sequence_item;
             };
         end
 
+        s = {s, "----- CSR Comparison -----\n"};
+        foreach (csrs[i]) begin
+            s = {
+                s,
+                $sformatf(
+                    "CSR 0x%03x: %08x %1s %08x\n",
+                    i,
+                    csrs[i],
+                    (csrs[i] == other_tx.csrs[i]) ? "" : "|",
+                    other_tx.csrs[i]
+                )
+            };
+        end
+
         return s;
     endfunction
 
@@ -81,6 +101,7 @@ class pipe_state_transaction extends uvm_sequence_item;
         // https://verificationacademy.com/forums/t/copy-assoc-array-to-assoc-arry/30549
         int_regs    = _obj.int_regs;
         data_memory = _obj.data_memory;
+        csrs        = _obj.csrs;
     endfunction
 
     virtual function bit do_compare(uvm_object rhs, uvm_comparer comparer);
@@ -91,6 +112,7 @@ class pipe_state_transaction extends uvm_sequence_item;
         return
             int_regs    == _obj.int_regs    &
             pc          == _obj.pc          &
-            data_memory == _obj.data_memory ;
+            data_memory == _obj.data_memory &
+            csrs        == _obj.csrs        ;
     endfunction
 endclass
