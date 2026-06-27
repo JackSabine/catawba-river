@@ -11,6 +11,13 @@ module csr_wrapper import catawba_params::*; #(
     input  logic            req_valid,
 
     input  logic [1:0]      hart_curr_privilege,
+
+    // Trap entry inputs (driven by execute on ecall/ebreak)
+    input  logic            take_trap,
+    input  logic [XLEN-1:0] trap_pc,
+    input  logic [XLEN-1:0] trap_mcause_val,
+    output logic [XLEN-1:0] csr_mtvec,
+
     output logic [XLEN-1:0] rsp_csr_value
 );
 
@@ -25,9 +32,24 @@ logic [XLEN-1:0] csr_read_value;
 logic [XLEN-1:0] value_to_write;
 system_csr_op_e csr_op;
 logic invalid_csr_index;
+
+// mepc hw override (trap entry: save faulting PC)
 logic [31:0] csr_mepc;
 logic [31:0] csr_mepc_hw_ovrd;
 logic        csr_mepc_hw_ovrd_en;
+
+// mstatus hw override (trap entry: update MIE/MPIE/MPP fields)
+logic [31:0] csr_mstatus;
+logic [31:0] csr_mstatus_hw_ovrd;
+logic        csr_mstatus_hw_ovrd_en;
+
+// mcause hw override (trap entry: set exception code)
+logic [31:0] csr_mcause_hw_ovrd;
+logic        csr_mcause_hw_ovrd_en;
+
+// mtval hw override (trap entry: 0 for ecall/ebreak)
+logic [31:0] csr_mtval_hw_ovrd;
+logic        csr_mtval_hw_ovrd_en;
 
 assign req_csr_address_rw = req_csr_address[11:10];
 assign req_csr_address_privilege_required = req_csr_address[9:8];
@@ -78,7 +100,31 @@ always_comb begin
 end
 
 
-assign csr_mepc_hw_ovrd_en = '0;
+assign csr_mepc_hw_ovrd    = trap_pc;
+assign csr_mepc_hw_ovrd_en = take_trap;
+
+// Trap entry: mcause = exception code (11 for M-mode ecall, 3 for ebreak)
+assign csr_mcause_hw_ovrd    = trap_mcause_val;
+assign csr_mcause_hw_ovrd_en = take_trap;
+
+// Trap entry: mtval = 0 for ecall/ebreak
+assign csr_mtval_hw_ovrd    = '0;
+assign csr_mtval_hw_ovrd_en = take_trap;
+
+// Trap entry: mstatus field update
+//   MPP  [12:11] = hart_curr_privilege (save current privilege mode)
+//   MPIE [7]     = old MIE             (save old interrupt-enable)
+//   MIE  [3]     = 0                   (disable interrupts during trap)
+assign csr_mstatus_hw_ovrd = {
+    csr_mstatus[XLEN-1:13],  // upper bits preserved
+    hart_curr_privilege,      // [12:11] MPP = current privilege
+    csr_mstatus[10:8],        // [10:8] preserved
+    csr_mstatus[3],           // [7] MPIE = old MIE
+    csr_mstatus[6:4],         // [6:4] preserved
+    1'b0,                     // [3] MIE = 0
+    csr_mstatus[2:0]          // [2:0] preserved
+};
+assign csr_mstatus_hw_ovrd_en = take_trap;
 
 // gen_csr.py begin
 csr_core #(
@@ -93,9 +139,17 @@ csr_core #(
     .req_trigger_read_side_effects,
     .csr_read_value,
     .invalid_csr_index,
+    .csr_mstatus,
+    .csr_mstatus_hw_ovrd,
+    .csr_mstatus_hw_ovrd_en,
+    .csr_mtvec,
     .csr_mepc,
     .csr_mepc_hw_ovrd,
-    .csr_mepc_hw_ovrd_en
+    .csr_mepc_hw_ovrd_en,
+    .csr_mcause_hw_ovrd,
+    .csr_mcause_hw_ovrd_en,
+    .csr_mtval_hw_ovrd,
+    .csr_mtval_hw_ovrd_en
 );
 // gen_csr.py end
 

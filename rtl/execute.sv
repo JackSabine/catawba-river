@@ -34,6 +34,11 @@ module execute import catawba_params::*; #(
     logic memory_busy;
     logic stall_to_make_csr_op_atomic;
 
+    // Trap detection
+    logic take_trap;
+    logic [XLEN-1:0] trap_mcause;
+    logic [XLEN-1:0] csr_mtvec;
+
     assign stall_to_make_csr_op_atomic = `IS_CSR_INSN(de_if.instruction) & wb_has_valid_instruction;
 
     assign local_stall_request = stall_to_make_csr_op_atomic | memory_busy;
@@ -56,6 +61,10 @@ module execute import catawba_params::*; #(
         .result(branch_alu_result)
     );
 
+    // take_trap fires for exactly one cycle: when a valid ecall/ebreak commits from execute
+    assign take_trap  = de_if.valid & propagate_upstream_data & `IS_TRAP_INSN(de_if.instruction);
+    assign trap_mcause = `IS_EBREAK_INSN(de_if.instruction) ? 32'd3 : 32'd11;
+
     csr_wrapper #(
         .XLEN(XLEN)
     ) csr_wrapper (
@@ -69,6 +78,12 @@ module execute import catawba_params::*; #(
         .req_valid(de_if.valid & `IS_CSR_INSN(de_if.instruction) & ~stall_to_make_csr_op_atomic),
 
         .hart_curr_privilege(hart_curr_privilege),
+
+        .take_trap(take_trap),
+        .trap_pc(de_if.pc),
+        .trap_mcause_val(trap_mcause),
+        .csr_mtvec(csr_mtvec),
+
         .rsp_csr_value(csr_read_value)
     );
 
@@ -117,6 +132,9 @@ module execute import catawba_params::*; #(
 
     assign fe_if.jump_or_branch_valid = de_if.valid & (`IS_BRANCH_INSN(de_if.instruction) | `IS_JUMP_INSN(de_if.instruction));
     assign fe_if.jump_or_branch_next_pc = (branch_alu_result | `IS_JUMP_INSN(de_if.instruction)) ? alu_result : de_if.pc_plus_4;
+
+    assign fe_if.take_trap      = take_trap;
+    assign fe_if.trap_target_pc = csr_mtvec;
 
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin

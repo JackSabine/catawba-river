@@ -31,6 +31,9 @@ always_comb begin
             if (`IS_HALT_INSN(instruction)) begin
                 next_fe_state = HALTED;
                 next_pc = pc;
+            end else if (`IS_TRAP_INSN(instruction)) begin
+                next_fe_state = STALL_ON_TRAP;
+                next_pc = pc;
             end else if (`IS_BRANCH_INSN(instruction) | `IS_JUMP_INSN(instruction)) begin
                 next_fe_state = STALL_ON_JUMP_OR_BRANCH;
                 next_pc = pc;
@@ -47,6 +50,18 @@ always_comb begin
                 force_downstream_valid_low = 1'b1;
             end else begin
                 next_fe_state = STALL_ON_JUMP_OR_BRANCH;
+                next_pc = pc;
+                local_stall_request = 1'b1;
+            end
+        end
+
+        STALL_ON_TRAP: begin
+            if (ex_if.take_trap) begin
+                next_fe_state = NORMAL_OPERATION;
+                next_pc = ex_if.trap_target_pc;
+                force_downstream_valid_low = 1'b1;
+            end else begin
+                next_fe_state = STALL_ON_TRAP;
                 next_pc = pc;
                 local_stall_request = 1'b1;
             end

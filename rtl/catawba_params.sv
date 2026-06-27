@@ -47,6 +47,7 @@ package catawba_params;
     typedef enum logic [1:0] {
         STALL_ON_JUMP_OR_BRANCH = 2'b00,
         NORMAL_OPERATION,
+        STALL_ON_TRAP,
         HALTED
     } fetch_state_e;
 

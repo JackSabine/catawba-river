@@ -25,6 +25,11 @@
 `define IS_RD_X0(insn)              (insn.rd  == '0)
 `define IS_RS_X0(insn)              (insn.rs1 == '0)
 
+// System instructions (opcode=1110011, funct3=000): distinguished by {funct7, rs2} = imm[11:0]
+`define IS_ECALL_INSN(insn)  ((insn.opcode == 7'b1110011) & (insn.funct3 == 3'b000) & (insn[31:20] == 12'h000))
+`define IS_EBREAK_INSN(insn) ((insn.opcode == 7'b1110011) & (insn.funct3 == 3'b000) & (insn[31:20] == 12'h001))
+`define IS_TRAP_INSN(insn)   (`IS_ECALL_INSN(insn) | `IS_EBREAK_INSN(insn))
+
 
 `define RO_CSR(CSR_NAME, ADDRESS, CONST_VALUE) \
     logic [XLEN-1:0] csr_``CSR_NAME; \
