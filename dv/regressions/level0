@@ -16,3 +16,4 @@ asm_test --plusargs ASM_TEST=dot_product
 asm_test --plusargs ASM_TEST=bytes
 asm_test --plusargs ASM_TEST=7-ecall
 asm_test --plusargs ASM_TEST=8-ebreak
+asm_test --plusargs ASM_TEST=9-mret
