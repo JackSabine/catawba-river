@@ -35,11 +35,11 @@ make elf
 # Generate memory map .txt files from .elf files
 make memory_maps
 
-# Run a single test
+# Run a single test (qsim always calls make first — use qsim instead of make for builds)
 qsim asm_test --plusargs ASM_TEST=0-simple-addi
 
 # Run a regression (reads from dv/regressions/<name>)
-qsim level0 -R
+qsim -R level0
 
 # Run with specific seed and verbosity
 qsim asm_test --plusargs ASM_TEST=1-read-after-write --seed 12345 --uvm_verbosity UVM_HIGH
@@ -54,7 +54,7 @@ qsim asm_test --clean --plusargs ASM_TEST=2-loop
 waves   # alias set by project.sh
 ```
 
-`qsim` is a Python script at `scripts/qsim/qsim`. It calls `make`, then invokes `xsim` with the elaborated snapshot.
+`qsim` is a Python script at `scripts/qsim/qsim`. It calls `make` automatically, then invokes `xsim` with the elaborated snapshot. **Always use `qsim` to build/run — do not call `make` separately.**
 
 ## Architecture
 
@@ -84,14 +84,16 @@ icache_if ──► fetch ──fe_de_if──► decode ──de_ex_if──►
 
 #### Fetch (`rtl/fetch.sv`)
 
-State machine with three states (`fetch_state_e`):
-- `NORMAL_OPERATION` — increment PC each cycle an icache beat is fulfilled; detect halt/branch/jump
-- `STALL_ON_JUMP_OR_BRANCH` — freeze PC and wait for execute to resolve the target via `fe_ex_if.jump_or_branch_valid` / `jump_or_branch_next_pc`; asserts `force_downstream_valid_low` on the cycle the redirect arrives to squash the in-flight instruction
+State machine with five states (`fetch_state_e`, `logic[2:0]`):
+- `NORMAL_OPERATION` — increment PC each cycle an icache beat is fulfilled; detect halt/trap/mret/branch/jump
+- `STALL_ON_JUMP_OR_BRANCH` — freeze PC; wait for `fe_ex_if.jump_or_branch_valid`; asserts `force_downstream_valid_low` on redirect cycle
+- `STALL_ON_TRAP` — freeze PC; wait for `fe_ex_if.take_trap`; redirect to `trap_target_pc` (mtvec)
+- `STALL_ON_MRET` — freeze PC; wait for `fe_ex_if.do_mret`; redirect to `mret_target_pc` (mepc)
 - `HALTED` — freeze indefinitely
 
-Fetch always issues a LOAD WORD to icache (`req_valid=1`, `req_size=WORD`). If the cache is not ready, the instruction is `'0` and `upstream_valid` to the downstream advance_control is `0`.
+Detection priority in `NORMAL_OPERATION`: HALT → TRAP → MRET → BRANCH/JUMP → normal advance.
 
-**Currently missing:** No mechanism to redirect fetch to `mtvec` (trap entry) or `mepc` (MRET). Adding this requires a new fetch state or overriding `next_pc` from a trap signal.
+Fetch always issues a LOAD WORD to icache (`req_valid=1`, `req_size=WORD`). If the cache is not ready, the instruction is `'0` and `upstream_valid` to the downstream advance_control is `0`.
 
 #### Decode (`rtl/decode.sv`)
 
@@ -104,7 +106,7 @@ Responsibilities:
 - Operand B mux: immediate or rs2_word
 - Stall from `register_scoreboard` (RAW/WAW); stall from execute propagated back via `ex_if.stall_upstream`
 
-**ECALL/EBREAK/MRET** all decode as `I_INST` with opcode `7'b1110011` (system). They are not distinguished from CSR instructions in decode — all go to execute as `instruction_kind = I_INST`. Execute only checks `` `IS_CSR_INSN `` (funct3 ≠ 000), so ECALL/EBREAK/MRET (`funct3 == 000`) fall through to the default `ex_result = alu_result` path and are silently discarded.
+**ECALL/EBREAK/MRET** all decode as `I_INST` with opcode `7'b1110011` (system). They are not distinguished from CSR instructions in decode — all go to execute as `instruction_kind = I_INST`. Execute uses `` `IS_TRAP_INSN `` / `` `IS_MRET_INSN `` macros to identify them after they reach execute. ECALL/EBREAK/MRET all fall through the default `ex_result = alu_result` path (their result is discarded — they affect only CSRs and the PC).
 
 #### Execute (`rtl/execute.sv`)
 
@@ -150,19 +152,20 @@ Decodes access type from `system_op_e` (funct3):
 - Write suppression: CSRRS/CSRRC with rs1=x0 (or uimm=0) suppresses write (spec §2.6)
 - Read suppression: CSRRW with rd=x0 suppresses read side effects
 - RW/RS/RC operation on `csr_read_value` to produce `value_to_write`
-- Exports `csr_mepc` and accepts `csr_mepc_hw_ovrd` / `csr_mepc_hw_ovrd_en` — the override enable is **hardwired to 0** (placeholder for trap entry)
+- Exports `csr_mepc` and accepts `csr_mepc_hw_ovrd` / `csr_mepc_hw_ovrd_en` — override is driven by trap entry logic in execute
+- Exports `csr_mtvec`, `csr_mcause`, `csr_mtval` for probe access and trap logic
 
 #### `csr.sv` / `csr_core.sv` (generated)
 
-All M-mode CSRs are present in the address space. The following are storage-only (generic `RW_CSR` flip-flops) with no functional behavior wired up:
+All M-mode CSRs are present in the address space. Current hardware override (hw_ovrd) wiring:
 
-| CSR | Address | Gap |
-|-----|---------|-----|
-| `mstatus` | `0x300` | No field-level logic: MIE, MPIE, MPP not driven by hardware; WPRI bits not masked on write |
-| `mtvec` | `0x305` | Not connected to fetch redirect |
-| `mepc` | `0x341` | HW override port exists but `csr_mepc_hw_ovrd_en = '0` |
-| `mcause` | `0x342` | Never written by hardware |
-| `mtval` | `0x343` | Never written by hardware |
+| CSR | Address | Status |
+|-----|---------|--------|
+| `mstatus` | `0x300` | ✅ HW-driven on trap entry (MPP/MPIE/MIE) and MRET (MIE←MPIE, MPIE←1, MPP←M); reset value `0x1800` (MPP=M) |
+| `mtvec` | `0x305` | ✅ Exported; fetch reads it for trap redirect |
+| `mepc` | `0x341` | ✅ HW-written with faulting PC on trap; exported as `csr_mepc` for MRET target |
+| `mcause` | `0x342` | ✅ HW-written with 11 (ECALL) or 3 (EBREAK) on trap |
+| `mtval` | `0x343` | ✅ HW-written with faulting PC on EBREAK, 0 on ECALL |
 | `mip` | `0x344` | No interrupt controller connected |
 | `mie` | `0x304` | No interrupt logic |
 | `mcycle` | `0xB00` | Not counting |
@@ -178,23 +181,21 @@ The following spec-required behaviors are not yet implemented:
 
 #### 1. ~~ECALL / EBREAK~~ ✅ Implemented
 - Detected via `IS_TRAP_INSN` macro in fetch (stalls like branch/jump) and execute (fires `take_trap`)
-- `take_trap` triggers all four CSR hardware overrides simultaneously: `mepc` ← faulting PC, `mcause` ← 11/3, `mtval` ← 0, `mstatus` fields updated (MPP/MPIE/MIE)
+- `take_trap` triggers all four CSR hardware overrides simultaneously: `mepc` ← faulting PC, `mcause` ← 11/3, `mtval` ← faulting PC (EBREAK) or 0 (ECALL), `mstatus` fields updated (MPP/MPIE/MIE)
 - Fetch redirects to `mtvec` when `take_trap` arrives from execute
 - Tests: `dv/code_tests/7-ecall.S`, `dv/code_tests/8-ebreak.S`
 
-#### 2. MRET (Privileged §3.3.2)
-- Encoding: `opcode=1110011, funct3=000, rs2=00010, rs1=00000, rd=00000`
-- Reaches execute and is discarded
-- Requires: restore `mepc` → PC; set `mstatus.MIE = mstatus.MPIE`; set `mstatus.MPIE = 1`; set privilege to `mstatus.MPP`; set `mstatus.MPP = 0` (U-mode, or M-mode if only M supported)
+#### 2. ~~MRET~~ ✅ Implemented
+- Detected via `IS_MRET_INSN` macro; fetch enters `STALL_ON_MRET` state; execute fires `do_mret`
+- `do_mret` triggers `mstatus` update (MIE←MPIE, MPIE←1, MPP←M) and fetch redirect to `csr_mepc`
+- Test: `dv/code_tests/9-mret.S`
 
-#### 3. Trap Entry Hardware (Privileged §3.1.6, §3.1.7, §3.1.9)
-- Required for exceptions and interrupts
-- Must: flush fetch/decode/execute pipeline stages; write `mepc` with the faulting PC; write `mcause` with exception code; write `mtval` where applicable; update `mstatus` (save MIE→MPIE, clear MIE, save privilege→MPP); redirect fetch to `mtvec` (direct mode: `mtvec[31:2]<<2`; vectored mode for interrupts: base + 4×cause)
+#### 3. ~~Trap Entry Hardware~~ ✅ Implemented
+- Pipeline flush, mepc/mcause/mtval/mstatus HW writes, and mtvec redirect all implemented for ECALL/EBREAK
 
-#### 4. `mstatus` Field Logic (Privileged §3.1.6)
-- Fields `MIE` [3], `MPIE` [7], `MPP` [12:11] must be driven by hardware on trap entry/return
-- WPRI fields must be masked to 0 on write
-- `SD` [31] = 0 (no FP/V state for RV32I)
+#### 4. ~~`mstatus` Field Logic~~ ✅ Implemented (trap-relevant fields only)
+- `MIE` [3], `MPIE` [7], `MPP` [12:11] driven by hardware on trap entry and MRET
+- WPRI masking and `SD` bit: not implemented (low priority for RV32I M-mode only)
 
 #### 5. Illegal Instruction Exception (Spec §2.8)
 - Triggered by: opcode not in the defined set (currently `INST_UNDEFINED` in decode, silently dropped); insufficient CSR privilege (detected in `csr_wrapper` but `underprivileged_hart` is not exported); write to a read-only CSR (detected but not exported); access to undefined CSR (`invalid_csr_index` hardwired to 0)
@@ -215,7 +216,7 @@ UVM testbench structure:
 
 - **`tb_top.sv`** — top module; instantiates DUT (`pipeline`), two `cache_bfm` instances (icache/dcache), clock, reset, and probes
 - **`environment.sv`** — UVM env; contains `reset_agent`, `commit_agent`, and `scoreboard`
-- **`scoreboard.sv`** — co-simulates Spike step-by-step via DPI-C; compares register file and data memory state after each committed instruction
+- **`scoreboard.sv`** — co-simulates Spike step-by-step via DPI-C; compares register file, CSRs (mstatus/mtvec/mepc/mcause/mtval), and data memory state after each committed instruction
 - **`dv/agents/commit_agent/`** — monitors pipeline commit events, produces `pipe_state_transaction`
 - **`dv/model/cache_bfm/`** — BFM that backs the memory interface; the `main_memory` object is shared between `cache_bfm` and `scoreboard`
 - **`dv/probe/`** — probe interface and signal assignments for visibility into internal pipeline state
@@ -250,10 +251,12 @@ The packed struct `instruction_t` (in `catawba_params.sv`) maps directly to RV32
 ### Distinguishing ECALL / EBREAK / MRET / WFI from CSR Instructions
 
 All system instructions share opcode `7'b1110011`. The decode module treats them all as `I_INST`. The distinguishing field is `funct3`:
-- `3'b000` → ECALL/EBREAK/MRET/WFI (currently unhandled)
+- `3'b000` → ECALL/EBREAK/MRET/WFI — handled in execute via `IS_TRAP_INSN` / `IS_MRET_INSN`
 - `3'b001`–`3'b111` → CSR instructions (handled by `csr_wrapper`)
 
 Within `funct3==000`, the `rs2` field (bits [24:20]) distinguishes: `00000`=ECALL, `00001`=EBREAK, `00010`=MRET, `00101`=WFI.
+
+Fetch detects `IS_TRAP_INSN` / `IS_MRET_INSN` directly from `instruction` to enter the correct stall state before the instruction reaches execute.
 
 ### UVM Config DB Pattern
 
@@ -261,7 +264,7 @@ Interfaces and shared objects are passed through `uvm_config_db` in `tb_top.sv`;
 
 ### Spike DPI-C Integration
 
-The scoreboard calls `spike_create`, `spike_step`, `spike_get_all_gprs`, and `spike_read_mem_word` — functions exposed by `subip/riscv-isa-sim-dpi/dpi/libspike_dpi.so`. This library must be built once with `make spike`.
+The scoreboard calls `spike_create`, `spike_step`, `spike_get_all_gprs`, `spike_read_mem_word`, and `spike_get_csr` — functions exposed by `subip/riscv-isa-sim-dpi/dpi/libspike_dpi.so`. This library must be built once with `make spike`.
 
 ### Submodules
 
