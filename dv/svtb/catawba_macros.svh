@@ -28,6 +28,7 @@
 // System instructions (opcode=1110011, funct3=000): distinguished by {funct7, rs2} = imm[11:0]
 `define IS_ECALL_INSN(insn)  ((insn.opcode == 7'b1110011) & (insn.funct3 == 3'b000) & (insn[31:20] == 12'h000))
 `define IS_EBREAK_INSN(insn) ((insn.opcode == 7'b1110011) & (insn.funct3 == 3'b000) & (insn[31:20] == 12'h001))
+`define IS_MRET_INSN(insn)   ((insn.opcode == 7'b1110011) & (insn.funct3 == 3'b000) & (insn[31:20] == 12'h302))
 `define IS_TRAP_INSN(insn)   (`IS_ECALL_INSN(insn) | `IS_EBREAK_INSN(insn))
 
 

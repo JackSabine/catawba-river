@@ -16,9 +16,15 @@ module csr_wrapper import catawba_params::*; #(
     input  logic            take_trap,
     input  logic [XLEN-1:0] trap_pc,
     input  logic [XLEN-1:0] trap_mcause_val,
-    output logic [XLEN-1:0] csr_mtvec,
 
-    output logic [XLEN-1:0] rsp_csr_value
+    // MRET input (driven by execute on mret)
+    input  logic            do_mret,
+
+    output logic [XLEN-1:0] rsp_csr_value,
+    output logic [XLEN-1:0] csr_mtvec,
+    output logic [XLEN-1:0] csr_mepc,
+    output logic [XLEN-1:0] csr_mcause,
+    output logic [XLEN-1:0] csr_mtval
 );
 
 logic [1:0] req_csr_address_rw;
@@ -33,8 +39,7 @@ logic [XLEN-1:0] value_to_write;
 system_csr_op_e csr_op;
 logic invalid_csr_index;
 
-// mepc hw override (trap entry: save faulting PC)
-logic [31:0] csr_mepc;
+// mepc hw override (trap entry: save faulting PC); also output for mret_target_pc
 logic [31:0] csr_mepc_hw_ovrd;
 logic        csr_mepc_hw_ovrd_en;
 
@@ -111,20 +116,41 @@ assign csr_mcause_hw_ovrd_en = take_trap;
 assign csr_mtval_hw_ovrd    = '0;
 assign csr_mtval_hw_ovrd_en = take_trap;
 
-// Trap entry: mstatus field update
-//   MPP  [12:11] = hart_curr_privilege (save current privilege mode)
-//   MPIE [7]     = old MIE             (save old interrupt-enable)
-//   MIE  [3]     = 0                   (disable interrupts during trap)
-assign csr_mstatus_hw_ovrd = {
-    csr_mstatus[XLEN-1:13],  // upper bits preserved
-    hart_curr_privilege,      // [12:11] MPP = current privilege
-    csr_mstatus[10:8],        // [10:8] preserved
-    csr_mstatus[3],           // [7] MPIE = old MIE
-    csr_mstatus[6:4],         // [6:4] preserved
-    1'b0,                     // [3] MIE = 0
-    csr_mstatus[2:0]          // [2:0] preserved
-};
-assign csr_mstatus_hw_ovrd_en = take_trap;
+// mstatus hw override: trap entry and MRET are mutually exclusive; take_trap has priority
+//
+// Trap entry:
+//   MPP  [12:11] = hart_curr_privilege  (save current privilege mode)
+//   MPIE [7]     = old MIE              (save old interrupt-enable)
+//   MIE  [3]     = 0                    (disable interrupts during trap)
+//
+// MRET return (Privileged spec §3.3.2):
+//   MPP  [12:11] = 2'b11                (restore to M-mode — only supported mode)
+//   MPIE [7]     = 1                    (set MPIE to 1)
+//   MIE  [3]     = old MPIE             (restore interrupt-enable from saved state)
+always_comb begin
+    if (take_trap) begin
+        csr_mstatus_hw_ovrd = {
+            csr_mstatus[XLEN-1:13],   // upper bits preserved
+            hart_curr_privilege,       // [12:11] MPP = current privilege
+            csr_mstatus[10:8],         // [10:8] preserved
+            csr_mstatus[3],            // [7] MPIE = old MIE
+            csr_mstatus[6:4],          // [6:4] preserved
+            1'b0,                      // [3] MIE = 0
+            csr_mstatus[2:0]           // [2:0] preserved
+        };
+    end else begin // do_mret
+        csr_mstatus_hw_ovrd = {
+            csr_mstatus[XLEN-1:13],   // upper bits preserved
+            2'b11,                     // [12:11] MPP = M (only supported mode)
+            csr_mstatus[10:8],         // [10:8] preserved
+            1'b1,                      // [7] MPIE = 1
+            csr_mstatus[6:4],          // [6:4] preserved
+            csr_mstatus[7],            // [3] MIE = old MPIE
+            csr_mstatus[2:0]           // [2:0] preserved
+        };
+    end
+end
+assign csr_mstatus_hw_ovrd_en = take_trap | do_mret;
 
 // gen_csr.py begin
 csr_core #(
@@ -146,8 +172,10 @@ csr_core #(
     .csr_mepc,
     .csr_mepc_hw_ovrd,
     .csr_mepc_hw_ovrd_en,
+    .csr_mcause,
     .csr_mcause_hw_ovrd,
     .csr_mcause_hw_ovrd_en,
+    .csr_mtval,
     .csr_mtval_hw_ovrd,
     .csr_mtval_hw_ovrd_en
 );

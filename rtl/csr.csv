@@ -4,7 +4,7 @@ marchid,F12,32,0123_4567,N,N
 mimpid,F13,32,0000_0001,N,N
 mhartid,F14,32,0,N,N
 mconfigptr,F15,32,0,N,N
-mstatus,300,32,0,Y,Y
+mstatus,300,32,1800,Y,Y
 mstatush,310,32,0,N,N
 misa,301,32,4000_0100,N,N
 medeleg,302,32,0,N,N
@@ -14,8 +14,8 @@ mtvec,305,32,0,Y,N
 medelegh,312,32,0,N,N
 mscratch,340,32,0,N,N
 mepc,341,32,0,Y,Y
-mcause,342,32,0,N,Y
-mtval,343,32,0,N,Y
+mcause,342,32,0,Y,Y
+mtval,343,32,0,Y,Y
 mip,344,32,0,N,N
 mtinst,34A,32,0,N,N
 mtval2,34B,32,0,N,N

@@ -39,6 +39,10 @@ module execute import catawba_params::*; #(
     logic [XLEN-1:0] trap_mcause;
     logic [XLEN-1:0] csr_mtvec;
 
+    // MRET detection
+    logic do_mret;
+    logic [XLEN-1:0] csr_mepc;
+
     assign stall_to_make_csr_op_atomic = `IS_CSR_INSN(de_if.instruction) & wb_has_valid_instruction;
 
     assign local_stall_request = stall_to_make_csr_op_atomic | memory_busy;
@@ -61,9 +65,11 @@ module execute import catawba_params::*; #(
         .result(branch_alu_result)
     );
 
-    // take_trap fires for exactly one cycle: when a valid ecall/ebreak commits from execute
-    assign take_trap  = de_if.valid & propagate_upstream_data & `IS_TRAP_INSN(de_if.instruction);
+    assign take_trap   = de_if.valid & propagate_upstream_data & `IS_TRAP_INSN(de_if.instruction);
     assign trap_mcause = `IS_EBREAK_INSN(de_if.instruction) ? 32'd3 : 32'd11;
+
+    // do_mret fires for exactly one cycle: when a valid mret commits from execute
+    assign do_mret = de_if.valid & propagate_upstream_data & `IS_MRET_INSN(de_if.instruction);
 
     csr_wrapper #(
         .XLEN(XLEN)
@@ -82,7 +88,11 @@ module execute import catawba_params::*; #(
         .take_trap(take_trap),
         .trap_pc(de_if.pc),
         .trap_mcause_val(trap_mcause),
+        .do_mret(do_mret),
         .csr_mtvec(csr_mtvec),
+        .csr_mepc(csr_mepc),
+        .csr_mcause(),
+        .csr_mtval(),
 
         .rsp_csr_value(csr_read_value)
     );
@@ -135,6 +145,9 @@ module execute import catawba_params::*; #(
 
     assign fe_if.take_trap      = take_trap;
     assign fe_if.trap_target_pc = csr_mtvec;
+
+    assign fe_if.do_mret        = do_mret;
+    assign fe_if.mret_target_pc = csr_mepc;
 
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin

@@ -44,10 +44,11 @@ package catawba_params;
         logic [`OPC_BITS-1:0] opcode;
     } instruction_t;
 
-    typedef enum logic [1:0] {
-        STALL_ON_JUMP_OR_BRANCH = 2'b00,
+    typedef enum logic [2:0] {
+        STALL_ON_JUMP_OR_BRANCH = 3'b000,
         NORMAL_OPERATION,
         STALL_ON_TRAP,
+        STALL_ON_MRET,
         HALTED
     } fetch_state_e;
 
