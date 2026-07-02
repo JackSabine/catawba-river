@@ -1,4 +1,4 @@
-module register_read import catawba_params::*; (
+module regread import catawba_params::*; (
     input logic clk,
 
     input logic [PRF_PTR_WIDTH-1:0] read_port_select_1,
