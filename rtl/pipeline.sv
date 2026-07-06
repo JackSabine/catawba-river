@@ -15,7 +15,11 @@ fetch_decode_if fe_de_if();
 fetch_execute_if fe_ex_if();
 decode_execute_if de_ex_if();
 execute_writeback_if ex_wb_if();
-writeback_decode_if wb_de_if();
+retire_decode_if wb_de_if();
+
+writeback_rob_if wb_rob_if();
+rob_writer_if rob_writer_if();
+retire_rob_if rt_rob_if();
 
 fetch fe (
     .clk(clk),
@@ -30,7 +34,8 @@ decode de (
     .rst_if(rst_if),
     .fe_if(fe_de_if),
     .ex_if(de_ex_if),
-    .wb_if(wb_de_if)
+    .rob_if(rob_writer_if),
+    .rt_if(wb_de_if)
 );
 
 execute ex (
@@ -47,7 +52,22 @@ execute ex (
 writeback wb (
     .clk(clk),
     .ex_if(ex_wb_if),
-    .de_if(wb_de_if)
+    .rob_if(wb_rob_if)
+);
+
+retire rt (
+    .clk(clk),
+    .de_if(wb_de_if),
+    .rob_if(rt_rob_if)
+);
+
+
+reorder_buffer rob (
+    .clk(clk),
+    .rst_if(rst_if),
+    .wr_if(rob_writer_if),
+    .wb_if(wb_rob_if),
+    .rt_if(rt_rob_if)
 );
 
 endmodule

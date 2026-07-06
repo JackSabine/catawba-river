@@ -5,7 +5,10 @@ rtl/interfaces/fetch_decode_if.sv
 rtl/interfaces/decode_execute_if.sv
 rtl/interfaces/execute_writeback_if.sv
 rtl/interfaces/fetch_execute_if.sv
-rtl/interfaces/writeback_decode_if.sv
+rtl/interfaces/writeback_rob_if.sv
+rtl/interfaces/retire_decode_if.sv
+rtl/interfaces/rob_writer_if.sv
+rtl/interfaces/retire_rob_if.sv
 
 work/csr_core.sv
 rtl/csr_wrapper.sv
@@ -19,4 +22,6 @@ rtl/decode.sv
 rtl/fetch.sv
 rtl/memory.sv
 rtl/writeback.sv
+rtl/retire.sv
+rtl/reorder_buffer.sv
 rtl/pipeline.sv

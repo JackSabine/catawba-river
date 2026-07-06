@@ -6,7 +6,8 @@ module decode import catawba_params::*; #(
 
     fetch_decode_if.de fe_if,
     decode_execute_if.de ex_if,
-    writeback_decode_if.de wb_if
+    rob_writer_if.writer rob_if,
+    retire_decode_if.de rt_if
 );
 
     function void r_type_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
@@ -57,6 +58,7 @@ module decode import catawba_params::*; #(
 
     instruction_kind_t instruction_kind;
 
+    logic scoreboard_stall;
     logic local_stall_request;
     logic propagate_upstream_data;
 
@@ -66,8 +68,8 @@ module decode import catawba_params::*; #(
         .clk(clk),
         .read_port_select_1(fe_if.instruction.rs1),
         .read_port_select_2(fe_if.instruction.rs2),
-        .write_port_select(wb_if.rd),
-        .write_port_data(wb_if.result),
+        .write_port_select(rt_if.rd),
+        .write_port_data(rt_if.result),
 
         .read_port_data_1(rs1_word),
         .read_port_data_2(rs2_word)
@@ -84,12 +86,19 @@ module decode import catawba_params::*; #(
         .de_read_port_select_2(fe_if.instruction.rs2),
         .de_write_port_select(fe_if.instruction.rd),
 
-        .wb_write_port_select(wb_if.rd),
+        .wb_write_port_select(rt_if.rd),
 
         .block_ready_bit_clear(ex_if.stall_upstream),
 
-        .stall(local_stall_request)
+        .stall(scoreboard_stall)
     );
+
+    assign local_stall_request = scoreboard_stall || rob_if.full;
+
+    assign rob_if.pc = fe_if.pc;
+    assign rob_if.instruction = fe_if.instruction;
+    assign rob_if.dest_reg = fe_if.instruction.rd;
+    assign rob_if.push = fe_if.valid && !local_stall_request;
 
     always_comb begin
         a_use_pc_or_zero = fe_if.instruction.opcode[6:2] inside {
@@ -171,6 +180,8 @@ module decode import catawba_params::*; #(
             ex_if.branch_alu_operation <= branch_alu_operation;
             ex_if.operand_a <= operand_a;
             ex_if.operand_b <= operand_b;
+            ex_if.exception <= fe_if.exception;
+            ex_if.rob_index <= rob_if.rob_index;
         end
     end
 endmodule

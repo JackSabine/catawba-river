@@ -73,4 +73,7 @@ package catawba_params;
     parameter XLEN = 32;
 
     parameter RESET_PC = 32'h8000_0000; // Must agree with bootloader section dv/gcc/link.ld
+
+    parameter ROB_DEPTH = 16;
+    parameter ROB_PTR_WIDTH = $clog2(ROB_DEPTH);
 endpackage

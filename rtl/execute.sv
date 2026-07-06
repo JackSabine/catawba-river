@@ -161,6 +161,9 @@ module execute import catawba_params::*; #(
             wb_if.instruction_kind <= de_if.instruction_kind;
 
             wb_if.pc <= de_if.pc;
+
+            wb_if.exception <= de_if.exception;
+            wb_if.rob_index <= de_if.rob_index;
         end
     end
 endmodule
