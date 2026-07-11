@@ -70,6 +70,13 @@ package catawba_params;
         RC = 2'b11
     } system_csr_op_e;
 
+    typedef enum logic [31:0] {
+        EXC_NONE                = 32'd63
+       ,EXC_ILLEGAL_INSTRUCTION = 32'd2
+       ,EXC_EBREAK              = 32'd3
+       ,EXC_ECALL_M_MODE        = 32'd11
+    } exception_code_e;
+
     parameter XLEN = 32;
 
     parameter RESET_PC = 32'h8000_0000; // Must agree with bootloader section dv/gcc/link.ld

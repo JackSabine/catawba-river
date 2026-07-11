@@ -51,6 +51,7 @@ execute ex (
 
 writeback wb (
     .clk(clk),
+    .rst_if(rst_if),
     .ex_if(ex_wb_if),
     .rob_if(wb_rob_if)
 );

@@ -66,14 +66,6 @@ module execute import catawba_params::*; #(
         .result(branch_alu_result)
     );
 
-    assign take_trap   = de_if.valid & propagate_upstream_data & `IS_TRAP_INSN(de_if.instruction);
-    assign trap_mcause = `IS_EBREAK_INSN(de_if.instruction) ? 32'd3 : 32'd11;
-    // EBREAK: mtval = faulting PC (spec §3.1.17); ECALL: mtval = 0
-    assign trap_mtval  = `IS_EBREAK_INSN(de_if.instruction) ? de_if.pc : '0;
-
-    // do_mret fires for exactly one cycle: when a valid mret commits from execute
-    assign do_mret = de_if.valid & propagate_upstream_data & `IS_MRET_INSN(de_if.instruction);
-
     csr_wrapper #(
         .XLEN(XLEN)
     ) csr_wrapper (
@@ -153,6 +145,14 @@ module execute import catawba_params::*; #(
     assign fe_if.do_mret        = do_mret;
     assign fe_if.mret_target_pc = csr_mepc;
 
+    // do_mret fires for exactly one cycle: when a valid mret commits from execute
+    assign do_mret = de_if.valid & propagate_upstream_data & `IS_MRET_INSN(de_if.instruction);
+
+    `EXCEPTION_BEGIN
+    `EXCEPTION_END
+
+    `EXCEPTION_FLOPS(wb_if, de_if)
+
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin
             wb_if.ex_result <= ex_result;
@@ -162,7 +162,6 @@ module execute import catawba_params::*; #(
 
             wb_if.pc <= de_if.pc;
 
-            wb_if.exception <= de_if.exception;
             wb_if.rob_index <= de_if.rob_index;
         end
     end

@@ -102,6 +102,11 @@ advance_control advance_ctrl (
     .request_upstream_stall()
 );
 
+`EXCEPTION_BEGIN
+`EXCEPTION_END
+
+`EXCEPTION_FLOPS_NO_UPSTREAM(de_if)
+
 always_ff @(posedge clk) begin
     if (rst_if.reset) begin
         pc <= RESET_PC;

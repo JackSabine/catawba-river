@@ -50,4 +50,41 @@
     end \
     assign csr_array[ADDRESS] = csr_``CSR_NAME;
 
+`define EXCEPTION_BEGIN \
+    logic post_exception; \
+    exception_code_e exception_code; \
+    always_comb begin : i_exception_logic \
+        post_exception = 1'b1; \
+        exception_code = EXC_NONE; \
+        if (1'b0) begin \
+        end
+
+`define EXCEPTION_CASE(condition, code) \
+        else if (condition) begin \
+            exception_code = code; \
+        end
+
+
+`define EXCEPTION_END \
+        else begin \
+            post_exception = 1'b0; \
+        end \
+    end : i_exception_logic
+
+`define EXCEPTION_FLOPS(downstream_if, upstream_if) \
+    always_ff @(posedge clk) begin \
+        if (propagate_upstream_data) begin \
+            downstream_if.exception_posted <= upstream_if.exception_posted | (upstream_if.valid & post_exception); \
+            downstream_if.exception_code   <= upstream_if.exception_posted ? upstream_if.exception_code : exception_code; \
+        end \
+    end
+
+`define EXCEPTION_FLOPS_NO_UPSTREAM(downstream_if) \
+    always_ff @(posedge clk) begin \
+        if (propagate_upstream_data) begin \
+            downstream_if.exception_posted <= post_exception; \
+            downstream_if.exception_code   <= exception_code; \
+        end \
+    end
+
 `endif

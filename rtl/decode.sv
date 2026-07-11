@@ -40,9 +40,10 @@ module decode import catawba_params::*; #(
         composed_immediate = {{12{fe_if.instruction[31]}}, fe_if.instruction[19:12], fe_if.instruction[20], fe_if.instruction[30:21], 1'b0};
     endfunction
 
-    function void invalid_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate);
+    function void invalid_inst(output instruction_kind_t instruction_kind, output logic [XLEN-1:0] composed_immediate, output logic exception_illegal_instruction);
         instruction_kind = INST_UNDEFINED;
         composed_immediate = 'x;
+        exception_illegal_instruction = 1'b1;
     endfunction
 
     logic [XLEN-1:0] rs1_word, rs2_word;
@@ -57,6 +58,8 @@ module decode import catawba_params::*; #(
     branch_alu_operation_e branch_alu_operation;
 
     instruction_kind_t instruction_kind;
+
+    logic exception_illegal_instruction;
 
     logic scoreboard_stall;
     logic local_stall_request;
@@ -140,6 +143,7 @@ module decode import catawba_params::*; #(
 
 
     always_comb begin
+        exception_illegal_instruction = 1'b0;
         unique casez (fe_if.instruction.opcode)
             7'b0110011: r_type_inst(instruction_kind, composed_immediate); // R-type
             7'b0010011: i_type_inst(instruction_kind, composed_immediate); // I-type ALU
@@ -151,7 +155,7 @@ module decode import catawba_params::*; #(
             7'b0010111: u_type_inst(instruction_kind, composed_immediate); // U-type auipc
             7'b1101111: j_type_inst(instruction_kind, composed_immediate); // J-type jal
             7'b1110011: i_type_inst(instruction_kind, composed_immediate); // I-type system (CSR, ecall, ebreak)
-            default:    invalid_inst(instruction_kind, composed_immediate);
+            default:    invalid_inst(instruction_kind, composed_immediate, exception_illegal_instruction);
         endcase
     end
 
@@ -168,6 +172,14 @@ module decode import catawba_params::*; #(
         .request_upstream_stall(fe_if.stall_upstream)
     );
 
+    `EXCEPTION_BEGIN
+        `EXCEPTION_CASE( exception_illegal_instruction,      EXC_ILLEGAL_INSTRUCTION )
+        `EXCEPTION_CASE( `IS_ECALL_INSN(fe_if.instruction),  EXC_ECALL_M_MODE        )
+        `EXCEPTION_CASE( `IS_EBREAK_INSN(fe_if.instruction), EXC_EBREAK              )
+    `EXCEPTION_END
+
+    `EXCEPTION_FLOPS(ex_if, fe_if)
+
     always_ff @(posedge clk) begin
         if (propagate_upstream_data) begin
             ex_if.rs1_word <= rs1_word;
@@ -180,7 +192,6 @@ module decode import catawba_params::*; #(
             ex_if.branch_alu_operation <= branch_alu_operation;
             ex_if.operand_a <= operand_a;
             ex_if.operand_b <= operand_b;
-            ex_if.exception <= fe_if.exception;
             ex_if.rob_index <= rob_if.rob_index;
         end
     end
